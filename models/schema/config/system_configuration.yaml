@@ -1,0 +1,219 @@
+components:
+  schemas:
+    System.Configuration:
+      type: object
+      x-astra-sim-type: schema
+      description: Defines ASTRA-sim core system configuration parameters used to control simulation behavior. This includes scheduling policies, collective communication algorithms, key performance metrics, and advanced features like roofline modeling and execution tracing. Users can specify these settings directly via a structured schema for precise and flexible simulation setup.
+      properties:
+        scheduling_policy:
+          type: string
+          enum:
+            - LIFO
+            - FIFO
+            - EXPLICIT
+          default: LIFO
+          description: The order we proritize collectives according based on their time of arrival. LIFO means that most recently created collectives have higher priority. While FIFO is the reverse.
+          x-field-uid: 1
+          x-astra-sim-name: scheduling-policy
+        all_reduce_implementation:
+          type: array
+          items:
+            type: string
+            enum:
+              - ring
+              - oneRing
+              - doubleBinaryTree
+              - direct
+              - oneDirect
+          minItems: 1
+          maxItems: 3
+          default: [ring]
+          description: |-
+            (Dimension0Collective_Dimension1Collective_xxx_DimensionNCollective)
+            Here we can create a multiphase colective all-reduce algorithm and directly specify the collective algorithm type for each logical dimension. The available options (algorithms) are: ring, direct, doubleBinaryTree, oneRing, oneDirect.
+            For example, “ring_doubleBinaryTree” means we create a logical topology with 2 dimensions and we perform ring algorithm on the first dimension followed by double binary tree on the second dimension for the all-reduce pattern. Hence the number of physical dimension should be equal to the number of logical dimensions. The only exceptions are oneRing/oneDirect where we assume no matter how many physical dimensions we have, we create a one big logical ring/direct(AllToAll) topology where all NPUs are connected and perfrom a one phase ring/direct algorithm.
+          x-field-uid: 2
+          x-astra-sim-name: all-reduce-implementation
+        reduce_scatter_implementation:
+          type: array
+          items:
+            type: string
+            enum:
+              - ring
+              - oneRing
+              - direct
+              - oneDirect
+          minItems: 1
+          maxItems: 3
+          default: [ring]
+          description: |-
+            (Dimension0CollectiveAlg_Dimension1CollectiveAlg_xxx_DimensionNCollectiveAlg)
+            The same as all-reduce-implementation - but for reduce-scatter collective. The available options are: ring, direct, oneRing, oneDirect.
+          x-field-uid: 3
+          x-astra-sim-name: reduce-scatter-implementation
+        all_gather_implementation:
+          type: array
+          items:
+            type: string
+            enum:
+              - ring
+              - oneRing
+              - direct
+              - oneDirect
+          minItems: 1
+          maxItems: 3
+          default: [ring]
+          description: |-
+            (Dimension0CollectiveAlg_Dimension1CollectiveAlg_xxx_DimensionNCollectiveAlg)
+            The same as all-reduce-implementation - but for all-gather collective. The available options (algorithms) are: ring, direct, oneRing, oneDirect.
+          x-field-uid: 4
+          x-astra-sim-name: all-gather-implementation
+        all_to_all_implementation:
+          type: array
+          items:
+            type: string
+            enum:
+              - ring
+              - oneRing
+              - direct
+              - oneDirect
+          minItems: 1
+          maxItems: 3
+          default: [ring]
+          description: |-
+            (Dimension0CollectiveAlg_Dimension1CollectiveAlg_xxx_DimensionNCollectiveAlg)
+            The same as all-reduce-implementation - but for all-to-all collective. The available options (algorithms) are: ring, direct, oneRing, oneDirect.
+          x-field-uid: 5
+          x-astra-sim-name: all-to-all-implementation
+        all_to_all_implementation_custom:
+          type: array
+          items:
+            type: string
+          description: |-
+            This parameter specifies a Chakra Execution Trace (ET) file path for implementing AllToAll collective operations, requiring exactly one ET file that covers all dimensions in multi-dimensional collectives.
+          x-field-uid: 6
+          x-astra-sim-name: all-to-all-implementation-custom
+        all_gather_implementation_custom:
+          type: array
+          items:
+            type: string
+          description: |-
+            This parameter defines a Chakra ET file path for AllGather collective operations, following the same single-file requirement for multi-dimensional scenarios.
+          x-field-uid: 7
+          x-astra-sim-name: all-gather-implementation-custom
+        all_reduce_implementation_custom:
+          type: array
+          items:
+            type: string
+          description: |-
+            This parameter specifies a Chakra ET file for AllReduce operations, also requiring exactly one ET file to cover all dimensions in the collective implementation.
+          x-field-uid: 8
+          x-astra-sim-name: all-reduce-implementation-custom
+        collective_optimization:
+          type: string
+          enum:
+            - baseline
+            - localBWAware
+          description: |-
+            baseline issues allreduce across all dimensions to handle allreduce of single chunk. While for an N-dimensional network, localBWAware issues a series of reduce-scatters on all dimensions from dim1 to dimN-1, followed by all-reduce on dimN, and then series of all-gathers starting from dimN-1 to dim1. This optimization is used to reduce the chunk size as it goes to the next network dimensions.
+          default: localBWAware
+          x-field-uid: 9
+          x-astra-sim-name: collective-optimization
+        local_reduction_delay:
+          type: integer
+          description: The local_reduction_delay parameter specifies the delay for local reduction operations during collective communications, with a default value of 1.
+          default: 0
+          x-field-uid: 10
+          x-astra-sim-name: local-reduction-delay
+        active_chunks_per_dimension:
+          type: integer
+          description: This corresponds to the Maximum number of chunks we like execute in parallel on each logical dimesnion of topology.
+          default: 1
+          x-field-uid: 11
+          x-astra-sim-name: active-chunks-per-dimension
+        latency:
+          type: number
+          format: float
+          description: Translates to L - Latency parameter for memory operations.
+          x-field-uid: 12
+          x-astra-sim-name: L
+        overhead:
+          type: number
+          format: float
+          description: Translates to o - Overhead parameter for memory transactions.
+          x-field-uid: 13
+          x-astra-sim-name: o
+        gap:
+          type: number
+          format: float
+          description: Translates to g - Gap parameter between memory operations.
+          x-field-uid: 14
+          x-astra-sim-name: g
+        global_memory:
+          type: number
+          format: float
+          description: Translates to G - Global memory parameter or bandwidth-related setting.
+          x-field-uid: 15
+          x-astra-sim-name: G
+        endpoint_delay:
+          type: integer
+          description: The time NPU spends processing a message after receiving it in terms of cycles.
+          x-field-uid: 16
+          default: 0
+          x-astra-sim-name: endpoint-delay
+        model_shared_bus:
+          type: integer
+          description: The local_reduction_delay parameter specifies the delay for local reduction operations during collective communications, with a default value of 1.
+          x-field-uid: 17
+          x-astra-sim-name: model-shared-bus
+        preferred_dataset_splits:
+          type: integer
+          description: The preferred_dataset_splits parameter controls how datasets are divided for collective operations, with a default value of 0.
+          default: 1
+          minimum: 0
+          x-field-uid: 18
+          x-astra-sim-name: preferred-dataset-splits
+        peak_perf:
+          type: number
+          format: double
+          description: The peak_perf parameter specifies the peak computational performance in TFLOPS, with a default value of 0.
+          minimum: 0
+          x-field-uid: 19
+          x-astra-sim-name: peak-perf
+        local_mem_bw:
+          type: number
+          format: double
+          description: The local_mem_bw parameter defines the local memory bandwidth in GB/sec, with a default value of 0.
+          minimum: 0
+          default: 50
+          x-field-uid: 20
+          x-astra-sim-name: local-mem-bw
+        roofline_enabled:
+          type: integer
+          description: The roofline_enabled parameter is a boolean flag that enables roofline performance modeling, defaulting to false. When enabled, it creates a Roofline instance using the specified local_mem_bw and peak_perf parameters for realistic performance modeling.
+          minimum: 0
+          x-field-uid: 21
+          x-astra-sim-name: roofline-enabled
+        trace_enabled:
+          type: integer
+          description: The trace_enabled parameter controls whether execution tracing is enabled during simulation, defaulting to false. When enabled, it activates detailed logging throughout the workload execution for debugging and analysis purposes.
+          minimum: 0
+          default: 0
+          x-field-uid: 22
+          x-astra-sim-name: trace-enabled
+        replay_only:
+          type: integer
+          description: The replay_only parameter is a boolean flag that skips actual simulation and uses current duration values, defaulting to false. When enabled, it bypasses normal simulation execution and directly processes workload nodes without timing simulation.
+          minimum: 0
+          x-field-uid: 23
+          x-astra-sim-name: replay-only
+        track_local_mem:
+          type: integer
+          minimum: 0
+          x-field-uid: 24
+          x-astra-sim-name: track-local-mem
+        local_mem_trace_filename:
+          type: string
+          x-field-uid: 25
+          x-astra-sim-name: local-mem-trace-filename
+

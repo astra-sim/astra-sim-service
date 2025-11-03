@@ -1,0 +1,73 @@
+components:
+  schemas:
+    Analytical.Configuration:
+      type: object
+      description: This allows user to define the analytical configuration by allowing them to select between a schema or infragraph which will be translated to schema by the server.
+      properties:
+        topology:
+          $ref:  "#/components/schemas/Analytical.Topology"
+          x-field-uid: 1
+    Analytical.Topology:
+      type: object
+      description: |-
+        Provides a choice between infragraph and analytical network configuration. If analytical is selected, a schema is provided to specify analytical network values. If infragraph is selected, the user can reference the infragraph schema from the global configuration, which the server will convert into an analytical schema.
+      properties:
+        choice:
+          description: |-
+            Specifies the choice between analytical network config or infragraph.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            network:
+              x-field-uid: 1
+            infragraph:
+              x-field-uid: 2
+        network:
+          type: array
+          description: An array of Analytical.Topology.Network which holds the topology, npus_count, bandwidth and latency. The minimum length of array is 1 and maximum is 3.
+          items:
+            $ref:  "#/components/schemas/Analytical.Topology.Network"
+          minimum: 1
+          maximum: 3
+          x-field-uid: 2
+    Analytical.Topology.Network:
+      type: object
+      x-astra-sim-type: schema
+      properties:
+        topology:
+          type: string
+          description: >
+            List of topology types for each dimension (in order).
+          x-enum:
+            ring:
+              x-field-uid: 1
+              x-astra-sim-name: Ring
+            fullyconnected:
+              x-field-uid: 2
+              x-astra-sim-name: FullyConnected
+            switch:
+              x-field-uid: 3
+              x-astra-sim-name: Switch
+          x-field-uid: 1
+        npus_count:
+          type: integer
+          description: >
+            Number of NPUs (neuronal processing units) along each topology dimension.
+          x-field-uid: 2
+        bandwidth:
+          type: number
+          format: float
+          description: >
+            Bandwidth per dimension in GB/s.
+          x-field-uid: 3
+        latency:
+          type: number
+          format: float
+          description: >
+            Latency per dimension in nanoseconds (ns).
+          x-field-uid: 4
+      required:
+        - topology
+        - npus_count
+        - bandwidth
+        - latency

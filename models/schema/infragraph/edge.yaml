@@ -1,0 +1,120 @@
+components:
+  schemas:
+    Edge.Common:
+      type: object
+      required:
+        - scheme
+      properties:
+        scheme:
+          description: |-
+            The scheme that will be used to create edges between the endpoints ep1 and ep2.
+          type: string
+          x-enum:
+            one2one:
+              x-field-uid: 1
+            many2many:
+              x-field-uid: 2
+            ring:
+              x-field-uid: 3
+    Device.Endpoint:
+      type: object
+      required:
+        - component
+      properties:
+        device:
+          description: |-
+            An optional name of a device that contains the component.
+            If the property is empty the name of the device is the parent of the edge object.
+            An endpoint will be generated for every device based on the count.
+          type: string
+          x-field-uid: 1
+        component:
+          description: |-
+            The name of a component that exists in the containing device
+            and the indexes of the component.
+
+            The indexes MUST be specified using python slice notation.
+              - example: cx5[0:2]
+          type: string
+          x-field-uid: 2
+    Infrastructure.Endpoint:
+      type: object
+      required:
+        - instance
+        - component
+      properties:
+        instance:
+          description: |-
+            A name that matches the Instance.name property of an instance object that MUST exist in the infrastructure instances array.
+
+            The instance object yields:
+              - a device name that contains the component and MUST exist in the infrastructure devices
+              - a count that is the maximum to be used in the slice notation
+
+            The indexes MUST be specified using python slice notation.
+              - example: host[0:2]
+          type: string
+          x-field-uid: 1
+        component:
+          description: |-
+            The name of a component that MUST exist in the Instance.device specified by the instance object in the Infrastructure.instances array.
+
+            The indexes MUST be specified using python slice notation.
+              - example: npu[0:2]
+          type: string
+          x-field-uid: 2
+    Infrastructure.Edge:
+      type: object
+      required:
+        - ep1
+        - ep2
+        - link
+      properties:
+        ep1:
+          description: |-
+            A device and component that is one endpoint of the edge
+          $ref: "#/components/schemas/Infrastructure.Endpoint"
+          x-field-uid: 1
+        ep2:
+          description: |-
+            A device and component that is the other endpoint of the edge
+          required:
+            - device
+            - component
+          $ref: "#/components/schemas/Infrastructure.Endpoint"
+          x-field-uid: 2
+        scheme:
+          x-include: "#/components/schemas/Edge.Common/properties/scheme"
+          x-field-uid: 3
+        link:
+          description: |-
+            The name of a link that defines additional characteristics of the edge.
+            The name MUST exist in the links array of the infrastructure.
+          type: string
+          x-field-uid: 4
+    Device.Edge:
+      type: object
+      required:
+        - ep1
+        - ep2
+        - link
+      properties:
+        ep1:
+          description: |-
+            An optional device and component that is the other endpoint of the edge
+          $ref: "#/components/schemas/Device.Endpoint"
+          x-field-uid: 1
+        ep2:
+          description: |-
+            An optional device and component that is the other endpoint of the edge
+          $ref: "#/components/schemas/Device.Endpoint"
+          x-field-uid: 2
+        scheme:
+          x-include: "#/components/schemas/Edge.Common/properties/scheme"
+          x-field-uid: 3
+        link:
+          description: |-
+            The name of a link that defines additional characteristics of the edge.
+            The name MUST exist in the links array of the containing device.
+          type: string
+          x-field-uid: 4

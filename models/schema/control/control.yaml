@@ -1,0 +1,58 @@
+components:
+  schemas:
+    Control:
+      type: object
+      description: Represents control operations for managing a network backend, including actions to start or stop the backend and retrieve its current status.
+      properties:
+        choice:
+          description: |-
+            Represents a control interface that allows users to choose between starting or stopping ASTRA-sim simulation. Only one action — start or stop— can be performed at a time. Users must specify either the configuration to start a backend or the command to stop it, ensuring that these actions are mutually exclusive within a single operation.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            start:
+              x-field-uid: 1
+            stop:
+              x-field-uid: 2
+        start:
+          description: Defines the configuration and action required to set the control to a specific network backend.
+          $ref: '#/components/schemas/Control.Start'
+          x-field-uid: 2
+    Control.Start:
+      type: object
+      description: Specifies the operation to set control to a specific network backend, allowing the user to initiate an action on the selected backend.
+      required: [backend]
+      properties:
+        backend:
+          type: string
+          description: The name of the backend to control. This string must match one of the allowed backend names (as defined in the enumerated list), specifying which backend to activate or interact with.
+          x-enum:
+            analytical_congestion_aware:
+              x-field-uid: 1
+            analytical_congestion_unaware:
+              x-field-uid: 2
+            ns3:
+              x-field-uid: 3
+            htsim:
+              x-field-uid: 4
+            custom:
+              x-field-uid: 100
+          x-field-uid: 1
+    Control.Status:
+      type: object
+      description: Provides the status of the network backend or simulation, reflecting its current lifecycle state.
+      properties:
+        status:
+          type: string
+          x-enum:
+            running:
+              x-field-uid: 1
+            completed:
+              x-field-uid: 2
+            failed:
+              x-field-uid: 3
+            terminated:
+              x-field-uid: 4
+            inactive:
+              x-field-uid: 5
+          x-field-uid: 1

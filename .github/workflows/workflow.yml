@@ -1,0 +1,142 @@
+name: CI/CD
+
+# Trigger every time a push occurs
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Install dependencies and tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+          python3.11 \
+          python3-pip \
+          python3.11-dev \
+          coreutils \
+          wget \
+          vim \
+          git \
+          gcc-11 \
+          g++-11 \
+          make \
+          cmake \
+          clang-format \
+          libboost-dev \
+          libboost-program-options-dev \
+          libprotobuf-dev \
+          protobuf-compiler \
+          openmpi-bin \
+          openmpi-common \
+          openmpi-doc \
+          libopenmpi-dev \
+          graphviz \
+          apt-transport-https \
+          ca-certificates \
+          gnupg \
+          lsb-release \
+          curl \
+          dos2unix \
+          protobuf-compiler \
+          ant
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends ant vim ssh curl graphviz python3.11 python3-pip
+
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash -
+          sudo apt-get install -y nodejs
+          sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
+
+          sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+          python3 -m pip config set global.break-system-packages true
+          sudo npm install -g @redocly/cli
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install prerequisites
+        run: make install-prerequisites
+
+      - name: Make build script executable
+        run: |
+         chmod +x make_version.sh
+
+      - name: |-
+          Creates a clean environment
+          Generates openapiart artifacts - astra-sim sdk
+          Builds the sdk
+          Installs the sdk
+          Builds docs site using src and generated yaml
+          Runs notebook tests
+          Builds the service
+          Runs the tests
+        run: |
+          make build-all
+
+      - name: Generate doc from openapi.yaml
+        uses: seeebiii/redoc-cli-github-action@v10
+        with:
+          args: 'bundle models/artifacts/openapi.yaml -o models/artifacts/openapi.html'
+
+      # - name: Generate service docker image
+      #   run: |
+      #     make build-service-docker
+
+      - name: Get version
+        id: get_version
+        run: |
+          echo "::set-output name=version::v$(cat .VERSION)"
+
+      - name: Check tag for current version
+        uses: mukunku/tag-exists-action@v1.0.0
+        id: check_tag
+        with:
+          tag: ${{ steps.get_version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            models/artifacts/openapi.yaml
+            models/artifacts/openapi.json
+            models/artifacts/astra.proto
+            models/artifacts/openapi.html
+            models/dist/*.*
+            service/dist/*.*
+      # service/astra_sim_service*.tar
+
+      - name: Create release and publish artifacts
+        if: github.ref == 'refs/heads/main' && steps.check_tag.outputs.exists == 'false'
+        uses: ncipollo/release-action@v1
+        with:
+          name: "Release ${{ steps.get_version.outputs.version }}"
+          body: |-
+            The OpenAPI schema for this release (openapi.yaml) is included as part of the assets and can be viewed by loading the included openapi.html document in a browser.
+          artifacts: |
+            models/artifacts/openapi.yaml
+            models/artifacts/openapi.json
+            models/artifacts/astra.proto
+            models/artifacts/openapi.html
+            models/dist/*.*
+            service/dist/*.*
+      # service/astra_sim_service*.tar
+          tag: ${{ steps.get_version.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}

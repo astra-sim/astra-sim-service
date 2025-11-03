@@ -1,0 +1,23 @@
+[build-system]
+requires = [ "setuptools>=77", "wheel",]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "astra_server"
+version = "1.0.0"
+description = "Astra Sim Server Package"
+requires-python = ">=3.10"
+dependencies = [ "pytest", "pytest-cov", "pytest-asyncio", "pylint", "requests", "psutil", "black", "toml", "astra_sim_sdk===1.0.0",]
+[[project.authors]]
+name = "Keysight"
+email = "harsh.sikhwal@keysight.com"
+
+[project.scripts]
+run_astra_sim_server = "astra_server.__main__:main"
+
+[tool.setuptools]
+packages = [ "astra_server", "astra_server.infrastructure",]
+
+[tool.setuptools.package-dir]
+astra_server = "astra_server"
+"astra_server.infrastructure" = "astra_server/infrastructure"

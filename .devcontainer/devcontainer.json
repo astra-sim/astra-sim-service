@@ -1,0 +1,73 @@
+// For format details, see https://aka.ms/devcontainer.json.
+// For config options, see https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+    "name": "astra_sim_service",
+    "build": {
+        "context": "..",
+        "dockerfile": "../Dockerfile.devenv"
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/astra_sim_service,type=bind",
+    "workspaceFolder": "/workspaces/astra_sim_service",
+    "containerEnv": {
+        "PYTHONPATH": "${containerWorkspaceFolder}/models,${containerWorkspaceFolder}/notebook,${containerWorkspaceFolder}/service,${containerWorkspaceFolder}/service/astra_server,${containerWorkspaceFolder}/client-scripts/utils",
+        "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "5"
+    },
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "remoteUser": "root",
+    "postCreateCommand": "make install-prerequisites",
+    "features": {
+        "docker-from-docker": "latest"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "editor.rulers": [
+                    110
+                ],
+                "files.eol": "\n",
+                "files.trimTrailingWhitespace": true,
+                "files.exclude": {
+                    "**/*.pyc": true
+                },
+                "[python]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "ms-python.black-formatter"
+                },
+                "black-formatter.args": [
+                    "--line-length=110"
+                ],
+                "python.languageServer": "Pylance",
+                "python.defaultInterpreterPath": "/usr/bin/python3",
+                "python.analysis.extraPaths": [
+                    "/home/vscode/.local/lib/python3.10/site-packages",
+                    "/usr/local/lib/python3.10/site-packages",
+                    "${workspaceFolder}/astra_sim_service"
+                ],
+                "pylint.importStrategy": "fromEnvironment",
+                "pylint.args": [
+                    "--rcfile=${workspaceFolder}/.pylintrc"
+                ],
+                "python.analysis.diagnosticSeverityOverrides": {
+                    "reportMissingImports": "none"
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-python.debugpy",
+                "ms-python.pylint",
+                "ms-toolsai.jupyter",
+                "ms-vscode.makefile-tools",
+                "ms-azuretools.vscode-docker",
+                "xaver.clang-format",
+                "eamodio.gitlens",
+                "redocly.openapi-vs-code",
+                "zxh404.vscode-proto3"
+            ]
+        }
+    }
+}

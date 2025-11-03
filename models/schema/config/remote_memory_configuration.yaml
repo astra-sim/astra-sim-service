@@ -1,0 +1,51 @@
+components:
+  schemas:
+    RemoteMemory:
+      type: object
+      x-astra-sim-type: schema
+      description: Defines the remote memory configuration parameters for ASTRA-sim, enabling direct specification of memory subsystem settings via a structured schema. This includes memory access patterns, latency, and bandwidth characteristics that influence how tensor loads, stores, and other memory operations are simulated. Users can utilize this schema to create detailed remote memory configurations for accurate and flexible workload modeling.
+      properties:
+        memory_type:
+          type: string
+          enum:
+            - NO_MEMORY_EXPANSION
+            - PER_NODE_MEMORY_EXPANSION
+            - PER_NPU_MEMORY_EXPANSION
+            - MEMORY_POOL
+          default: NO_MEMORY_EXPANSION
+          description: the memory type.
+          x-field-uid: 1
+          x-astra-sim-name: memory-type
+        remote_mem_latency:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 0
+          description: remote memory latency (ns).
+          x-field-uid: 2
+          x-astra-sim-name: remote-mem-latency
+        remote_mem_bw:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 0
+          description: remote memory bandwidth (GB/s or B/ns).
+          x-field-uid: 3
+          x-astra-sim-name: remote-mem-bw
+        num_nodes:
+          type: integer
+          format: int32
+          minimum: 0
+          description: number of nodes (only valid with “PER_NODE_MEMORY_EXPANSION”).
+          x-field-uid: 4
+          x-astra-sim-name: num-nodes
+        num_npus_per_node:
+          type: integer
+          format: int32
+          minimum: 0
+          description: number of NPUs per node (only valid with “PER_NODE_MEMORY_EXPANSION”).
+          x-field-uid: 5
+          x-astra-sim-name: num-npus-per-node
+
+
+

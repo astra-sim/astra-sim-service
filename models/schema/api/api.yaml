@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: ASTRA-sim APIs
+  version: 1.0.0
+  description: The ASTRA-sim API provides a standardized interface for submitting configurations, executing jobs, checking job status, and retrieving results.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+security: []
+servers:
+  - url: /
+paths:
+  /upload_config:
+    post:
+      tags:
+      - Configuration
+      operationId: upload_config
+      summary: |-
+        Uploads workload execution traces in a .zip file. The set_config endpoint must be called to validate the uploaded workloads and to configure additional parameters defined in the config schema, which is a part of the set_config request.
+      x-stream: client
+      requestBody:
+        required: true
+        description: The uploaded file is a ZIP archive that contains execution traces packaged together in ZIP format.
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+            x-field-uid: 1
+      responses:
+        '200':
+          $ref: '../result/request.yaml#/components/responses/Success'
+          x-field-uid: 1
+        default:
+          $ref: '../result/request.yaml#/components/responses/Failure'
+          x-field-uid: 2
+  /set_config:
+    post:
+      tags:
+        - Configuration
+      operationId: set_config
+      x-stream: client
+      summary: |-
+        The set_config API accepts a configuration payload containing schemas for various settings, allowing users to create configuration using schema definitions. It validates the uploaded workloads from the upload_config API, then generates files from the configurations. This process effectively applies and activates the configuration on the server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../config/config.yaml#/components/schemas/Config'
+      responses:
+        '200':
+          $ref: '../result/request.yaml#/components/responses/Success'
+          x-field-uid: 1
+        default:
+          $ref: '../result/request.yaml#/components/responses/Failure'
+          x-field-uid: 2
+  /get_config:
+    post:
+      tags:
+      - Configuration
+      operationId: get_config
+      summary: |-
+        Downloads the current active configuration as a packaged ZIP archive containing all the workloads and generated configuration files.
+      x-stream: server
+      responses:
+        '200':
+          description: Downloads the currently active configuration files from the server in .zip format.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          x-field-uid: 1
+        default:
+          $ref: '../result/request.yaml#/components/responses/Failure'
+          x-field-uid: 2
+  /get_status:
+    post:
+      tags:
+        - Control
+      summary: Retrieves the simulation status, which can be failed, completed, running, terminated, or inactive.
+      operationId: get_status
+      responses:
+        '200':
+          description: Simulation status [failed, completed, running, inactive, terminated].
+          content:
+            application/json:
+              schema:
+                $ref: '../control/control.yaml#/components/schemas/Control.Status'
+          x-field-uid: 1
+        default:
+          $ref: '../result/request.yaml#/components/responses/Failure'
+          x-field-uid: 2
+  /set_control_action:
+    post:
+      tags:
+      - Control
+      operationId: set_control_action
+      summary: |-
+        Sets the simulation state to either start or stop.
+      requestBody:
+        required: true
+        content:
+           application/json:
+            schema:
+              $ref: "../control/control.yaml#/components/schemas/Control"
+      responses:
+        '200':
+          $ref: '../result/request.yaml#/components/responses/Success'
+          x-field-uid: 1
+        default:
+          $ref: '../result/request.yaml#/components/responses/Failure'
+          x-field-uid: 2
+  /result:
+    post:
+      tags:
+        - Result
+      summary: List result files for a completed simulation job
+      operationId: get_result
+      x-stream: server
+      requestBody:
+        required: true
+        description: In the result API payload, the user can choose to provide either a filename or a metadata. When a metadata is provided, the server returns metadata about the generated result files. If a filename is specified, the corresponding file will be downloaded. Filenames can be obtained from the metadata returned by the server when using the metadata option.
+        content:
+          application/json:
+            schema:
+              $ref: '../result/result.yaml#/components/schemas/Result'
+      responses:
+        '200':
+          description: List of simulation result files.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          x-field-uid: 1
+        default:
+          $ref: '../result/request.yaml#/components/responses/Failure'
+          x-field-uid: 2

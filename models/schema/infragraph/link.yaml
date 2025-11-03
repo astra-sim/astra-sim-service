@@ -1,0 +1,94 @@
+components:
+  schemas:
+    Link.Physical.Bandwidth:
+      description: |-
+        A container for specific Link physical Properties.
+      type: object
+      properties:
+        choice:
+          type: string
+          x-field-uid: 1
+          x-enum:
+            gigabits_per_second:
+              x-field-uid: 1
+            gigabytes_per_second:
+              x-field-uid: 2
+            gigatransfers_per_second:
+              x-field-uid: 3
+        gigabits_per_second:
+          description: |-
+            Gigabits per second.
+          type: number
+          x-field-uid: 2
+        gigabytes_per_second:
+          description: |-
+            Gigabytes per second.
+          type: number
+          x-field-uid: 3
+        gigatransfers_per_second:
+          description: |-
+            Gigatrasfers per second.
+          type: number
+          x-field-uid: 4
+
+    Link.Physical.Latency:
+      description: |-
+        A container for specific Link latency properties.
+      type: object
+      properties:
+        choice:
+          type: string
+          x-field-uid: 1
+          x-enum:
+            ms:
+              x-field-uid: 1
+            us:
+              x-field-uid: 2
+            ns:
+              x-field-uid: 3
+        ms:
+          description: |-
+            Latency in milliseconds
+          type: number
+          x-field-uid: 2
+        us:
+          description: |-
+            Latency in microseconds.
+          type: number
+          x-field-uid: 3
+        ns:
+          description: |-
+            Latency in nanoseconds.
+          type: number
+          x-field-uid: 4
+
+    Link.Physical:
+      type: object
+      properties:
+        bandwidth:
+          $ref: "#/components/schemas/Link.Physical.Bandwidth"
+          x-field-uid: 1
+        latency:
+          $ref: "#/components/schemas/Link.Physical.Latency"
+          x-field-uid: 2
+
+    Link:
+      description: |-
+        A container for describing a link used between components.
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          x-include: ./common.yaml#/components/schemas/Named.Object/properties/name
+          x-field-uid: 1
+        description:
+          description: |-
+            A description of the type of link.
+          type: string
+          x-field-uid: 2
+        physical:
+          description: |-
+            A container for physical properties.
+          $ref: "#/components/schemas/Link.Physical"
+          x-field-uid: 3

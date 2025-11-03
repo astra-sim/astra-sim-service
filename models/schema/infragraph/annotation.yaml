@@ -1,0 +1,97 @@
+components:
+  schemas:
+    Annotations:
+      type: object
+      description: Container for link and device specifications annotations
+      properties:
+        link_specifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Link.Specifications"
+          x-field-uid: 1
+        device_specifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Device.Specifications"
+          x-field-uid: 2
+        rank_assignment:
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Rank.Assignment"
+          x-field-uid: 3
+    Annotation.Link.Specifications:
+      type: object
+      description: The link specifications including name, packet loss, and error rates
+      properties:
+        link_name:
+          type: string
+          description: The name of the device defined in infragraph
+          x-field-uid: 1
+        packet_loss_rate:
+          type: number
+          format: float
+          description: The packet loss rate on the link as a percentage
+          x-field-uid: 2
+        link_error_rate:
+          type: number
+          format: float
+          description: The link error rate indicating transmission errors
+          x-field-uid: 3
+    Annotation.Device.Specifications:
+      type: object
+      description: Specifications of a device including its name, type, latency, bandwidth, and queue details
+      properties:
+        device_name:
+          type: string
+          description: The name of the device defined in infragraph
+          x-field-uid: 1
+        device_type:
+          type: string
+          enum:
+            - host
+            - switch
+          description: The type of device - host or switch
+          x-field-uid: 2
+        device_latency_ms:
+          type: number
+          format: float
+          description: The latency of the device in milliseconds
+          x-field-uid: 3
+        device_bandwidth_gbps:
+          type: number
+          format: float
+          description: The bandwidth capacity of the device in Gbps
+          x-field-uid: 4
+        radix_up:
+          type: number
+          format: int32
+          description: Number of upward radix connections
+          x-field-uid: 5
+        radix_down:
+          type: number
+          format: int32
+          description: Number of downward radix connections
+          x-field-uid: 6
+        queue_up:
+          type: number
+          format: int32
+          description: Number of packets in the upward queue
+          x-field-uid: 7
+        queue_down:
+          type: number
+          format: int32
+          description: Number of packets in the downward queue
+          x-field-uid: 8
+    Annotation.Rank.Assignment:
+      type: object
+      description: Specifications of rank assignment with the rank identifier and the npu identifier as device_instance.index.npu_component.index
+      properties:
+        rank_identifier:
+          type: number
+          format: int32
+          description: The rank identifier of an NPU component
+          x-field-uid: 1
+        npu_identifier:
+          type: string
+          description: The npu identifier - given as device_instance.index.npu_component.index
+          x-field-uid: 2

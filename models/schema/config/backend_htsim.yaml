@@ -1,0 +1,221 @@
+components:
+  schemas:
+    HTSim.Configuration:
+      type: object
+      description: Allows the end user to configure the HTSim backend. Users can select the HTSim protocol (e.g., TCP, RoCE) along with its schema-specific options, and define the network topology. For topology, users can either provide an infragraph from the global configuration or choose a network configuration schema, which has analytical network config and predefined schemas for topologies such as fat-tree and others.
+      properties:
+        htsim_protocol:
+          $ref: "#/components/schemas/HTSim.Protocol"
+          description: The network protocol required to run simulation.
+          x-field-uid: 1
+        topology:
+          $ref: "#/components/schemas/HTSim.Topology.Options"
+          description: HTSim topology - a choice between infragraph and HTSim network and topology configuration.
+          x-field-uid: 2
+    HTSim.Topology.Options:
+      type: object
+      description: |-
+        Provides a choice between infragraph and HTSim network configuration with topology. If HTSim topology is selected, users can define analytical network configurations or choose HTSim-specific topologies such as fat-tree or dragonfly from the schema. If infragraph is selected, users can provide an infragraph from the global configuration, which the server will translate into an HTSim network configuration and topology.
+      properties:
+        choice:
+          description: |-
+            Specifies the choice between HTSim network configuration and infragraph.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            network_topology_configuration:
+              x-field-uid: 1
+            infragraph:
+              x-field-uid: 2
+        network_topology_configuration:
+          $ref:  "#/components/schemas/HTSim.Network.Configuration"
+          x-field-uid: 2
+    HTSim.Network.Configuration:
+      type: object
+      properties:
+        network:
+          type: array
+          items:
+            $ref:  "backend_analytical.yaml#/components/schemas/Analytical.Topology.Network"
+          minimum: 1
+          maximum: 3
+          x-field-uid: 1
+        htsim_topology:
+          $ref: '#/components/schemas/HTSim.Topology'
+          x-field-uid: 2
+          x-astra-sim-name: -topo
+          x-astra-sim-type: cmd
+    HTSim.Topology:
+      type: object
+      x-astra-sim-type: schema
+      description: The HTSim network simulator provides a rich collection of datacenter network topologies designed for evaluating transport protocols and congestion control algorithms.
+      properties:
+        choice:
+          description: |-
+            This setting allows users to select the topology definition. The users can choose from various predefined topologies such as fat tree, dragonfly, and others directly within the HTSim topology configuration.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            fat_tree:
+              x-field-uid: 1
+        fat_tree:
+          $ref: '#/components/schemas/HTSim.Topology.FatTree'
+          x-field-uid: 2
+    HTSim.Topology.FatTree:
+      properties:
+        nodes:
+          type: integer
+          format: int32
+          description: The total number of nodes in a topology.
+          x-field-uid: 1
+        tiers:
+          type: integer
+          format: int32
+          description: The total number of tiers in a topology.
+          minimum: 2
+          maximum: 3
+          x-field-uid: 2
+        podsize:
+          type: integer
+          format: int32
+          description: The total podsize in a topology.
+          x-field-uid: 3
+        tier_0:
+          $ref: '#/components/schemas/HTSim.Topology.FatTree.Tier'
+          x-field-uid: 4
+        tier_1:
+          $ref: '#/components/schemas/HTSim.Topology.FatTree.Tier'
+          x-field-uid: 5
+        tier_2:
+          $ref: '#/components/schemas/HTSim.Topology.FatTree.Tier2'
+          x-field-uid: 6
+    HTSim.Topology.FatTree.Tier2:
+      properties:
+        downlink_speed_gbps:
+          type: integer
+          format: int32
+          description: The downlink speed of the tier, measured in gigabits per second (Gbps).
+          x-field-uid: 2
+        radix_down:
+          type: integer
+          format: int32
+          description: The count of downlink ports available in the given tier.
+          x-field-uid: 4
+        queue_down:
+          type: integer
+          format: int32
+          description: The number of downlink queues assigned for this tier.
+          x-field-uid: 6
+        oversubscribed:
+          type: integer
+          format: int32
+          description: The oversubscription ratio configured for this tier.
+          x-field-uid: 7
+        bundle:
+          type: integer
+          format: int32
+          description: The count of port bundles configured for this tier.
+          x-field-uid: 8
+        switch_latency_ns:
+          type: integer
+          format: int32
+          description: The switch latency within the tier, measured in nanoseconds.
+          x-field-uid: 9
+        downlink_latency_ns:
+          type: integer
+          format: int32
+          description: The latency on the downlink ports of the tier, measured in nanoseconds.
+          x-field-uid: 10
+    HTSim.Topology.FatTree.Tier:
+      properties:
+        downlink_speed_gbps:
+          type: integer
+          format: int32
+          description: The downlink speed of the tier, measured in gigabits per second (Gbps).
+          x-field-uid: 2
+        radix_up:
+          type: integer
+          format: int32
+          description: The count of uplink ports available in the given tier.
+          x-field-uid: 3
+        radix_down:
+          type: integer
+          format: int32
+          description: The count of downlink ports available in the given tier.
+          x-field-uid: 4
+        queue_up:
+          type: integer
+          format: int32
+          description: The number of uplink queues assigned for this tier.
+          x-field-uid: 5
+        queue_down:
+          type: integer
+          format: int32
+          description: The number of downlink queues assigned for this tier.
+          x-field-uid: 6
+        oversubscribed:
+          type: integer
+          format: int32
+          description: The oversubscription ratio configured for this tier.
+          x-field-uid: 7
+        bundle:
+          type: integer
+          format: int32
+          description: The count of port bundles configured for this tier.
+          x-field-uid: 8
+        switch_latency_ns:
+          type: integer
+          format: int32
+          description: The switch latency within the tier, measured in nanoseconds.
+          x-field-uid: 9
+        downlink_latency_ns:
+          type: integer
+          format: int32
+          description: The latency on the downlink ports of the tier, measured in nanoseconds.
+          x-field-uid: 10
+    HTSim.Protocol:
+      type: object
+      properties:
+        choice:
+          description: |-
+            The type of protocol backend: tcp, roce, etc.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            tcp:
+              x-field-uid: 1
+        tcp:
+          $ref: '#/components/schemas/HTSim.Protocol.Tcp'
+          x-field-uid: 2
+    HTSim.Protocol.Tcp:
+      type: object
+      x-astra-sim-type: schema
+      description: Enables users to define a configurable TCP schema for HTSim, allowing selection of the specific TCP protocol variant (such as UNCOUPLED, EPSILON, and others) to be simulated. The schema also lets users specify the associated network topology file that dictates the structure and path layout for the simulation. This flexible configuration supports in-depth experimentation with different TCP behaviors and network topologies within HTSim.
+      properties:
+        o:
+          type: string
+          x-field-uid: 1
+          x-astra-sim-name: -o
+          x-astra-sim-type: cmd
+        sub:
+          type: string
+          x-field-uid: 2
+          x-astra-sim-name: -sub
+          x-astra-sim-type: cmd
+        nodes:
+          type: string
+          x-field-uid: 3
+          x-astra-sim-name: -nodes
+          x-astra-sim-type: cmd
+        tcp_protocol:
+          type: string
+          description: Specifies the TCP protocol variant to use in the simulation. Supported values include UNCOUPLED, COUPLED_INC, COUPLED_TCP, COUPLED_SCALABLE_TCP, and COUPLED_EPSILON, each representing a distinct congestion control or coupling approach within HTSim.
+          enum:
+            - UNCOUPLED
+            - COUPLED_INC
+            - COUPLED_TCP
+            - COUPLED_SCALABLE_TCP
+            - COUPLED_EPSILON
+          x-field-uid: 4
+          x-astra-sim-name: n/a
+          x-astra-sim-type: cmd

@@ -1,0 +1,18 @@
+{
+    "recommendations": [
+        "ms-python.debugpy",
+        "ms-python.pylint",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-vscode.makefile-tools",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "meezilla.json",
+        "humao.rest-client",
+        "ms-toolsai.jupyter",
+        "xaver.clang-format",
+        "ms-azuretools.vscode-containers",
+        "redocly.openapi-vs-code"
+    ]
+}

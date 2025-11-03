@@ -1,0 +1,75 @@
+components:
+  schemas:
+    SpdlogConfig:
+      type: object
+      description: Defines the overall logging configuration used to generate a TOML-based spdlog configuration file. It specifies log sinks (output targets) and loggers (named logging instances with levels and patterns).
+      properties:
+        sink:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sink'
+          description: List of log sinks, defining where log messages are written (e.g., files, console).
+          x-field-uid: 1
+        logger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Logger'
+          description: List of logger configurations, each mapping to one or more sinks and defining log levels and formats.
+          x-field-uid: 2
+    Sink:
+      type: object
+      required:
+        - name
+        - type
+      description: Defines a log sink, which represents an output destination (such as a file or console) for log messages.
+      properties:
+        name:
+          type: string
+          description: Unique identifier for the sink, used to reference it in logger definitions.
+          x-field-uid: 1
+        type:
+          type: string
+          description: Sink type (e.g., stdout_sink_mt for console, basic_file_sink_mt for file output).
+          x-field-uid: 2
+        filename:
+          type: string
+          description: File path where log messages will be written. Required when using file-based sinks.
+          x-field-uid: 3
+        truncate:
+          type: boolean
+          description: Determines whether existing files should be truncated on startup (`true`) or logs should be appended (`false`).
+          x-field-uid: 4
+        create_parent_dir:
+          type: boolean
+          description: Indicates whether parent directories should automatically be created if they do not exist.
+          x-field-uid: 5
+    Logger:
+      type: object
+      description: Defines a logger configuration, which specifies the sinks it writes to, its log level, and optional message formatting.
+      properties:
+        name:
+          type: string
+          description: Name of the logger, used to uniquely identify it.
+          x-field-uid: 1
+        sinks:
+          type: array
+          items:
+            type: string
+          description: List of sink names associated with this logger. Each log message is written to the defined sinks.
+          x-field-uid: 2
+        level:
+          type: string
+          enum:
+            - trace
+            - debug
+            - info
+            - warn
+            - error
+            - critical
+            # - off
+          description: Minimum severity level of messages the logger will output.
+          x-field-uid: 3
+        pattern:
+          type: string
+          description: Optional message format pattern for log output (overrides the default spdlog pattern if specified).
+          x-field-uid: 4

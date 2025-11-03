@@ -1,0 +1,511 @@
+components:
+  schemas:
+    NS3.Configuration:
+      type: object
+      description: The NS3 backend configuration enables users to define the NS3 backend settings using a schema-based approach. The primary configuration schemas include network (representing network settings), topology (encompassing nc_topology, logical topology, and trace information), and trace itself, allowing users to specify properties via schemas. The topology schema supports a choice between the infragraph and nc_topology schemas; when infragraph is selected, the server automatically converts the infragraph representation to the nc_topology format on the backend, streamlining the process for users.
+      properties:
+        network:
+          $ref: "#/components/schemas/NS3.Network"
+          description: The NS3 network configuration file.
+          x-field-uid: 1
+        topology:
+          $ref: "#/components/schemas/NS3.Topology"
+          description: A choice between infragraph and native nc_topology schema where the user can choose either of the one. On choosing infragraph, the infragraph gets converted to ns3 nc topology.
+          x-field-uid: 2
+        logical_topology:
+          $ref: "#/components/schemas/NS3.Logical.Topology"
+          description: The logical topology schema enables users to define the logical structure or dimensions of the ns3 topology, specifying how nodes and links are organized and interact within the simulated network environment.
+          x-field-uid: 3
+        trace:
+          $ref: "#/components/schemas/NS3.Trace"
+          description: A trace identifier schema enables users to specify the trace IDs of devices for which trace data should be generated, ensuring that only the desired device traces are collected during the simulation.
+          x-field-uid: 4
+    NS3.Topology:
+      type: object
+      description: |-
+        A choice between infragraph and ns3 nc topology, where the user can choose either infragraph or nc_topology. On choosing nc_topology, the user gets a schema which allows to fill in the nc_topology values, and on choosing infragraph, the user can create infragraph from the schema which will be translated to ns3 topology at the server.
+      properties:
+        choice:
+          description: |-
+            Specifies the choice between versions of infragraph.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            nc_topology:
+              x-field-uid: 1
+            infragraph:
+              x-field-uid: 2
+        nc_topology:
+          $ref: "#/components/schemas/NC.Topology"
+          x-field-uid: 2
+    NC.Topology:
+      type: object
+      description: NC Topology Schema
+      properties:
+        total_nodes:
+          type: integer
+          description: The total number of nodes - total gpus + switches.
+          x-field-uid: 1
+        total_switches:
+          type: integer
+          description: The total number of switches.
+          x-field-uid: 2
+        total_links:
+          type: integer
+          description: The total number of links.
+          x-field-uid: 3
+        switch_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          description: A list containing all unique switch identifiers.
+          x-field-uid: 4
+        connections:
+          type: array
+          items:
+            $ref: "#/components/schemas/NC.Topology.Connection"
+          description: Holds a collection of connection entries, representing multiple links between sources and destinations.
+          x-field-uid: 5
+    NC.Topology.Connection:
+      type: object
+      description: Represents a connection entry, including source index, destination index, bandwidth, error rate, and latency.
+      properties:
+        source_index:
+          type: integer
+          format: uint32
+          description: The index of the source node for this connection.
+          x-field-uid: 1
+        destination_index:
+          type: integer
+          format: uint32
+          description: The index of the destination node for this connection.
+          x-field-uid: 2
+        bandwidth:
+          type: string
+          description: The maximum data transfer capacity of the connection (e.g., in Gbps). Example - 100Gbps.
+          x-field-uid: 3
+        latency:
+          type: string
+          description: The communication delay associated with the connection, typically measured in milliseconds. Example - 0.0005ms.
+          x-field-uid: 4
+        error_rate:
+          type: string
+          description: The probability of packet errors occurring over the connection.
+          x-field-uid: 5
+    NS3.Trace:
+      type: object
+      description: The trace file includes the unique identifiers of devices specified in the nc_topology file and serves as an input to the network configuration. This enables NS3 to generate trace data specifically for the provided device identifiers.
+      properties:
+        trace_ids:
+          description: An array of all the device identifiers.
+          type: array
+          items:
+            type: integer
+            format: uint32
+          x-field-uid: 1
+    NS3.Logical.Topology:
+      type: object
+      description: The logical topology in the NS-3 backend is defined through the network configuration file, specifically using the "logical-dims" field. This field specifies the dimensions of the network topology as an array of strings, where each string represents the number of NPUs in that dimension.
+      properties:
+        logical_dimensions:
+          description: The NS-3 logical topology configuration file serves as a blueprint for defining the high-level arrangement of network elements in an NS3 simulation. Provided as a JSON file, it primarily features a "logical-dims" field, which specifies the network’s dimensional structure by listing the number of NPUs (processing units) in each dimension as an array of strings.
+          type: array
+          items:
+            type: integer
+            format: uint32
+          minItems: 1
+          maxItems: 3
+          x-astra-sim-name: logical-dims
+          x-field-uid: 1
+    NS3.Network:
+      type: object
+      x-astra-sim-type: schema
+      description: Defines the network topology and simulation parameters for NS3-based network simulations.
+      properties:
+        enable_qcn:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            0: disable, 1: enable.
+          x-field-uid: 1
+          x-astra-sim-name: ENABLE_QCN
+        use_dynamic_pfc_threshold:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            0: disable, 1: enable.
+          x-field-uid: 2
+          x-astra-sim-name: USE_DYNAMIC_PFC_THRESHOLD
+        packet_payload_size:
+          type: integer
+          format: uint32
+          default: 1024
+          description: >
+            packet size (bytes).
+          x-field-uid: 3
+          x-astra-sim-name: PACKET_PAYLOAD_SIZE
+        topology_file:
+          type: string
+          default: nc-topology.txt
+          description: >
+            input file: topoology.
+          x-field-uid: 4
+          x-astra-sim-name: TOPOLOGY_FILE
+        flow_file:
+          type: string
+          default: flow.txt
+          description: >
+            input file: flow to generate.
+          x-field-uid: 5
+          x-astra-sim-name: FLOW_FILE
+        trace_file:
+          type: string
+          default: trace.txt
+          description: >
+            input file: nodes to monitor packet-level events (enqu, dequ, pfc, etc.), will be dumped to TRACE_OUTPUT_FILE.
+          x-field-uid: 6
+          x-astra-sim-name: TRACE_FILE
+        trace_output_file:
+          type: string
+          default: trace_out.tr
+          description: >
+            output file: packet-level events (enqu, dequ, pfc, etc.).
+          x-field-uid: 7
+          x-astra-sim-name: TRACE_OUTPUT_FILE
+        fct_output_file:
+          type: string
+          default: fct.txt
+          description: >
+            output file: flow completion time of different flows.
+          x-field-uid: 8
+          x-astra-sim-name: FCT_OUTPUT_FILE
+        pfc_output_file:
+          type: string
+          default: pfc.txt
+          description: >
+            output file: result of PFC.
+          x-field-uid: 9
+          x-astra-sim-name: PFC_OUTPUT_FILE
+        simulator_stop_time:
+          type: number
+          format: float
+          default: 40000000000000.00
+          description: >
+            simulation stop time.
+          x-field-uid: 10
+          x-astra-sim-name: SIMULATOR_STOP_TIME
+        cc_mode:
+          type: integer
+          default: 12
+          description: >
+            Specifying different CC. 1: DCQCN, 3: HPCC, 7: TIMELY, 8: DCTCP, 10: HPCC-PINT.
+          x-field-uid: 11
+          x-astra-sim-name: CC_MODE
+        alpha_resume_interval:
+          type: integer
+          format: uint32
+          default: 1
+          description: >
+            for DCQCN: the interval of update alpha.
+          x-field-uid: 12
+          x-astra-sim-name: ALPHA_RESUME_INTERVAL
+        rate_decrease_interval:
+          type: integer
+          format: uint32
+          default: 4
+          description: >
+            for DCQCN: the interval of rate decrease.
+          x-field-uid: 13
+          x-astra-sim-name: RATE_DECREASE_INTERVAL
+        clamp_target_rate:
+          type: integer
+          format: uint32
+          default: 0
+          description: >
+            for DCQCN: whether to reduce target rate upon consecutive rate decrease.
+          x-field-uid: 14
+          x-astra-sim-name: CLAMP_TARGET_RATE
+        rp_timer:
+          type: integer
+          format: uint32
+          default: 900
+          description: >
+            for DCQCN: the interval of rate increase.
+          x-field-uid: 15
+          x-astra-sim-name: RP_TIMER
+        ewma_gain:
+          type: number
+          format: float
+          default: 0.00390625
+          description: >
+            for DCQCN and DCTCP: the gain of EWMA.
+          x-field-uid: 16
+          x-astra-sim-name: EWMA_GAIN
+        fast_recovery_times:
+          type: integer
+          format: uint32
+          default: 1
+          description: >
+            for DCQCN: number of times of increase for fast recovery.
+          x-field-uid: 17
+          x-astra-sim-name: FAST_RECOVERY_TIMES
+        rate_ai:
+          type: string
+          default: 50Mb/s
+          description: >
+            Additive increase (not for DCTCP).
+          x-field-uid: 18
+          x-astra-sim-name: RATE_AI
+        rate_hai:
+          type: string
+          default: 100Mb/s
+          description: >
+            Hyper additive increase.
+          x-field-uid: 19
+          x-astra-sim-name: RATE_HAI
+        min_rate:
+          type: string
+          default: 100Mb/s
+          description: >
+            Minimum rate.
+          x-field-uid: 20
+          x-astra-sim-name: MIN_RATE
+        dctcp_rate_ai:
+          type: string
+          default: 1000Mb/s
+          description: >
+            Additive increase for DCTCP.
+          x-field-uid: 21
+          x-astra-sim-name: DCTCP_RATE_AI
+        error_rate_per_link:
+          type: number
+          format: float
+          default: 0.0000
+          description: >
+            Error rate of each link.
+          x-field-uid: 22
+          x-astra-sim-name: ERROR_RATE_PER_LINK
+        l2_chunk_size:
+          type: integer
+          format: uint32
+          default: 4000
+          description: >
+            for DCQCN: chunk size.
+          x-field-uid: 23
+          x-astra-sim-name: L2_CHUNK_SIZE
+        l2_ack_interval:
+          type: integer
+          format: uint32
+          default: 1
+          description: >
+            number of packets between ACK generation, 1 means per packet.
+          x-field-uid: 24
+          x-astra-sim-name: L2_ACK_INTERVAL
+        l2_back_to_zero:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+          description: >
+            0: go-back-0, 1: go-back-N.
+          x-field-uid: 25
+          x-astra-sim-name: L2_BACK_TO_ZERO
+        has_win:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            0: no window, 1: has a window.
+          x-field-uid: 26
+          x-astra-sim-name: HAS_WIN
+        global_t:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+          description: >
+            0: different server pairs use their own RTT as T, 1: use the max base RTT as the global T.
+          x-field-uid: 27
+          x-astra-sim-name: GLOBAL_T
+        var_win:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            0: fixed size of window (alwasy maximum), 1: variable window.
+          x-field-uid: 28
+          x-astra-sim-name: VAR_WIN
+        fast_react:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            0: react once per RTT, 1: react per ACK.
+          x-field-uid: 29
+          x-astra-sim-name: FAST_REACT
+        u_target:
+          type: number
+          format: float
+          default: 0.95
+          description: >
+            for HPCC: eta in paper.
+          x-field-uid: 30
+          x-astra-sim-name: U_TARGET
+        mi_thresh:
+          type: integer
+          format: uint32
+          default: 0
+          description: >
+            for HPCC: eta in paper.
+          x-field-uid: 31
+          x-astra-sim-name: MI_THRESH
+        int_multi:
+          type: integer
+          format: uint32
+          default: 1
+          description: >
+            for HPCC: multiply the unit of txBytes and qLen in INT header.
+          x-field-uid: 32
+          x-astra-sim-name: INT_MULTI
+        multi_rate:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+          description: >
+            for HPCC: 0: one rate for all hops, 1: one rate per hop.
+          x-field-uid: 33
+          x-astra-sim-name: MULTI_RATE
+        sample_feedback:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+          description: >
+            for HPCC: 0: get INT per packet, 1: get INT once per RTT or qlen>0.
+          x-field-uid: 34
+          x-astra-sim-name: SAMPLE_FEEDBACK
+        pint_log_base:
+          type: number
+          format: float
+          default: 1.05
+          description: >
+            for HPCC-PINT: the base of the log encoding, equals to (1+epsilon)^2 where epsilon is the error bound. 1.05 corresponds to epsilon=0.025.
+          x-field-uid: 35
+          x-astra-sim-name: PINT_LOG_BASE
+        pint_prob:
+          type: number
+          format: float
+          default: 1.0
+          description: >
+            for HPCC-PINT: the base of the log encoding, equals to (1+epsilon)^2 where epsilon is the error bound. 1.05 corresponds to epsilon=0.025.
+          x-field-uid: 36
+          x-astra-sim-name: PINT_PROB
+        rate_bound:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            0: no rate limitor, 1: use rate limitor.
+          x-field-uid: 37
+          x-astra-sim-name: RATE_BOUND
+        ack_high_prio:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+          description: >
+            0: ACK has same priority with data packet, 1: prioritize ACK.
+          x-field-uid: 38
+          x-astra-sim-name: ACK_HIGH_PRIO
+        link_down:
+          type: array
+          items:
+            type: integer
+            format: uint32
+          minItems: 1
+          maxItems: 3
+          default: [0, 0, 0]
+          description: >
+            a b c: take down link between b and c at time a. 0 0 0 mean no link down.
+          x-field-uid: 39
+          x-astra-sim-name: LINK_DOWN
+        enable_trace:
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: >
+            dump packet-level events or not.
+          x-field-uid: 40
+          x-astra-sim-name: ENABLE_TRACE
+        kmax_map:
+          type: string
+          default: 6 25000000000 400 40000000000 800 100000000000 1600 200000000000 2400 400000000000 3200 2400000000000 3200
+          description: >
+            a map from link bandwidth to ECN threshold kmax.
+          x-field-uid: 41
+          x-astra-sim-name: KMAX_MAP
+        kmin_map:
+          type: string
+          default: 6 25000000000 100 40000000000 200 100000000000 400 200000000000 600 400000000000 800 2400000000000 800
+          description: >
+            a map from link bandwidth to ECN threshold kmin.
+          x-field-uid: 42
+          x-astra-sim-name: KMIN_MAP
+        pmax_map:
+          type: string
+          default: 6 25000000000 0.2 40000000000 0.2 100000000000 0.2 200000000000 0.2 400000000000 0.2 2400000000000 0.2
+          description: >
+            a map from link bandwidth to ECN threshold pmax.
+          x-field-uid: 43
+          x-astra-sim-name: PMAX_MAP
+        buffer_size:
+          type: integer
+          format: uint32
+          default: 32
+          description: >
+            buffer size per switch.
+          x-field-uid: 44
+          x-astra-sim-name: BUFFER_SIZE
+        qlen_mon_file:
+          type: string
+          default: qlen.txt
+          description: >
+            buffer size per switch.
+          x-field-uid: 45
+          x-astra-sim-name: QLEN_MON_FILE
+        qlen_mon_start:
+          type: integer
+          format: int64
+          default: 0
+          description: >
+            start time of dumping qlen.
+          x-field-uid: 46
+          x-astra-sim-name: QLEN_MON_START
+        qlen_mon_end:
+          type: integer
+          format: int64
+          default: 20000
+          description: >
+            end time of dumping qlen.
+          x-field-uid: 47
+          x-astra-sim-name: QLEN_MON_END
+        nic_total_pause_time:
+          type: integer
+          format: int32
+          default: 0
+          description: >
+            nic pause time.
+          x-field-uid: 48
+          x-astra-sim-name: NIC_TOTAL_PAUSE_TIME
+

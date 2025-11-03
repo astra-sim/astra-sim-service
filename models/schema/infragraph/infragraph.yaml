@@ -1,0 +1,45 @@
+components:
+  schemas:
+    Infrastructure:
+      type: object
+      properties:
+        name:
+          description: |-
+            The name of the infrastructure.
+          x-include: ./common.yaml#/components/schemas/Named.Object/properties/name
+          x-field-uid: 1
+        description:
+          description: |-
+            A detailed description of the infrastructure.
+          type: string
+          x-field-uid: 2
+        devices:
+          description: |-
+            An inventory of devices and components.
+          type: array
+          items:
+            $ref: './device.yaml#/components/schemas/Device'
+          x-field-uid: 3
+        links:
+          description: |-
+            An inventory of the links present in the infrastructure edges.
+          type: array
+          items:
+            $ref: "./link.yaml#/components/schemas/Link"
+          x-field-uid: 4
+        instances:
+          description: |-
+            An inventory of the device instances present in the infrastructure edges.
+          type: array
+          items:
+            $ref: "./instance.yaml#/components/schemas/Instance"
+          x-field-uid: 5
+        edges:
+          description: |-
+            An array of edge objects used to connect instance devices and components to other instance
+            devices and components. These edge objects are used to form a fully qualified qualified graph.
+          type: array
+          items:
+            $ref: "./edge.yaml#/components/schemas/Infrastructure.Edge"
+          x-field-uid: 6
+

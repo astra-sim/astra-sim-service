@@ -1,0 +1,17 @@
+components:
+  schemas:
+    Communicator.Group:
+      type: object
+      x-astra-sim-type: schema
+      description: Defines the communication group configuration for ASTRA-sim, enabling users to specify process group memberships and related NPUs within a structured schema.
+      properties:
+        identifier:
+          type: string
+          description: Represents a unique identifier for a communication group. This ID is used to distinguish different groups of NPUs that participate together in collective communication operations.
+          x-field-uid: 1
+        npu_list:
+          type: array
+          items:
+            type: integer
+          description: Contains the list of NPU IDs that belong to the communication group identified by the process ID. Each NPU listed is a member of this group and will participate in collective operations such as AllReduce and AllGather with the other NPUs in the same group.
+          x-field-uid: 2

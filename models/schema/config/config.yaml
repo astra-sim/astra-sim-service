@@ -1,0 +1,126 @@
+components:
+  schemas:
+    Config:
+      type: object
+      properties:
+        common_config:
+          $ref: "#/components/schemas/Common.Configuration"
+          x-field-uid: 1
+        network_backend:
+          $ref: "#/components/schemas/Network.Backend"
+          x-field-uid: 2
+        infragraph:
+          $ref: "#/components/schemas/Infragraph"
+          x-field-uid: 3
+    Common.Configuration:
+      type: object
+      description: Holds the schemas that define ASTRA-sim configurations common to all backends, including workload, system, communicator group, logging, remote memory, and command parameters.
+      properties:
+        workload:
+          type: string
+          description: Specifies the path containing workload configuration data as part of the uploaded .zip package. This field holds the folder/filename (excluding the `.rankid.et` suffix).
+          x-field-uid: 1
+        system:
+          $ref: "./system_configuration.yaml#/components/schemas/System.Configuration"
+          description: Holds the ASTRA-sim system configuration schema, allowing users to generate system configurations based on the schema.
+          x-field-uid: 2
+        communicator_group:
+          type: array
+          items:
+            $ref: "./comm_group_configuration.yaml#/components/schemas/Communicator.Group"
+          description: Holds the ASTRA-sim communicator group configuration schema, allowing users to generate communicator group configurations based on the schema.
+          x-field-uid: 3
+        remote_memory:
+          $ref: "./remote_memory_configuration.yaml#/components/schemas/RemoteMemory"
+          description: Holds the ASTRA-sim remote memory configuration schema, allowing users to define and create remote memory configurations.
+          x-field-uid: 4
+        logging:
+          $ref: "./logging_configuration.yaml#/components/schemas/SpdlogConfig"
+          description: Holds the logging configuration schema, allowing users to generate a TOML-based spdlog configuration file.
+          x-field-uid: 5
+        cmd_parameters:
+          $ref: "#/components/schemas/Command.Arguments"
+          description: Contains the command parameters schema, allowing users to define and set command line argument values.
+          x-field-uid: 6
+    Command.Arguments:
+      type: object
+      x-astra-sim-type: schema
+      description: Command Line Arguments that are common to the ASTRA-sim binary.
+      properties:
+        num_queues_per_dim:
+          type: integer
+          format: uint32
+          description: The num-queues-per-dim parameter specifies the number of communication queues allocated per network dimension, with a default value of 1.
+          default: 1
+          x-field-uid: 1
+          x-astra-sim-name: --num-queues-per-dim
+          x-astra-sim-type: cmd
+        comm_scale:
+          type: number
+          format: double
+          description: The comm-scale parameter is a scaling factor applied to communication operations, with a default value of 1.0.
+          default: 1.0
+          x-field-uid: 2
+          x-astra-sim-name: --comm-scale
+          x-astra-sim-type: cmd
+        injection_scale:
+          type: number
+          format: double
+          description: The injection-scale parameter scales injection delays and endpoint communication delays, with a default value of 1.0.
+          default: 1.0
+          x-field-uid: 3
+          x-astra-sim-name: --injection-scale
+          x-astra-sim-type: cmd
+        rendezvous_protocol:
+          type: boolean
+          description: The rendezvous-protocol parameter enables or disables the rendezvous communication protocol, with a default value of false.
+          default: false
+          x-field-uid: 4
+          x-astra-sim-name: --rendezvous-protocol
+          x-astra-sim-type: cmd
+    Network.Backend:
+      type: object
+      description: A choice of network backends of ASTRA-sim which will run the simulation.
+      properties:
+        choice:
+          description: |-
+            Specifies the network backend to use for the simulation. Supported options include the analytical congestion-aware or congestion-unaware models, the NS3 discrete-event simulator, and the htsim high-performance simulator.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            analytical_congestion_aware:
+              x-field-uid: 1
+            analytical_congestion_unaware:
+              x-field-uid: 2
+            ns3:
+              x-field-uid: 3
+            htsim:
+              x-field-uid: 4
+        analytical_congestion_aware:
+          $ref: "backend_analytical.yaml#/components/schemas/Analytical.Configuration"
+          x-field-uid: 2
+        analytical_congestion_unaware:
+          $ref: "backend_analytical.yaml#/components/schemas/Analytical.Configuration"
+          x-field-uid: 3
+        ns3:
+          $ref: "backend_ns3.yaml#/components/schemas/NS3.Configuration"
+          x-field-uid: 4
+        htsim:
+          $ref: "backend_htsim.yaml#/components/schemas/HTSim.Configuration"
+          x-field-uid: 5
+    Infragraph:
+      type: object
+      description: |
+        InfraGraph or infrastructure graph defines a model-driven, vendor-neutral, standard interface for capturing a system of systems suitable for use in co-designing AI/HPC solutions.
+        This model allows for defining physical infrastructure as a logical system of systems using graph like terminology. In addition to defining a logical graph, an unlimited number of different physical characteristics can be associated with logical endpoints.
+      properties:
+        infrastructure:
+          $ref: "../infragraph/infragraph.yaml#/components/schemas/Infrastructure"
+          description: The infrastructure model representing the current version (v0.4.1) of InfraGraph schema
+          x-field-uid: 1
+        annotations:
+          $ref: "../infragraph/annotation.yaml#/components/schemas/Annotations"
+          description: Additional annotations to enrich infrastructure data, used by Astra Sim backend network topologies and other components
+          x-field-uid: 2
+
+

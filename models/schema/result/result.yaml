@@ -1,0 +1,20 @@
+components:
+  schemas:
+    Result:
+      type: object
+      description: Represents the result containing a collection of file metadata entries along with a single file metadata object.
+      properties:
+        choice:
+          description: |-
+            The type of result required: metadata or file.
+          type: string
+          x-field-uid: 1
+          x-enum:
+            metadata:
+              x-field-uid: 1
+            filename:
+              x-field-uid: 2
+        filename:
+          type: string
+          description: A single file metadata object describing filename which is associated with the result.
+          x-field-uid: 2
