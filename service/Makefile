@@ -49,6 +49,7 @@ build-docker: version
 
 .PHONY: version
 version: ## Generate build version
+	chmod +x ../make_version.sh && \
 	CI_COMMIT_REF_NAME=$(CI_COMMIT_REF_NAME) \
 	export CI_COMMIT_REF_NAME; \
 	VERSION_FROM_FILE=$$(cat ../.VERSION); \
