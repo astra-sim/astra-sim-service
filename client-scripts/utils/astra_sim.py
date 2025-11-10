@@ -24,6 +24,7 @@ SOFTWARE.
 
 import os
 import time
+import socket
 from enum import Enum
 import pandas as pd
 
@@ -90,6 +91,29 @@ class AstraSim:
         self.configuration = astra_sim_sdk.Config()
         self._backend_name = backend_name
         self.tag = tag
+        self._validate_server_endpoint()
+
+    def _validate_server_endpoint(self):
+        """
+        Check if the given IP:port is reachable
+        """
+        try:
+            ip, port = self._server_endpoint.split(":")
+            port = int(port)
+
+            with socket.create_connection((ip, port), timeout=2):
+                print(f"Successfully connected to server at {ip}:{port}")
+
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid endpoint format: {self._server_endpoint}. " f"Use 'IP:PORT' format."
+            ) from exc
+
+        except (socket.timeout, ConnectionRefusedError, OSError) as exc:
+            raise ConnectionError(
+                f"Could not connect to server at {self._server_endpoint}. "
+                f"Ensure the server is running and reachable."
+            ) from exc
 
     def generate_collective(self, collective, coll_size, npu_range):
         """
