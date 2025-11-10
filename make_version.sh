@@ -17,6 +17,7 @@ if [[ -z "$VERSION_FROM_FILE" ]]; then
 fi
 
 BRANCH_NAME=${CI_COMMIT_REF_NAME//-/.}
+BRANCH_NAME=${BRANCH_NAME//_/.}
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if [ "$BRANCH" = "main" ]; then
