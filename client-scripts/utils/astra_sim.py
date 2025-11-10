@@ -24,7 +24,7 @@ SOFTWARE.
 
 import os
 import time
-import socket
+import grpc
 from enum import Enum
 import pandas as pd
 
@@ -95,24 +95,17 @@ class AstraSim:
 
     def _validate_server_endpoint(self):
         """
-        Check if the given IP:port is reachable
+        Validate if a gRPC server is reachable.
         """
         try:
-            ip, port = self._server_endpoint.split(":")
-            port = int(port)
+            channel = grpc.insecure_channel(self._server_endpoint)
+            grpc.channel_ready_future(channel).result(timeout=2)
+            print(f"Successfully connected to gRPC server at {self._server_endpoint}")
 
-            with socket.create_connection((ip, port), timeout=2):
-                print(f"Successfully connected to server at {ip}:{port}")
-
-        except ValueError as exc:
-            raise ValueError(
-                f"Invalid endpoint format: {self._server_endpoint}. " f"Use 'IP:PORT' format."
-            ) from exc
-
-        except (socket.timeout, ConnectionRefusedError, OSError) as exc:
+        except grpc.FutureTimeoutError as exc:
             raise ConnectionError(
-                f"Could not connect to server at {self._server_endpoint}. "
-                f"Ensure the server is running and reachable."
+                f"Could not connect to gRPC server at {self._server_endpoint}. "
+                "Ensure the server is running and reachable."
             ) from exc
 
     def generate_collective(self, collective, coll_size, npu_range):
