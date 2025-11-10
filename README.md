@@ -5,7 +5,7 @@ ASTRA-sim Service provides a unified interface for configuring and running ASTRA
 
 ## Getting Started
 
-### Development Environment
+### 1. Development Environment
 
 The project uses VS Code Dev Containers to ensure a reproducible and isolated development setup.
 
@@ -17,13 +17,13 @@ This environment is particularly useful for contributors who want a ready-to-use
 
 ---
 
-### Using the Client Notebooks
+### 2. Using the Client Notebooks
 
 Client Jupyter notebooks are provided under `client-scripts/notebooks`. You can open them using the VS Code Jupyter extension, configure connections to the running ASTRA-sim service (via the server IP and port), and run simulation workflows interactively. The next steps talk about how to build and run the astra-sim-service.
 
 ---
 
-### Build the Service
+#### 2a. Build the Service
 
 To build the ASTRA-sim Service:
 ```
@@ -39,7 +39,7 @@ make build-all
 
 ---
 
-### Run the Service
+#### 2b. Run the Service
 
 After a successful build, the service can be started locally using:
 
@@ -53,7 +53,7 @@ This command launches the ASTRA-sim gRPC server, exposing it for client connecti
 
 ---
 
-### astra-sim-service as a Docker
+### 3. astra-sim-service as a Docker
 
 The repository provides a Docker-based build for deploying the ASTRA-sim service in an isolated environment.
 
@@ -83,25 +83,14 @@ Once built, the image can be run independently and accessed remotely using the e
 
 The ASTRA-sim Service architecture consists of the following key components:
 
-- Models: Define the schema for ASTRA-sim configuration and infrastructure descriptions. These models are specified using [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main), providing a neutral and extensible format for capturing system and simulation details.
-- Service: Implements the ASTRA-sim server that runs using gRPC. It serves as the execution backend for simulation requests from clients.
-- Client Scripts: Provide user-facing interfaces, including Jupyter notebooks, that allow users to configure simulations, trigger runs, and visualize results.
+- models: [Read the model documentation](models/README.md)
+Define the schema for ASTRA-sim configuration and infrastructure descriptions. These models are specified using [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main), providing a neutral and extensible format for capturing system and simulation details.
+- service: [Read the service documentation](service/README.md)
+Implements the ASTRA-sim server that runs using gRPC. It serves as the execution backend for simulation requests from clients.
+- client-scripts: [Read the client-scripts documentation](client-scripts/README.md)
+Provide user-facing interfaces, including Jupyter notebooks, that allow users to configure simulations, trigger runs, and visualize results.
 
 The combination of these components supports model-driven simulation workflows where users can define ASTRA-sim setups programmatically, launch remote simulations, and analyze outcomes—all from interactive notebooks.
-
-
-### Repository Structure
-
-The repository is organized into three primary submodules:
-
-1. models/ – [Read the model documentation](models/README.md)
-   Contains schema definitions for ASTRA-sim and InfraGraph (version 0.5.0) configuration.
-2. client-scripts/ – [Read the client-scripts documentation](client-scripts/README.md)
-   Provides client utilities and example notebooks for launching and managing simulation sessions.
-3. service/ – [Read the service documentation](service/README.md)
-   Hosts the gRPC-based simulation service that runs the ASTRA-sim backend.
-
-
 
 ## Contributing
 
