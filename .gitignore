@@ -305,6 +305,7 @@ service/idmap.txt
 # models
 models/openapiart/*
 models/artifacts/*
+models/astra_sim_sdk/*
 models/.GENERATED_VERSION
 
 # notebook

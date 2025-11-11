@@ -24,6 +24,7 @@ SOFTWARE.
 
 import os
 import time
+import grpc
 from enum import Enum
 import pandas as pd
 
@@ -90,6 +91,22 @@ class AstraSim:
         self.configuration = astra_sim_sdk.Config()
         self._backend_name = backend_name
         self.tag = tag
+        self._validate_server_endpoint()
+
+    def _validate_server_endpoint(self):
+        """
+        Validate if a gRPC server is reachable.
+        """
+        try:
+            channel = grpc.insecure_channel(self._server_endpoint)
+            grpc.channel_ready_future(channel).result(timeout=2)
+            print(f"Successfully connected to gRPC server at {self._server_endpoint}")
+
+        except grpc.FutureTimeoutError as exc:
+            raise ConnectionError(
+                f"Could not connect to gRPC server at {self._server_endpoint}. "
+                "Ensure the server is running and reachable."
+            ) from exc
 
     def generate_collective(self, collective, coll_size, npu_range):
         """
