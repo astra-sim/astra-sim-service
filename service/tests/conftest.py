@@ -336,12 +336,12 @@ def infra_single_gpu_server_factory():
         server.name = "server"
         server.description = "A generic server with npu_factor * 4 npu(s)"
 
-        npu = server.components.add(
-            name="npu",
-            description="Generic GPU/NPU",
+        xpu = server.components.add(
+            name="xpu",
+            description="Generic GPU/XPU",
             count=1,
         )
-        npu.choice = Component.NPU
+        xpu.choice = Component.XPU
         nvlsw = server.components.add(
             name="nvlsw",
             description="NVLink Switch",
@@ -360,11 +360,11 @@ def infra_single_gpu_server_factory():
         pcie = server.links.add(name="pcie")
 
         edge = server.edges.add(scheme=DeviceEdge.MANY2MANY, link=nvlink.name)  # type: ignore
-        edge.ep1.component = npu.name
+        edge.ep1.component = xpu.name
         edge.ep2.component = nvlsw.name
 
         edge = server.edges.add(scheme=DeviceEdge.ONE2ONE, link=pcie.name)  # type: ignore
-        edge.ep1.component = npu.name
+        edge.ep1.component = xpu.name
         edge.ep2.component = nic.name
 
         return server

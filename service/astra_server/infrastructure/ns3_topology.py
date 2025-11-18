@@ -77,7 +77,7 @@ class NS3Topology:
                     for i in range(0, device_instance.count):
                         # get the npus from networkx graph
                         nodes = NetworkxUtils.get_component_node_from_type_and_instance(
-                            self.infragraph_service, "npu", device_instance.name, int(i)
+                            self.infragraph_service, "xpu", device_instance.name, int(i)
                         )
 
                         for node in nodes:
@@ -98,7 +98,7 @@ class NS3Topology:
             instance_index = host_instance.split(".")[1]
             # from graph, get all npus and then for each npu, get the nic neighbour
             npu_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
-                self.infragraph_service, "npu", instance_name, int(instance_index)
+                self.infragraph_service, "xpu", instance_name, int(instance_index)
             )
 
             # get the neighbour nics
@@ -153,7 +153,7 @@ class NS3Topology:
                 if (
                     len(
                         NetworkxUtils.get_neighbour_nodes_for_component_type(
-                            self.graph, switch, "npu"
+                            self.graph, switch, "xpu"
                         )
                     )
                     > 1
@@ -324,9 +324,9 @@ class NS3Topology:
                 # if either one is a switch and the other one is an npu:
                 if (
                     topology.graph.nodes[source]["type"] == "switch"
-                    and topology.graph.nodes[destination]["type"] == "npu"
+                    and topology.graph.nodes[destination]["type"] == "xpu"
                 ) or (
-                    topology.graph.nodes[source]["type"] == "npu"
+                    topology.graph.nodes[source]["type"] == "xpu"
                     and topology.graph.nodes[destination]["type"] == "switch"
                 ):
                     if source in topology.annotation.device_to_id:
