@@ -133,6 +133,7 @@ class AstraSim:
         self._astra_sim_client.upload_config()
         self._astra_sim_client.set_config(self.configuration)
         self._astra_sim_client.run_simulation(network_backend.value)
+        self._astra_sim_client.get_config()
         while True:
             status = self._astra_sim_client.get_status()
             if status in ["completed", "failed", "terminated"]:

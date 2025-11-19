@@ -69,6 +69,7 @@ class FileFolderUtils:
             self.OUTPUT_DIR = ""
             self.ZIP_DIR = ""
             self.ZIP_FILE_NAME = r"config.zip"
+            self.SERVER_ZIP_FILE_NAME = f"server_configuration.zip"
             self.INFRA_JSON_FILENAME = "infra.json"
             self.BIND_JSON_FILENAME = "bind.json"
             self.NETWORK_CONFIGURATION_FILENAME = "network_config.txt"
@@ -92,6 +93,7 @@ class FileFolderUtils:
         self.OUTPUT_DIR = os.path.join(self.TAG_DIR, "output")
         self.ZIP_DIR = os.path.join(self.TAG_DIR, "zip_dir")
         self.ZIP_PATH = os.path.join(self.TAG_DIR, self.ZIP_FILE_NAME)
+        self.SERVER_CONFIG_ZIP = os.path.join(self.TAG_DIR, self.SERVER_ZIP_FILE_NAME)
         self.reset_directories()
 
     def reset_directories(self):
