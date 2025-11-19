@@ -8,9 +8,9 @@ install-prerequisites:
 	cd client-scripts && make install-prerequisites
 	cd service && make install-prerequisites
 	pip install -r requirements.txt
-	wget https://github.com/Keysight/infragraph/releases/download/v0.5.0/infragraph-0.5.0-py3-none-any.whl
-	pip install infragraph-0.5.0-py3-none-any.whl
-	rm -f infragraph-0.5.0-py3-none-any.whl
+	wget https://github.com/Keysight/infragraph/releases/download/v0.6.0/infragraph-0.6.0-py3-none-any.whl
+	pip install infragraph-0.6.0-py3-none-any.whl
+	rm -f infragraph-0.6.0-py3-none-any.whl
 
 .PHONY: version
 version:

@@ -120,7 +120,7 @@ class AnalyticalTopology:
         instance_name = host_instance.split(".")[0]
         instance_index = host_instance.split(".")[1]
         npu_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
-            self.infragraph_service, "npu", instance_name, int(instance_index)
+            self.infragraph_service, "xpu", instance_name, int(instance_index)
         )
 
         # homogenous topology with a single host type
@@ -190,7 +190,7 @@ class AnalyticalTopology:
                         if (
                             len(
                                 NetworkxUtils.get_neighbour_nodes_for_component_type(
-                                    self.graph, switch, "npu"
+                                    self.graph, switch, "xpu"
                                 )
                             )
                             > 1
@@ -403,7 +403,7 @@ class AnalyticalTopology:
                 )
                 if instance.device in self.annotation.hosts:
                     npu_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
-                        self.infragraph_service, "npu", instance.name, i
+                        self.infragraph_service, "xpu", instance.name, i
                     )
                     self.total_npu_nodes = self.total_npu_nodes + len(npu_nodes)
             if host_instance == "":
