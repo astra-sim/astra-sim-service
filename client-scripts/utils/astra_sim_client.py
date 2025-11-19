@@ -23,7 +23,6 @@ SOFTWARE.
 """
 
 import os
-import time
 import json
 import logging
 import threading
@@ -122,7 +121,6 @@ class AstraSimClient:
         """
         Function to download the result file from service
         """
-        print("Downloading file: " + filename)
         result = self.get_api().result()
         result.filename = filename
 
@@ -183,3 +181,16 @@ class AstraSimClient:
         print("Generating Configuration ZIP")
         # check if zip is fine
         Utilities.zip_folder(FileFolderUtils().CONFIG_DIR, FileFolderUtils().ZIP_PATH)
+
+    def get_config(self):
+        """
+        Function that downloads the configuration in zip format consisting of all the files required for running the simulation.
+        """
+        config_response = self.get_api().get_config()
+        if config_response is None:
+            raise FileNotFoundError("Server couldn't return config")
+        zip_bytes = config_response.read()
+        print(f"Downloaded all configuration in {FileFolderUtils().SERVER_CONFIG_ZIP}")
+        output_path = os.path.join(FileFolderUtils().OUTPUT_DIR, FileFolderUtils().SERVER_CONFIG_ZIP)
+        with open(output_path, "wb") as f:
+            f.write(zip_bytes)

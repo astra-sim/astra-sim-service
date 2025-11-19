@@ -154,6 +154,19 @@ class AstraSim:
                 print("All metrics translated successfully")
             print("Simulation completed")
 
+    def download_configuration(self):
+        """
+        Function that downloads the configuration in zip format consisting of all the files required for running the simulation.
+        """
+        try:
+            self._astra_sim_client.get_config()
+        except FileNotFoundError as e:
+            print(f"Configuration file not found: {e}")
+            raise
+        except Exception as e:
+            print(f"Failed to download configuration: {e}")
+            raise
+
 
 class WorkloadConfiguration:
     """
