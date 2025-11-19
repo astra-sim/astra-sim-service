@@ -190,7 +190,7 @@ class AstraSimClient:
         if config_response is None:
             raise FileNotFoundError("Server couldn't return config")
         zip_bytes = config_response.read()
-        print(f"Downloading all configuration in {FileFolderUtils().SERVER_CONFIG_ZIP}")
+        print(f"Downloaded all configuration in {FileFolderUtils().SERVER_CONFIG_ZIP}")
         output_path = os.path.join(FileFolderUtils().OUTPUT_DIR, FileFolderUtils().SERVER_CONFIG_ZIP)
         with open(output_path, "wb") as f:
             f.write(zip_bytes)

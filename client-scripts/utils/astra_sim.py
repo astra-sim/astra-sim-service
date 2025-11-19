@@ -124,7 +124,7 @@ class AstraSim:
             collective=collective, coll_size=coll_size, npu_range=npu_range, tag=self.tag
         )
 
-    def run_simulation(self, network_backend, download_all_config: bool):
+    def run_simulation(self, network_backend):
         """
         A wrapper call over multiple operations allowing to upload, run, and download files for a simulation
         """
@@ -133,8 +133,6 @@ class AstraSim:
         self._astra_sim_client.upload_config()
         self._astra_sim_client.set_config(self.configuration)
         self._astra_sim_client.run_simulation(network_backend.value)
-        if download_all_config:
-            self._astra_sim_client.get_config()
         while True:
             status = self._astra_sim_client.get_status()
             if status in ["completed", "failed", "terminated"]:
@@ -155,6 +153,19 @@ class AstraSim:
                     StatUtil.ns3_flow_statistics()
                 print("All metrics translated successfully")
             print("Simulation completed")
+
+    def download_configuration(self):
+        """
+        Function that downloads the configuration in zip format consisting of all the files required for running the simulation.
+        """
+        try:
+            self._astra_sim_client.get_config()
+        except FileNotFoundError as e:
+            print(f"Configuration file not found: {e}")
+            raise
+        except Exception as e:
+            print(f"Failed to download configuration: {e}")
+            raise
 
 
 class WorkloadConfiguration:
