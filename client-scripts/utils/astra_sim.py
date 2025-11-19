@@ -124,7 +124,7 @@ class AstraSim:
             collective=collective, coll_size=coll_size, npu_range=npu_range, tag=self.tag
         )
 
-    def run_simulation(self, network_backend):
+    def run_simulation(self, network_backend, download_all_config: bool):
         """
         A wrapper call over multiple operations allowing to upload, run, and download files for a simulation
         """
@@ -133,7 +133,8 @@ class AstraSim:
         self._astra_sim_client.upload_config()
         self._astra_sim_client.set_config(self.configuration)
         self._astra_sim_client.run_simulation(network_backend.value)
-        self._astra_sim_client.get_config()
+        if download_all_config:
+            self._astra_sim_client.get_config()
         while True:
             status = self._astra_sim_client.get_status()
             if status in ["completed", "failed", "terminated"]:

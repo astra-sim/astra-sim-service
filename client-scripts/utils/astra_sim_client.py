@@ -23,7 +23,6 @@ SOFTWARE.
 """
 
 import os
-import time
 import json
 import logging
 import threading
@@ -190,9 +189,8 @@ class AstraSimClient:
         config_response = self.get_api().get_config()
         if config_response is None:
             raise FileNotFoundError("Server couldn't return config")
-        print("before zip_bytes")
         zip_bytes = config_response.read()
-        print("zip bytes", zip_bytes)
+        print(f"Downloading all configuration in {FileFolderUtils().SERVER_CONFIG_ZIP}")
         output_path = os.path.join(FileFolderUtils().OUTPUT_DIR, FileFolderUtils().SERVER_CONFIG_ZIP)
         with open(output_path, "wb") as f:
             f.write(zip_bytes)
