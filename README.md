@@ -17,43 +17,8 @@ This environment is particularly useful for contributors who want a ready-to-use
 
 ---
 
-### 2. Using the Client Notebooks
-
-Client Jupyter notebooks are provided under `client-scripts/notebooks`. You can open them using the VS Code Jupyter extension, configure connections to the running ASTRA-sim service (via the server IP and port), and run simulation workflows interactively. The next steps talk about how to build and run the astra-sim-service.
-
----
-
-#### 2a. Build the Service
-
-To build the ASTRA-sim Service:
-```
-make install-prerequisites
-make build-all
-```
-
-- `make install-prerequisites`: Installs all required dependencies, libraries, and supporting tools.
-- `make build-all`: Executes the full build pipeline:
-  1. Builds the model artifacts.
-  2. Runs tests for client scripts.
-  3. Builds and tests the service components.
-
----
-
-#### 2b. Run the Service
-
-After a successful build, the service can be started locally using:
-
-```
-cd service/astra_server
-python3 __main__.py
-```
-
-
-This command launches the ASTRA-sim gRPC server, exposing it for client connections.
-
----
-
-### 3. astra-sim-service as a Docker
+### 2. Deploy ASTRA-sim Service
+#### 2a. As a Docker Container
 
 The repository provides a Docker-based build for deploying the ASTRA-sim service in an isolated environment.
 
@@ -77,6 +42,41 @@ docker run -it astra_sim_service:0.0.6
 
 
 Once built, the image can be run independently and accessed remotely using the exposed host IP and port. Clients (via notebooks or scripts) can connect to this containerized service for distributed simulation execution.
+
+---
+
+#### 2b. Local build/run
+##### 1) Build the Service
+
+To build the ASTRA-sim Service:
+```
+make install-prerequisites
+make build-all
+```
+
+- `make install-prerequisites`: Installs all required dependencies, libraries, and supporting tools.
+- `make build-all`: Executes the full build pipeline:
+  1. Builds the model artifacts.
+  2. Runs tests for client scripts.
+  3. Builds and tests the service components.
+
+##### 2) Run the Service
+
+After a successful build, the service can be started locally using:
+
+```
+cd service/astra_server
+python3 __main__.py
+```
+
+
+This command launches the ASTRA-sim gRPC server, exposing it for client connections.
+
+---
+
+### 3. Using the Client Notebooks
+
+Client Jupyter notebooks are provided under `client-scripts/notebooks`. You can open them using the VS Code Jupyter extension, configure connections to the running ASTRA-sim service (via the server IP and port), and run simulation workflows interactively. The next steps talk about how to build and run the astra-sim-service.
 
 
 ## Repository Overview
