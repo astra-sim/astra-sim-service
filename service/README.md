@@ -13,7 +13,7 @@ The core server relies on the following packages:
 | Dependency         | Version  |
 |--------------------|----------|
 | astra-sim-schema   | 0.0.6    |
-| infragraph         | 0.5.0    |
+| infragraph         | 0.6.0    |
 | astra-sim          | 6d9c0d2  |
 
 It also leverages the **astra-sim-sdk**, which provides gRPC stubs implemented in `__main__`.
