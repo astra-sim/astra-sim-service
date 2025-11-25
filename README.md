@@ -99,5 +99,5 @@ You can contribute to ASTRA-sim Service in the following ways:
 - Open an issue in the repository to report bugs or request features.
 - Fork the models repository and submit a pull request (PR) with your changes or extensions.
 
-Contributions are welcome across all submodules—models, client, and service—to improve schema definitions, enhance automation scripts, and extend backend performance.
+Contributions are welcome across models, client, and service—to improve schema definitions, enhance automation scripts, and extend backend performance.
 
