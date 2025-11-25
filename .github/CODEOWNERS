@@ -1,0 +1,12 @@
+## ******************************************************************************
+## This source code is licensed under the MIT license found in the
+## LICENSE file in the root directory of this source tree.
+##
+## Copyright (c) 2025 Keysight Technologies
+## ******************************************************************************
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# the following owners will be requested for
+# review when someone opens a pull request.
+* @harsh-sikhwal @jinsun-yoo
