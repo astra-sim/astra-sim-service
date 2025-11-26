@@ -69,9 +69,7 @@ class NS3Topology:
             self.annotation.last_rank_identifier = 0
             for device_instance in infrastructure.instances:
                 # get the type of device_instance
-                device_name = self.annotation.instance_to_device_name[
-                    device_instance.name
-                ]
+                device_name = self.annotation.instance_to_device_name[device_instance.name]
                 if device_name in self.annotation.hosts:
                     # so we got a host
                     for i in range(0, device_instance.count):
@@ -81,16 +79,10 @@ class NS3Topology:
                         )
 
                         for node in nodes:
-                            self.annotation.device_to_id[
-                                node
-                            ] = self.annotation.last_rank_identifier
-                            self.annotation.last_rank_identifier = (
-                                self.annotation.last_rank_identifier + 1
-                            )
+                            self.annotation.device_to_id[node] = self.annotation.last_rank_identifier
+                            self.annotation.last_rank_identifier = self.annotation.last_rank_identifier + 1
 
-                        self.annotation.host_sequence.append(
-                            device_instance.name + "." + str(i)
-                        )
+                        self.annotation.host_sequence.append(device_instance.name + "." + str(i))
 
         for host_instance in self.annotation.host_sequence:
             # get the device instance
@@ -103,9 +95,7 @@ class NS3Topology:
 
             # get the neighbour nics
             for npu in npu_nodes:
-                nics = NetworkxUtils.get_neighbour_nodes_for_component_type(
-                    self.graph, npu, "nic"
-                )
+                nics = NetworkxUtils.get_neighbour_nodes_for_component_type(self.graph, npu, "nic")
                 if len(nics) <= 0:
                     # here we get equivalent nic
                     nic_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
@@ -150,22 +140,11 @@ class NS3Topology:
 
             # chances are switch nodes can be empty
             for switch in switch_nodes:
-                if (
-                    len(
-                        NetworkxUtils.get_neighbour_nodes_for_component_type(
-                            self.graph, switch, "xpu"
-                        )
-                    )
-                    > 1
-                ):
+                if len(NetworkxUtils.get_neighbour_nodes_for_component_type(self.graph, switch, "xpu")) > 1:
                     # if more than 1 npu is connected
                     self.switches.append(switch)
-                    self.annotation.device_to_id[
-                        switch
-                    ] = self.annotation.last_rank_identifier
-                    self.annotation.last_rank_identifier = (
-                        self.annotation.last_rank_identifier + 1
-                    )
+                    self.annotation.device_to_id[switch] = self.annotation.last_rank_identifier
+                    self.annotation.last_rank_identifier = self.annotation.last_rank_identifier + 1
 
     def _process_infra(self, infrastructure: astra_sim.Infrastructure):
 
@@ -183,9 +162,7 @@ class NS3Topology:
 
         instance_map = {}
         for instance in infrastructure.instances:
-            self.annotation.add_device_instance(
-                device_instance=instance.name, device_name=instance.device
-            )
+            self.annotation.add_device_instance(device_instance=instance.name, device_name=instance.device)
             instance_map[instance.name] = []
             for i in range(0, instance.count):
                 self.annotation.add_device_instance(
@@ -219,7 +196,8 @@ class NS3Topology:
             destination_device_index = destination_split[0] + "." + destination_split[1]
             source_device = source_split[0]
             destination_device = destination_split[0]
-
+            # we are storing all the components in a map where
+            # [instance.index] = [instance.index.component.index]
             if source_device_index in device_component_map:
                 device_component_map[source_device_index].add(source)
             else:
@@ -235,24 +213,18 @@ class NS3Topology:
                 if source_device in device_connection_graph:
                     if destination_device not in device_connection_graph[source_device]:
                         device_connection_graph[source_device] = [destination_device]
+                        device_connection_graph[destination_device] = []
                     else:
-                        if destination_device not in set(
-                            device_connection_graph[source_device]
-                        ):
-                            device_connection_graph[source_device].append(
-                                destination_device
-                            )
+                        if destination_device not in set(device_connection_graph[source_device]):
+                            device_connection_graph[source_device].append(destination_device)
 
                 elif destination_device in device_connection_graph:
                     if source_device not in device_connection_graph[destination_device]:
                         device_connection_graph[destination_device] = [source_device]
+                        device_connection_graph[source_device] = []
                     else:
-                        if source_device not in set(
-                            device_connection_graph[source_device]
-                        ):
-                            device_connection_graph[destination_device].append(
-                                source_device
-                            )
+                        if source_device not in set(device_connection_graph[source_device]):
+                            device_connection_graph[destination_device].append(source_device)
         stack = []
         for host in self.annotation.host_sequence:
             host_name = host.split(".")[0]
@@ -268,17 +240,11 @@ class NS3Topology:
                 device_instances = instance_map[device]
                 for instance in device_instances:
                     self.switches.append(instance)
-                    self.annotation.device_to_id[
-                        instance
-                    ] = self.annotation.last_rank_identifier
+                    self.annotation.device_to_id[instance] = self.annotation.last_rank_identifier
                     # add the device_components with same identifier
                     for component in device_component_map[instance]:
-                        self.annotation.device_to_id[
-                            component
-                        ] = self.annotation.last_rank_identifier
-                    self.annotation.last_rank_identifier = (
-                        self.annotation.last_rank_identifier + 1
-                    )
+                        self.annotation.device_to_id[component] = self.annotation.last_rank_identifier
+                    self.annotation.last_rank_identifier = self.annotation.last_rank_identifier + 1
 
     @staticmethod
     def generate_topology(configuration: astra_sim.Config):
@@ -291,16 +257,12 @@ class NS3Topology:
         topology = NS3Topology(infrastructure, annotations)
 
         configuration.network_backend.ns3.topology.nc_topology.total_links = 0
-        configuration.network_backend.ns3.topology.nc_topology.total_switches = len(
-            topology.switches
-        )
+        configuration.network_backend.ns3.topology.nc_topology.total_switches = len(topology.switches)
         configuration.network_backend.ns3.topology.nc_topology.switch_ids = []
 
         for switch in topology.switches:
             switch_id = topology.annotation.device_to_id[switch]
-            configuration.network_backend.ns3.topology.nc_topology.switch_ids.append(
-                switch_id
-            )
+            configuration.network_backend.ns3.topology.nc_topology.switch_ids.append(switch_id)
 
         configuration.network_backend.ns3.topology.nc_topology.total_nodes = (
             topology.annotation.last_rank_identifier
@@ -318,8 +280,7 @@ class NS3Topology:
             # case 1: both source and destination are hosts
             if (
                 topology.graph.nodes[source]["device"] in topology.annotation.hosts
-                and topology.graph.nodes[destination]["device"]
-                in topology.annotation.hosts
+                and topology.graph.nodes[destination]["device"] in topology.annotation.hosts
             ):
                 # if either one is a switch and the other one is an npu:
                 if (
@@ -336,12 +297,10 @@ class NS3Topology:
             # case 2: either one can be a host?
             elif (
                 topology.graph.nodes[source]["device"] in topology.annotation.hosts
-                and topology.graph.nodes[destination]["device"]
-                not in topology.annotation.hosts
+                and topology.graph.nodes[destination]["device"] not in topology.annotation.hosts
             ) or (
                 topology.graph.nodes[source]["device"] not in topology.annotation.hosts
-                and topology.graph.nodes[destination]["device"]
-                in topology.annotation.hosts
+                and topology.graph.nodes[destination]["device"] in topology.annotation.hosts
             ):
                 if source in topology.annotation.device_to_id:
                     source_dev = topology.annotation.device_to_id[source]
@@ -350,8 +309,7 @@ class NS3Topology:
             # case 2: both are not hosts and not same device
             elif (
                 topology.graph.nodes[source]["device"] not in topology.annotation.hosts
-                and topology.graph.nodes[destination]["device"]
-                not in topology.annotation.hosts
+                and topology.graph.nodes[destination]["device"] not in topology.annotation.hosts
             ) and (source_device_index != destination_device_index):
                 if source in topology.annotation.device_to_id:
                     source_dev = topology.annotation.device_to_id[source]
@@ -362,13 +320,9 @@ class NS3Topology:
                 print(f"Edge from {source} to {destination} with attributes {attr}")
                 print(f"ns3: {source_dev} {dest_dev}")
 
-                link = topology.annotation.get_link_specification(
-                    attr["link"]
-                )  # this is a dict
+                link = topology.annotation.get_link_specification(attr["link"])  # this is a dict
                 if len(link) == 0:
-                    raise InfragraphError(
-                        "Link missing", grpc.StatusCode.NOT_FOUND, 404
-                    )
+                    raise InfragraphError("Link missing", grpc.StatusCode.NOT_FOUND, 404)
 
                 bandwidth = link["bandwidth"].to_str()
                 latency = link["latency"].to_str()
@@ -383,8 +337,7 @@ class NS3Topology:
                 )
 
                 configuration.network_backend.ns3.topology.nc_topology.total_links = (
-                    configuration.network_backend.ns3.topology.nc_topology.total_links
-                    + 1
+                    configuration.network_backend.ns3.topology.nc_topology.total_links + 1
                 )
         # NS3Topology.dump_ns3(configuration.network_backend.ns3.topology.nc_topology)
 

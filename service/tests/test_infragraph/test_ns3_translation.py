@@ -234,3 +234,7 @@ def test_clos_fabric(infra_switch_factory):
     switch_device_spec.device_type = "switch"
     configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
     NS3Topology.generate_topology(configuration)
+    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 76
+    # assert configuration.network_backend.ns3.topology.nc_topology.total_links == 16
+    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 44
+    # assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 16
