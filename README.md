@@ -1,7 +1,8 @@
 # ASTRA-sim Service
 
-ASTRA-sim Service provides a unified interface for configuring and running ASTRA-sim as a gRPC-based service. It enables researchers and developers to co-design AI and HPC systems using a model-driven, vendor-neutral API built on the [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main) framework.
+ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simulations by providing an OpenAPI-based [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main) interface. It allows users to set up, control, and monitor simulations as remote services. The service supports flexible workload configuration using [MLCommons Chakra](https://github.com/mlcommons/chakra) and infrastructure modeling with [Keysight Infragraph](https://github.com/Keysight/infragraph). Users can easily configure simulation settings through Jupyter notebooks for interactive experimentation. The repository offers options for both Docker-based and standalone services, and includes ready-to-use sample notebooks for quick start.
 
+![ASTRA-sim service](resources/ASTRA-Sim-Service.png)
 
 ## Getting Started
 
