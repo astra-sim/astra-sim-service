@@ -1,6 +1,6 @@
 # ASTRA-sim Service
 
-ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simulations by providing an OpenAPI-based [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main) interface. It allows users to set up, control, and monitor simulations as remote services. The service supports flexible workload configuration using [MLCommons Chakra](https://github.com/mlcommons/chakra) and infrastructure modeling with [Keysight Infragraph](https://github.com/Keysight/infragraph). Users can easily configure simulation settings through Jupyter notebooks for interactive experimentation. The repository offers options for both Docker-based and standalone services, and includes ready-to-use sample notebooks for quick start.
+ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simulations by providing an OpenAPI-based [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main) interface. It allows users to set up, control, and monitor simulations as remote services. The service supports flexible workload configuration using [MLCommons Chakra](https://github.com/mlcommons/chakra) and infrastructure modeling with [InfraGraph](https://infragraph.dev/). Users can easily configure simulation settings through Jupyter notebooks for interactive experimentation. The repository offers options for both Docker-based and standalone services, and includes ready-to-use sample notebooks for quick start.
 
 ![ASTRA-sim service](resources/ASTRA-Sim-Service.png)
 
@@ -91,14 +91,14 @@ Implements the ASTRA-sim server that runs using gRPC. It serves as the execution
 - client-scripts: [Read the client-scripts documentation](client-scripts/README.md)
 Provide user-facing interfaces, including Jupyter notebooks, that allow users to configure simulations, trigger runs, and visualize results.
 
-The combination of these components supports model-driven simulation workflows where users can define ASTRA-sim setups programmatically, launch remote simulations, and analyze outcomes—all from interactive notebooks.
+The combination of these components supports model-driven simulation workflows where users can define ASTRA-sim setups programmatically, launch remote simulations, and analyze outcomes - all from interactive notebooks.
 
 ## Contributing
 
 You can contribute to ASTRA-sim Service in the following ways:
 
 - Open an issue in the repository to report bugs or request features.
-- Fork the models repository and submit a pull request (PR) with your changes or extensions.
+- Fork the repository and submit a pull request (PR) with your changes or extensions.
 
-Contributions are welcome across models, client, and service—to improve schema definitions, enhance automation scripts, and extend backend performance.
+Contributions are welcome across models, clients, and service to improve schema definitions, enhance notebook scripts, and extend server performance.
 
