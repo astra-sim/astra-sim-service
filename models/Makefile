@@ -65,4 +65,4 @@ redocly:
 	redocly build-docs ./artifacts/openapi.yaml -o ./artifacts/openapi.html
 	rm -rf ./docs
 	mkdir ./docs
-	cp ./artifacts/openapi.html ./docs/openapi.html
+	cp ./artifacts/openapi.html ./docs/index.html
