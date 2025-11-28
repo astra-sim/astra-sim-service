@@ -21,7 +21,7 @@ version:
 
 .PHONY: build-models
 build-models:
-	cd models && make build
+	cd models && make build && make redocly
 
 .PHONY: generate-sdk-doc
 generate-sdk-doc:

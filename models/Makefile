@@ -63,4 +63,6 @@ build: clean version infragraph
 .PHONY: redocly
 redocly:
 	redocly build-docs ./artifacts/openapi.yaml -o ./artifacts/openapi.html
-	cp ./artifacts/openapi.html ./${PACKAGE_NAME}/openapi.html
+	rm -rf ./docs
+	mkdir ./docs
+	cp ./artifacts/openapi.html ./docs/openapi.html
