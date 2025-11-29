@@ -25,7 +25,6 @@ SOFTWARE.
 import astra_sim_sdk.astra_sim_sdk as astra_sim
 from astra_server.infrastructure.htsim_topology import HTSimTopology
 from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
-from infragraph.blueprints.devices.dgx import Dgx
 from infragraph.blueprints.devices.generic_switch import Switch
 from infragraph.blueprints.devices.server import Server
 from infragraph import Component, InfrastructureEdge
@@ -329,7 +328,7 @@ def dump_yaml(clos_fabric, filename):
     pass
 
 
-def test_clos_fabric_2_tier(infra_single_gpu_server_factory, infra_switch_factory):
+def test_clos_fabric_2_tier():
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
@@ -355,11 +354,75 @@ def test_clos_fabric_2_tier(infra_single_gpu_server_factory, infra_switch_factor
     switch_device_spec.device_type = "switch"
     configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
 
-    topology = HTSimTopology.generate_topology(configuration)
+    HTSimTopology.generate_topology(configuration)
     configuration.network_backend.htsim.htsim_protocol.choice = "tcp"
     # ConfigurationHandler()._generate_htsim_topology(
     #     configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology,
     #     "htsim.topo",
     # )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize
+        == 16
+    )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes
+        == 16
+    )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers
+        == 2
+    )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down
+        == 4
+    )
 
-    # print(topology)
+
+def test_clos_fabric_3_tier():
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "htsim"
+    # load infrastructure and annotation?
+    server = Server()
+    switch = Switch(port_count=8)
+    clos_fat_tree = ClosFatTreeFabric(switch, server, 3, [])
+    dump_yaml(clos_fat_tree, "clos_fabric")
+    configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = "server"
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    switch_device_spec.device_bandwidth_gbps = 1000
+    switch_device_spec.device_latency_ms = 0.005
+    switch_device_spec.device_name = "switch"
+    switch_device_spec.device_type = "switch"
+    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+
+    HTSimTopology.generate_topology(configuration)
+    configuration.network_backend.htsim.htsim_protocol.choice = "tcp"
+    # ConfigurationHandler()._generate_htsim_topology(
+    #     configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology,
+    #     "htsim.topo",
+    # )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize
+        == 8
+    )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes
+        == 64
+    )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers
+        == 3
+    )
+    assert (
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down
+        == 4
+    )
