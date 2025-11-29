@@ -16,7 +16,7 @@ def test_htsim_sample(port_number):
 
         # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
 
-        astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 8 * 1024 * 1024, npu_range=[0, 8])
+        astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 1 * 1024 * 1024, npu_range=[0, 8])
         print(astra.configuration.common_config.workload)
 
         # ##### Configure the system configurations
@@ -42,7 +42,7 @@ def test_htsim_sample(port_number):
         # ##### Configure the Network_backend, topology and protocol
 
         astra.configuration.network_backend.htsim.topology.network_topology_configuration.network.clear()
-        astra.configuration.network_backend.htsim.topology.network_topology_configuration.network.add("ring", 8, 100, 0.005)
+        astra.configuration.network_backend.htsim.topology.network_topology_configuration.network.add("ring", 8, 100, 0.005) # add(type_of_topology, number_of_nodes, bandwidth_in_gbps, latency_in_ns)
         astra.configuration.network_backend.htsim.htsim_protocol.choice = astra.configuration.network_backend.htsim.htsim_protocol.TCP
         print("Network backend set to", astra.configuration.network_backend.choice)
         print("network backend choice set to:",astra.configuration.network_backend.htsim.topology.choice)
@@ -88,6 +88,9 @@ def test_htsim_sample(port_number):
 
         astra.run_simulation(NetworkBackend.HTSIM)
 
+        # ##### Download all the configurations as a zip
+
+        astra.download_configuration()
 
         assert True
     except Exception as e:
