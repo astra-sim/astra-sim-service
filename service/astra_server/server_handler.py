@@ -116,11 +116,11 @@ class ServerHandler:
         """
         returns the config as a zip
         """
-        Utilities.delete_file(
-            os.path.join(
-                Constants.TEST_RUN_DIR, Constants.SERVER_CONFIGURATION + ".zip"
-            )
-        )
+        # Utilities.delete_file(
+        #     os.path.join(
+        #         Constants.TEST_RUN_DIR, Constants.SERVER_CONFIGURATION + ".zip"
+        #     )
+        # )
         Utilities.zip_folder(
             Constants.CONFIGURATION_DIR,
             os.path.join(

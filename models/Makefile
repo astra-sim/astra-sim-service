@@ -29,7 +29,7 @@ clean-openapiart:
 infragraph:
 	rm -rf ./schema/infragraph/infragraph.yaml
 	rm -rf infragraph
-	git clone --branch v0.6.0 --depth 1 https://github.com/Keysight/infragraph
+	git clone --branch v0.6.1 --depth 1 https://github.com/Keysight/infragraph
 	cp infragraph/models/infrastructure.yaml ./schema/infragraph/infragraph.yaml
 	cp infragraph/models/device.yaml ./schema/infragraph/device.yaml
 	cp infragraph/models/link.yaml ./schema/infragraph/link.yaml
