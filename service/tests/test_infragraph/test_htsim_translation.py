@@ -24,9 +24,13 @@ SOFTWARE.
 
 import astra_sim_sdk.astra_sim_sdk as astra_sim
 from astra_server.infrastructure.htsim_topology import HTSimTopology
-
+from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
+from infragraph.blueprints.devices.dgx import Dgx
+from infragraph.blueprints.devices.generic_switch import Switch
+from infragraph.blueprints.devices.server import Server
 from infragraph import Component, InfrastructureEdge
 from infragraph.infragraph_service import InfraGraphService
+from astra_server.configuration_handler import ConfigurationHandler
 
 
 def test_3tier_8host_1npu(infra_single_gpu_server_factory, infra_switch_factory):
@@ -40,9 +44,7 @@ def test_3tier_8host_1npu(infra_single_gpu_server_factory, infra_switch_factory)
     configuration.infragraph.infrastructure.name = "3tier-8host-1npu"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
 
-    hosts = configuration.infragraph.infrastructure.instances.add(
-        name="host", device=server.name, count=8
-    )
+    hosts = configuration.infragraph.infrastructure.instances.add(name="host", device=server.name, count=8)
 
     rack_switch = configuration.infragraph.infrastructure.instances.add(
         name="rack_switch", device=switch.name, count=4
@@ -160,9 +162,7 @@ def test_3tier_8host_1npu(infra_single_gpu_server_factory, infra_switch_factory)
     switch_device_spec.device_latency_ms = 0.005
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
 
     HTSimTopology.generate_topology(configuration)
     assert (
@@ -194,13 +194,11 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
     spine_switch_dev = infra_switch_factory(8)
 
     configuration.infragraph.infrastructure.name = "3tier-8host-1npu"
-    configuration.infragraph.infrastructure.devices.append(server).append(
-        rack_switch_dev
-    ).append(pod_switch_dev).append(spine_switch_dev)
+    configuration.infragraph.infrastructure.devices.append(server).append(rack_switch_dev).append(
+        pod_switch_dev
+    ).append(spine_switch_dev)
 
-    hosts = configuration.infragraph.infrastructure.instances.add(
-        name="host", device=server.name, count=16
-    )
+    hosts = configuration.infragraph.infrastructure.instances.add(name="host", device=server.name, count=16)
 
     rack_switch = configuration.infragraph.infrastructure.instances.add(
         name="rack_switch", device=rack_switch_dev.name, count=4
@@ -234,15 +232,9 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
     spine_link.physical.latency.ms = 0.005
 
     host_component = InfraGraphService.get_component(server, Component.NIC)
-    rack_switch_component = InfraGraphService.get_component(
-        rack_switch_dev, Component.PORT
-    )
-    pod_switch_component = InfraGraphService.get_component(
-        pod_switch_dev, Component.PORT
-    )
-    spine_switch_component = InfraGraphService.get_component(
-        spine_switch_dev, Component.PORT
-    )
+    rack_switch_component = InfraGraphService.get_component(rack_switch_dev, Component.PORT)
+    pod_switch_component = InfraGraphService.get_component(pod_switch_dev, Component.PORT)
+    spine_switch_component = InfraGraphService.get_component(spine_switch_dev, Component.PORT)
 
     host_multiplier = 0
     # link two host to one rack switch
@@ -266,9 +258,7 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
             edge.ep1.instance = f"{rack_switch.name}[{rack_switch_index}]"
             edge.ep1.component = f"{rack_switch_component.name}[{4 + index}]"
             edge.ep2.instance = f"{pod_switch.name}[0]"
-            edge.ep2.component = (
-                f"{pod_switch_component.name}[{index + rack_switch_index * 4}]"
-            )
+            edge.ep2.component = f"{pod_switch_component.name}[{index + rack_switch_index * 4}]"
 
     # tier0.0 and tier0.1 -> tier1.0 - 4 links each
     for rack_switch_index in [2, 3]:
@@ -279,9 +269,7 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
             edge.ep1.instance = f"{rack_switch.name}[{rack_switch_index}]"
             edge.ep1.component = f"{rack_switch_component.name}[{4 + index}]"
             edge.ep2.instance = f"{pod_switch.name}[1]"
-            edge.ep2.component = (
-                f"{pod_switch_component.name}[{index + (rack_switch_index - 2) * 4}]"
-            )
+            edge.ep2.component = f"{pod_switch_component.name}[{index + (rack_switch_index - 2) * 4}]"
 
     # tier1.0 and tier1.1 -> tier2.0
     for index in range(0, 8):
@@ -311,9 +299,7 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
     switch_device_spec.device_latency_ms = 0.005
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
 
     HTSimTopology.generate_topology(configuration)
     assert (
@@ -332,3 +318,48 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
         configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down
         == 4
     )
+
+
+def dump_yaml(clos_fabric, filename):
+    import yaml
+
+    with open(filename + ".yaml", "w") as file:
+        data = clos_fabric.serialize("dict")
+        yaml.dump(data, file, default_flow_style=False, indent=4)
+    pass
+
+
+def test_clos_fabric_2_tier(infra_single_gpu_server_factory, infra_switch_factory):
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "htsim"
+    # load infrastructure and annotation?
+    server = Server()
+    switch = Switch(port_count=8)
+    clos_fat_tree = ClosFatTreeFabric(switch, server, 2, [])
+    # dump_yaml(clos_fat_tree, "clos_fabric")
+    configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = "server"
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    switch_device_spec.device_bandwidth_gbps = 1000
+    switch_device_spec.device_latency_ms = 0.005
+    switch_device_spec.device_name = "switch"
+    switch_device_spec.device_type = "switch"
+    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+
+    topology = HTSimTopology.generate_topology(configuration)
+    configuration.network_backend.htsim.htsim_protocol.choice = "tcp"
+    # ConfigurationHandler()._generate_htsim_topology(
+    #     configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology,
+    #     "htsim.topo",
+    # )
+
+    # print(topology)

@@ -40,7 +40,7 @@ def test_analytical_congestion_aware_sample(port_number):
 
         # astra.configuration.network_backend.choice = astra.configuration.network_backend.ANALYTICAL_CONGESTION_AWARE
         astra.configuration.network_backend.analytical_congestion_aware.topology.network.clear()
-        astra.configuration.network_backend.analytical_congestion_aware.topology.network.add("switch", 8, 100, 0.005)
+        astra.configuration.network_backend.analytical_congestion_aware.topology.network.add("switch", 8, 100, 0.005) # add(type_of_topology, number_of_nodes, bandwidth_in_gbps, latency_in_ns)
         print("Network backend set to", astra.configuration.network_backend.choice)
         print("network backend choice set to:",astra.configuration.network_backend.analytical_congestion_aware.topology.choice)
 
@@ -56,6 +56,9 @@ def test_analytical_congestion_aware_sample(port_number):
 
         astra.run_simulation(NetworkBackend.ANALYTICAL_CONGESTION_AWARE)
 
+        # ##### Download all the configurations as a zip
+
+        astra.download_configuration()
 
         assert True
     except Exception as e:

@@ -97,6 +97,10 @@ def test_ns3_infragraph_sample_dgx_device(port_number):
 
         astra.run_simulation(NetworkBackend.NS3)
 
+        # ##### Download all the configurations as a zip
+
+        astra.download_configuration()
+
         # ##### Read output files
 
         import pandas as pd

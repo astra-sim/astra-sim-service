@@ -43,7 +43,9 @@ def test_1host_4rank(infra_single_gpu_server_factory, infra_switch_factory):
     switch = infra_switch_factory()
     configuration.infragraph.infrastructure.name = "1host-4ranks"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
-    hosts = configuration.infragraph.infrastructure.instances.add(name="host", device=server.name, count=4)
+    hosts = configuration.infragraph.infrastructure.instances.add(
+        name="host", device=server.name, count=4
+    )
     rack_switch = configuration.infragraph.infrastructure.instances.add(
         name="rack_switch", device=switch.name, count=1
     )
@@ -80,7 +82,9 @@ def test_1host_4rank(infra_single_gpu_server_factory, infra_switch_factory):
     switch_device_spec.device_latency_ms = 0.005
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+    configuration.infragraph.annotations.device_specifications.append(
+        switch_device_spec
+    )
 
     NS3Topology.generate_topology(configuration)
 
@@ -99,7 +103,9 @@ def test_1tier_1host_8npu(infra_multi_gpu_server_factory, infra_switch_factory):
     switch = infra_switch_factory()
     configuration.infragraph.infrastructure.name = "1host-8ranks"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
-    hosts = configuration.infragraph.infrastructure.instances.add(name="host", device=server.name, count=1)
+    hosts = configuration.infragraph.infrastructure.instances.add(
+        name="host", device=server.name, count=1
+    )
     rack_switch = configuration.infragraph.infrastructure.instances.add(
         name="rack_switch", device=switch.name, count=1
     )
@@ -136,7 +142,9 @@ def test_1tier_1host_8npu(infra_multi_gpu_server_factory, infra_switch_factory):
     switch_device_spec.device_latency_ms = 0.005
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+    configuration.infragraph.annotations.device_specifications.append(
+        switch_device_spec
+    )
 
     NS3Topology.generate_topology(configuration)
 
@@ -201,7 +209,9 @@ def test_2dgx_1switch(infra_switch_factory):
     switch_device_spec.device_latency_ms = 0.05
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+    configuration.infragraph.annotations.device_specifications.append(
+        switch_device_spec
+    )
 
     NS3Topology.generate_topology(configuration)
 
@@ -232,7 +242,9 @@ def test_2_tier_clos_fabric():
     switch_device_spec.device_latency_ms = 0.05
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+    configuration.infragraph.annotations.device_specifications.append(
+        switch_device_spec
+    )
     NS3Topology.generate_topology(configuration)
     assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 76
     assert configuration.network_backend.ns3.topology.nc_topology.total_links == 128
@@ -260,8 +272,12 @@ def test_3_tier_clos_fabric():
     switch_device_spec.device_latency_ms = 0.05
     switch_device_spec.device_name = "switch"
     switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
-    configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+    configuration.infragraph.annotations.device_specifications.append(
+        switch_device_spec
+    )
+    configuration.infragraph.annotations.device_specifications.append(
+        switch_device_spec
+    )
     NS3Topology.generate_topology(configuration)
     assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 52
     assert configuration.network_backend.ns3.topology.nc_topology.total_links == 80

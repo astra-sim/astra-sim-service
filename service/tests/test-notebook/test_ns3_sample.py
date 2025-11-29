@@ -36,13 +36,6 @@ def test_ns3_sample(port_number):
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the communicator group
-
-        # clear the communicator group to avoid redundancy
-        astra.configuration.common_config.communicator_group.clear()
-        astra.configuration.common_config.communicator_group.add("0", [0, 1, 2, 3])
-        print(astra.configuration.common_config.communicator_group)
-
         # ##### Configure the Network_backend
 
         # astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
@@ -85,6 +78,10 @@ def test_ns3_sample(port_number):
         # #### Start the simulation by providing the network backend name in uppercase letters.
 
         astra.run_simulation(NetworkBackend.NS3)
+
+        # ##### Download all the configurations as a zip
+
+        astra.download_configuration()
 
         # ##### Read output files
 
