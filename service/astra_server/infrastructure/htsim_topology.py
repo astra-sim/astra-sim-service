@@ -69,7 +69,9 @@ class HTSimFatTree:
             "tier1": set(),
             "tier2": set(),
         }
-
+        self.hosts_per_rack = 0
+        self.racks_per_pod = 0
+        self.pod_size = 0
         self.top_to_bottom_device_map = {}
         self.annotation = Annotation(configuration.infragraph.annotations)
         self.infragraph_service = InfraGraphService()
@@ -261,11 +263,17 @@ class HTSimFatTree:
                 pod_size = pod_size + 1
         return pod_size
 
-    def _get_rack_switches_per_pod(self, pod_size):
+    def _get_rack_switches_per_pod(self):
         tier0_device = list(self.tier_device_instances["tier0"])[0]
         # calculate how many hosts are connected?
         hosts = len(self.top_to_bottom_device_map[tier0_device])
-        return pod_size / hosts
+        return self.pod_size / hosts
+
+    def _get_nodes_per_rack(self):
+        tier0_device = list(self.tier_device_instances["tier0"])[0]
+        # calculate how many hosts are connected?
+        hosts = len(self.top_to_bottom_device_map[tier0_device])
+        return hosts
 
     def _get_agg_switches_per_pod(self):
         agg_switch_count = 1
@@ -302,14 +310,15 @@ class HTSimFatTree:
         self._edge_parser("tier0", "tier1")
         self._edge_parser("tier1", "tier2")
 
-        pod_size = self._get_pod_size()
+        self.pod_size = self._get_pod_size()
         # check if gpus matter here?
         configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes = len(
             self.tier_device_instances["host"]
         )
         # create for tier0
         tier0 = self._get_tier_information(low_tier="host", mid_tier="tier0", up_tier="tier1")
-        rack_switch_count_per_pod = self._get_rack_switches_per_pod(pod_size=pod_size)
+        self.racks_per_pod = self._get_rack_switches_per_pod()
+        self.hosts_per_rack = self._get_nodes_per_rack()
         if tier0 is not None:
 
             if tier0.downlink_speed_gbps > 0:
@@ -428,7 +437,7 @@ class HTSimFatTree:
             )
 
         configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize = (
-            pod_size
+            self.pod_size
         )
 
 
@@ -445,30 +454,68 @@ class HTSimTopology:
         # need a switch for fat tree, dragonfly and so on here the configuration will have the topology choice
 
         # TODO: a switch is required between various topologies
-        HTSimFatTree(configuration)
+        topology = HTSimFatTree(configuration)
+        nodes = (
+            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes
+        )
+        podsize = (
+            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize
+        )
 
+        # TODO Need to check for multiple gpus in a host
         # analytical topology generation here
-        infrastructure = configuration.infragraph.infrastructure
-        annotations = configuration.infragraph.annotations
-        topology = AnalyticalTopology(infrastructure, annotations)
-        if topology.analytical_1d is not None:
+        npu_count = 1
+        # infrastructure = configuration.infragraph.infrastructure
+        # annotations = configuration.infragraph.annotations
+        # analytical_topology = AnalyticalTopology(infrastructure, annotations)
+        # if analytical_topology.analytical_1d is not None:
+        #     npu_count = analytical_topology.analytical_1d.node_count
+        #     configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
+        #         topology=analytical_topology.analytical_1d.topology,  # type: ignore
+        #         npus_count=analytical_topology.analytical_1d.node_count,
+        #         bandwidth=analytical_topology.analytical_1d.bandwidth,
+        #         latency=analytical_topology.analytical_1d.latency,
+        #     )
+        if podsize == nodes:
             configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
-                topology=topology.analytical_1d.topology,  # type: ignore
-                npus_count=topology.analytical_1d.node_count,
-                bandwidth=topology.analytical_1d.bandwidth,
-                latency=topology.analytical_1d.latency,
+                topology="switch",  # type: ignore
+                npus_count=nodes,
+                bandwidth=float(
+                    configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_speed_gbps
+                ),
+                latency=float(
+                    configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_latency_ns
+                ),
             )
-        if topology.analytical_2d is not None:
+        elif podsize < nodes and nodes % podsize == 0:
+            # TODO get rack connected nodes
+            # podsize will always be less than number of nodes
             configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
-                topology=topology.analytical_2d.topology,  # type: ignore
-                npus_count=topology.analytical_2d.node_count,
-                bandwidth=topology.analytical_2d.bandwidth,
-                latency=topology.analytical_2d.latency,
+                topology="switch",  # type: ignore
+                npus_count=topology.hosts_per_rack,
+                bandwidth=float(
+                    configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_speed_gbps
+                ),
+                latency=float(
+                    configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_latency_ns
+                ),
             )
-        if topology.analytical_3d is not None:
-            configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
-                topology=topology.analytical_3d.topology,  # type: ignore
-                npus_count=topology.analytical_3d.node_count,
-                bandwidth=topology.analytical_3d.bandwidth,
-                latency=topology.analytical_3d.latency,
-            )
+            if (
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1
+            ):
+                configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
+                    topology="switch",  # type: ignore
+                    npus_count=(nodes // topology.hosts_per_rack),
+                    bandwidth=float(
+                        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_speed_gbps
+                    ),
+                    latency=float(
+                        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_latency_ns
+                    ),
+                )
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes = (
+            nodes * npu_count
+        )
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize = (
+            podsize * npu_count
+        )
