@@ -77,7 +77,7 @@ This command launches the ASTRA-sim gRPC server, exposing it for client connecti
 
 ### 3. Using the Client Notebooks
 
-Client Jupyter notebooks are provided under `client-scripts/notebooks`. You can open them using the VS Code Jupyter extension, configure connections to the running ASTRA-sim service (via the server IP and port), and run simulation workflows interactively. The next steps talk about how to build and run the astra-sim-service.
+You can run any of the client Jupyter notebooks provided under [client-scripts/notebooks](client-scripts/notebooks). The easiest approach is to opn the notebooks using the [VS Code Jupyter extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter). Configure the endpoint of the running ASTRA-sim service at the top of the notebook, and run the rest of the notebook interactively. Refer to the README one level above ([client-scripts/README.md](client-scripts/)) for a description of each notebook.
 
 
 ## Repository Overview
