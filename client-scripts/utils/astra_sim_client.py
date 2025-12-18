@@ -174,15 +174,12 @@ class AstraSimClient:
             self.get_file(file)
         return metadata
 
-    def pack_zip(self, config):
+    def pack_zip(self, workload_folder):
         """
         Function that zips all the workloads in the config dir
         """
-        print("Generating Configuration ZIP")
-        workload_dir = config.common_config.workload
-        workload_parent_path = os.path.dirname(workload_dir)
-        # check if zip is fine
-        Utilities.zip_folder(os.path.join(workload_parent_path, ".."), FileFolderUtils().ZIP_PATH)
+        print("Generating Configuration ZIP now")
+        Utilities.zip_folder(os.path.join(workload_folder, ".."), FileFolderUtils().ZIP_PATH)
         print("pack_zip complete")
 
     def get_config(self):

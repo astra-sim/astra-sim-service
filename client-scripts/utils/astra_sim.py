@@ -128,8 +128,10 @@ class AstraSim:
         """
         A wrapper call over multiple operations allowing to upload, run, and download files for a simulation
         """
+        workload_dir = self.configuration.common_config.workload
+        workload_folder = os.path.dirname(workload_dir)
         self._astra_sim_client.set_url(self._server_endpoint)  # type: ignore
-        self._astra_sim_client.pack_zip(self.configuration)
+        self._astra_sim_client.pack_zip(workload_folder)
         self._astra_sim_client.upload_config()
         self._astra_sim_client.set_config(self.configuration)
         self._astra_sim_client.run_simulation(network_backend.value)
