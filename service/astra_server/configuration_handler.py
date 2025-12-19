@@ -161,13 +161,16 @@ class ConfigurationHandler:
             else:
                 module_logger.debug("workload present in zip")
                 configuration.common_config.workload = os.path.join(
-                    Constants.CONFIGURATION_DIR, *workload.split("/")[-2:]
+                    Constants.CONFIGURATION_DIR,
+                    workload.split("/")[-2],
+                    workload.split("/")[-1],
                 )
                 self.command.append(
                     "--workload-configuration="
                     + os.path.join(
                         Constants.CONFIGURATION_DIR,
-                        configuration.common_config.workload,
+                        workload.split("/")[-2],
+                        workload.split("/")[-1],
                     )
                 )
         module_logger.info("Done processing workload configuration")
