@@ -149,26 +149,28 @@ class ConfigurationHandler:
             # check if workload exists
             # process workload:
             module_logger.debug(
-                "Checking workload in the configuration zip: %s", workload.split("/")[0]
+                "Checking workload in the configuration zip: %s",
+                workload.split("/")[-2],
             )
             if not Utilities.is_file_or_folder_present(
-                os.path.join(Constants.CONFIGURATION_DIR, workload.split("/")[0])
+                os.path.join(Constants.CONFIGURATION_DIR, workload.split("/")[-2])
             ):
                 raise ConfigurationError(
                     "workload files not found", grpc.StatusCode.NOT_FOUND, 404
                 )
             else:
-                module_logger.debug(
-                    "%s workload present in zip", workload.split("/")[0]
-                )
+                module_logger.debug("workload present in zip")
                 configuration.common_config.workload = os.path.join(
-                    Constants.CONFIGURATION_DIR, configuration.common_config.workload
+                    Constants.CONFIGURATION_DIR,
+                    workload.split("/")[-2],
+                    workload.split("/")[-1],
                 )
                 self.command.append(
                     "--workload-configuration="
                     + os.path.join(
                         Constants.CONFIGURATION_DIR,
-                        configuration.common_config.workload,
+                        workload.split("/")[-2],
+                        workload.split("/")[-1],
                     )
                 )
         module_logger.info("Done processing workload configuration")

@@ -39,5 +39,5 @@ def mock_configuration_directory():
     The mock configuration directory
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    mock_dir = os.path.join(script_dir, "..", "notebooks", "mock_configurations")
+    mock_dir = os.path.join(script_dir, "..", "mock_configurations")
     return mock_dir

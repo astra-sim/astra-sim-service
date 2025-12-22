@@ -60,6 +60,11 @@ version: ## Generate build version
 pre-test:
 	rm -rf tests/test-notebook
 	python3 convert_nb_to_script.py
+	cp -r ../client-scripts/mock_configurations tests
+
+.PHONY: post-test
+post-test:
+	rm -rf tests/mock_configurations
 
 .PHONY: build
 build: clean version
@@ -70,6 +75,7 @@ build: clean version
 	pip install dist/*.whl
 	make pre-test
 	make test
+	make post-test
 
 .PHONY: test
 test:
