@@ -42,9 +42,7 @@ RESOURCES_DIR = os.path.join(SCRIPT_DIR, "..", "resources")
 )
 def test_generate_system_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
-    ConfigurationHandler()._process_system_configuration(
-        configuration, os.path.join(temp_dir, filename)
-    )
+    ConfigurationHandler()._process_system_configuration(configuration, os.path.join(temp_dir, filename))
     assert Utilities.is_file_or_folder_present(os.path.join(temp_dir, filename)) is True
 
 
@@ -58,13 +56,9 @@ def test_generate_system_configuration(config, filename, temp_dir, request):
 def test_generate_comm_group_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
     file_path = os.path.join(temp_dir, filename)
-    ConfigurationHandler()._process_communicator_group_configuration(
-        configuration, file_path
-    )
+    ConfigurationHandler()._process_communicator_group_configuration(configuration, file_path)
     assert Utilities.is_file_or_folder_present(file_path) is True
-    assert filecmp.cmp(
-        file_path, os.path.join(RESOURCES_DIR, "communicator_group.json")
-    )
+    assert filecmp.cmp(file_path, os.path.join(RESOURCES_DIR, "communicator_group_4_ranks.json"))
 
 
 @pytest.mark.parametrize(

@@ -60,11 +60,11 @@ version: ## Generate build version
 pre-test:
 	rm -rf tests/test-notebook
 	python3 convert_nb_to_script.py
-	cp -r ../client-scripts/mock_configurations tests
+	cp -r ../client-scripts/resources tests
 
 .PHONY: post-test
 post-test:
-	rm -rf tests/mock_configurations
+	rm -rf tests/resources
 
 .PHONY: build
 build: clean version

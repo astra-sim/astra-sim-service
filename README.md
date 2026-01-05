@@ -11,7 +11,7 @@ ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simu
 The project uses VS Code Dev Containers to ensure a reproducible and isolated development setup.
 
 - Base image: ubuntu:22.04
-- Preinstalled dependencies: Python 3.x, gRPC tools, Make, CMake, and simulation dependencies. For all the dependent packages please check [Dockerfile.devenv](Dockerfile.devenv)
+- This will install dependencies like: Python 3.x, gRPC tools, Make, CMake, and simulation dependencies. For all the dependent packages please check [Dockerfile.devenv](Dockerfile.devenv)
 - The dev container automatically sets up your environment, installs packages, and provides consistent build behavior across developers.
 
 This environment is particularly useful for contributors who want a ready-to-use setup for model updates, client testing, or service development.

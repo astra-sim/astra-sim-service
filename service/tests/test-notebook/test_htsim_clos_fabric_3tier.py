@@ -1,4 +1,4 @@
-def test_htsim_clos_fabric_2tier(port_number):
+def test_htsim_clos_fabric_3tier(port_number):
 
     try:
 
@@ -18,13 +18,13 @@ def test_htsim_clos_fabric_2tier(port_number):
 
         # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "htsim_clos_2tier_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "htsim_clos_3tier_trial")
 
-        # ##### Creating Infragraph for 2 tier clos fabric
+        # ##### Creating Infragraph for 3 tier clos fabric
 
         server = Server()
         switch = Switch(port_count=8)
-        clos_fat_tree = ClosFatTreeFabric(switch, server, 2,[])
+        clos_fat_tree = ClosFatTreeFabric(switch, server, 3,[])
         astra.configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
         print(astra.configuration.infragraph.infrastructure)
 
@@ -35,7 +35,7 @@ def test_htsim_clos_fabric_2tier(port_number):
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
 
-        total_npus = 16
+        total_npus = 64
 
         # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
 
@@ -66,6 +66,7 @@ def test_htsim_clos_fabric_2tier(port_number):
 
         astra.configuration.network_backend.choice = astra.configuration.network_backend.HTSIM
         astra.configuration.network_backend.htsim.topology.choice = astra.configuration.network_backend.htsim.topology.INFRAGRAPH
+        # astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
 
         # ##### Configure the protocol choice
 
@@ -116,7 +117,7 @@ def test_htsim_clos_fabric_2tier(port_number):
             data = clos_fat_tree.serialize("dict")
             yaml.dump(data, f, default_flow_style=False, indent=4)
 
-        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","2tier.yaml"))
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","3tier.yaml"))
 
         assert True
     except Exception as e:

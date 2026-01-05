@@ -34,10 +34,10 @@ def config():
 
 
 @pytest.fixture
-def mock_configuration_directory():
+def resources_dir():
     """
     The mock configuration directory
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    mock_dir = os.path.join(script_dir, "..", "mock_configurations")
+    mock_dir = os.path.join(script_dir, "..", "resources")
     return mock_dir
