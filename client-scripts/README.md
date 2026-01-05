@@ -5,10 +5,25 @@ This directory contains the client-scripts, which include utility modules and sa
 ## Directory Structure
 
 - **notebooks/**
-  Contains sample notebooks for all supported backends:
-  - Analytical Congestion Aware and Unaware
-  - HTSim
-  - NS3
+  Contains sample notebooks for all supported backends. The notebooks are present in the notebooks folder and are as follows:
+
+    | Notebook Path                                           | Description |
+    |--------------------------------------------------------|-------------|
+    | analytical_congestion_aware_sample.ipynb               | Notebook demonstrating simulation runs using the analytical congestion-aware backend |
+    | analytical_congestion_unaware_sample.ipynb             | Notebook demonstrating simulation runs using the analytical congestion-unaware backend |
+    | config_to_schema_sample.ipynb                          | Notebook showing how configuration files are translated into the Astra-sim schema format |
+    | htsim_sample.ipynb                                     | Notebook demonstrating simulation runs using the htsim backend. |
+    | load_existing_et_example.ipynb                         | Notebook demonstrating a simulation run that loads an existing execution trace and runs it on the ns-3 backend |
+    | ns3_sample.ipynb                                       | Notebook demonstrating simulation runs using the ns-3 backend |
+    | infragraph/htsim_clos_fabric_2tier.ipynb               | Notebook demonstrating a simulation run on the htsim backend using a two-tier Clos fabric defined in Infragraph |
+    | infragraph/htsim_clos_fabric_3tier.ipynb               | Notebook demonstrating a simulation run on the htsim backend using a three-tier Clos fabric defined in Infragraph |
+    | infragraph/ns3_clos_fabric_2tier.ipynb                 | Notebook demonstrating a simulation run on the ns-3 backend using a two-tier Clos fabric defined in Infragraph |
+    | infragraph/ns3_clos_fabric_3tier.ipynb                 | Notebook demonstrating a simulation run on the ns-3 backend using a three-tier Clos fabric defined in Infragraph |
+    | infragraph/ns3_infragraph_sample_dgx_device.ipynb      | Notebook demonstrating a simulation run on the ns-3 backend using a single-tier fabric with a switch and DGX host device defined in Infragraph |
+    | infragraph/ns3_infragraph_sample_generic_devices.ipynb | Notebook demonstrating a simulation run on the ns-3 backend using a single-tier fabric with a switch and generic host devices defined in Infragraph |
+
+
+
 
 - **notebooks/infragraph/**
   Contains the Infragraph notebook for the NS3 backend.
