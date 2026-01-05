@@ -108,5 +108,4 @@ Contributions are welcome across models, clients, and service to improve schema 
 |------|------|--------|--------|
 | Amos Rai | Contributor | [@Amos-Rai-KEYS](https://github.com/Amos-Rai-KEYS) | Keysight |
 | Harsh Sikhwal | Maintainer | [@harsh-sikhwal](https://github.com/harsh-sikhwal) | Keysight |
-| Jinsun Yoo | Maintainer | [@jinsun-yoo
-](https://github.com/jinsun-yoo) | Georgia Tech |
+| Jinsun Yoo | Maintainer | [@jinsun-yoo](https://github.com/jinsun-yoo) | Georgia Tech |
