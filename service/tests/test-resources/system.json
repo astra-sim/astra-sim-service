@@ -13,7 +13,6 @@
     "preferred-dataset-splits": 1,
     "local-mem-bw": 1600,
     "trace-enabled": 0,
-    "boost-mode": 0,
     "all-reduce-implementation": [
         "ring"
     ],

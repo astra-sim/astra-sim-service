@@ -28,7 +28,7 @@ def test_htsim_clos_fabric_2tier(port_number):
         astra.configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
         print(astra.configuration.infragraph.infrastructure)
 
-        # ##### Display Fabric
+        # ##### Initialize Infragraph service and Display Fabric
 
         service = InfraGraphService()
         service.set_graph(clos_fat_tree)
@@ -66,9 +66,8 @@ def test_htsim_clos_fabric_2tier(port_number):
 
         astra.configuration.network_backend.choice = astra.configuration.network_backend.HTSIM
         astra.configuration.network_backend.htsim.topology.choice = astra.configuration.network_backend.htsim.topology.INFRAGRAPH
-        # astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
 
-        # ##### Adding ns3 trace and logical dimension 
+        # ##### Configure the protocol choice
 
         astra.configuration.network_backend.htsim.htsim_protocol.choice = astra.configuration.network_backend.htsim.htsim_protocol.TCP
         print("Network backend set to", astra.configuration.network_backend.choice)

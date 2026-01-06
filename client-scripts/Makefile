@@ -5,6 +5,7 @@ install-prerequisites:  ## Install dependencies
 	git clone https://github.com/mlcommons/chakra.git
 	cp utils/pyproject.toml chakra
 	cd chakra && pip install .
+	rm -rf chakra
 
 
 .PHONY: test

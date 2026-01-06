@@ -126,14 +126,24 @@ class DeviceRateMetrics:
         """
         Converts the bandwith to the specified transfer unit
         """
-        return self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value
+        return (
+            self._bandwidth_in_gbps
+            / TransferUnit.GIGABIT_PER_SECOND.value
+            * target_unit.value
+        )
 
     def to_str(self, target_unit=TransferUnit.GIGABIT_PER_SECOND):
         """
         Converts the bandwith to the specified transfer unit and returns as string with the unit name appended
         """
         return (
-            str(int(self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value))
+            str(
+                int(
+                    self._bandwidth_in_gbps
+                    / TransferUnit.GIGABIT_PER_SECOND.value
+                    * target_unit.value
+                )
+            )
             + InfraUtils.TRANSFER_UNIT_TO_SHORT_NOTATION[target_unit.name]
         )
 
@@ -142,7 +152,9 @@ class DeviceRateMetrics:
         Converts the bandwidth to the specified transfer unit and returns as an integer
         """
         return round(
-            self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value,
+            self._bandwidth_in_gbps
+            / TransferUnit.GIGABIT_PER_SECOND.value
+            * target_unit.value,
             decimal_places,
         )
 
@@ -150,14 +162,24 @@ class DeviceRateMetrics:
         """
         Converts the bandwidth to the specified transfer unit and returns as an integer
         """
-        return int(self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value)
+        return int(
+            self._bandwidth_in_gbps
+            / TransferUnit.GIGABIT_PER_SECOND.value
+            * target_unit.value
+        )
 
     def to_int_str(self, target_unit=TransferUnit.GIGABIT_PER_SECOND):
         """
         Converts the bandwidth to the specified transfer unit and returns a string with transfer unit value in integer
         """
         return (
-            str(int(self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value))
+            str(
+                int(
+                    self._bandwidth_in_gbps
+                    / TransferUnit.GIGABIT_PER_SECOND.value
+                    * target_unit.value
+                )
+            )
             + InfraUtils.TRANSFER_UNIT_TO_SHORT_NOTATION[target_unit.name]
         )
 
@@ -275,8 +297,12 @@ class Annotation:
         rank_to_npu = {}
         for rank_assignment in annotations.rank_assignment:
             # assign to rank -> npu and npu -> rank #two way map
-            rank_to_npu[rank_assignment.rank_identifier] = rank_assignment.npu_identifier
-            self.device_to_id[rank_assignment.npu_identifier] = rank_assignment.rank_identifier
+            rank_to_npu[
+                rank_assignment.rank_identifier
+            ] = rank_assignment.npu_identifier
+            self.device_to_id[
+                rank_assignment.npu_identifier
+            ] = rank_assignment.rank_identifier
 
         # if ranks are not assigned?
         self.last_rank_identifier = len(rank_to_npu)
@@ -316,11 +342,15 @@ class Annotation:
         for device_name, device_data in self.device_specification.items():
             dev_type = device_data.get("device_type")
             if dev_type is None:
-                raise InfragraphError("Device Type is missing", grpc.StatusCode.INVALID_ARGUMENT, 400)
+                raise InfragraphError(
+                    "Device Type is missing", grpc.StatusCode.INVALID_ARGUMENT, 400
+                )
             if "host" == dev_type:
                 self.hosts.add(device_name)
         if len(self.hosts) == 0:
-            raise InfragraphError("host devices not specified", grpc.StatusCode.NOT_FOUND, 404)
+            raise InfragraphError(
+                "host devices not specified", grpc.StatusCode.NOT_FOUND, 404
+            )
 
     def add_device(self, device_name: str):
         """
@@ -372,13 +402,17 @@ class Annotation:
 
             if link.physical.get("latency") is not None:
                 if link.physical.latency.choice == "ms":
-                    self.link_specification[link.name]["latency"] = Latency(link.physical.latency.ms)
+                    self.link_specification[link.name]["latency"] = Latency(
+                        link.physical.latency.ms
+                    )
                 elif link.physical.latency.choice == "ns":
                     self.link_specification[link.name]["latency"] = Latency(
                         link.physical.latency.ns * 0.000001
                     )
                 elif link.physical.latency.choice == "us":
-                    self.link_specification[link.name]["latency"] = Latency(link.physical.latency.us * 0.001)
+                    self.link_specification[link.name]["latency"] = Latency(
+                        link.physical.latency.us * 0.001
+                    )
 
     def add_device_instance(self, device_instance: str, device_name: str):
         """
@@ -405,13 +439,18 @@ class NetworkxUtils:
         return list(set(neighbors))
 
     @staticmethod
-    def get_nodes_from_device_component_type(graph, device_instance_name: str, component_type: str):
+    def get_nodes_from_device_component_type(
+        graph, device_instance_name: str, component_type: str
+    ):
         """
         This returns all the nodes from the graph for a given component type
         """
         nodes = []
         for node, attrs in graph.nodes(data=True):
-            if attrs.get("type") == component_type and attrs.get("instance") == device_instance_name:
+            if (
+                attrs.get("type") == component_type
+                and attrs.get("instance") == device_instance_name
+            ):
                 nodes.append(node)
         return nodes
 

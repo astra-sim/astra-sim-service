@@ -32,20 +32,20 @@ from utils.config_to_schema import TranslateConfig
 from utils.common import Utilities
 
 
-def test_translate_remote_memory(config, mock_configuration_directory):
+def test_translate_remote_memory(config, resources_dir):
     """
     Tests remote memory translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "RemoteMemory.json")
+    test_file_path = os.path.join(resources_dir, "RemoteMemory.json")
     TranslateConfig.translate_remote_memory(test_file_path, config)
     assert config.common_config.remote_memory.memory_type == "NO_MEMORY_EXPANSION"
 
 
-def test_translate_nc_topology_configuration(config, mock_configuration_directory):
+def test_translate_nc_topology_configuration(config, resources_dir):
     """
     Tests ns3 nc topology translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "nc-topology-file.txt")
+    test_file_path = os.path.join(resources_dir, "nc-topology-file.txt")
     expected_total_nodes = 37
     expected_len_switch_ids = 5
     TranslateConfig.translate_ns3_nc_topology_configuration(test_file_path, config)
@@ -53,11 +53,11 @@ def test_translate_nc_topology_configuration(config, mock_configuration_director
     assert len(config.network_backend.ns3.topology.nc_topology.switch_ids) == expected_len_switch_ids
 
 
-def test_translate_system_configuration(config, mock_configuration_directory):
+def test_translate_system_configuration(config, resources_dir):
     """
     Tests system configuration translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "system.json")
+    test_file_path = os.path.join(resources_dir, "system.json")
     TranslateConfig.translate_system_configuration(test_file_path, config)
     expected_endpoint_delay = 10
     system_dict = Utilities.to_dict(config.common_config.system)
@@ -66,22 +66,22 @@ def test_translate_system_configuration(config, mock_configuration_directory):
     assert "active-chunks-per-dimension" not in system_dict
 
 
-def test_translate_communicator_configuration(config, mock_configuration_directory):
+def test_translate_communicator_configuration(config, resources_dir):
     """
     Tests communicator group configuration translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "communicator_group.json")
+    test_file_path = os.path.join(resources_dir, "communicator_group.json")
     TranslateConfig.translate_communicator_configuration(test_file_path, config)
     communicator_list = Utilities.to_dict(config.common_config.communicator_group)
     expected_no_of_groups = 2
     assert len(communicator_list) == expected_no_of_groups
 
 
-def test_translate_ns3_network_configuration(config, mock_configuration_directory):
+def test_translate_ns3_network_configuration(config, resources_dir):
     """
     Tests ns3 network configuration translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "network_config.txt")
+    test_file_path = os.path.join(resources_dir, "network_config.txt")
     TranslateConfig.translate_ns3_network_configuration(test_file_path, config)
     network_dict = Utilities.to_dict(config.network_backend.ns3.network)
     expected_buffer_size = 64
@@ -104,11 +104,11 @@ def test_translate_ns3_network_configuration(config, mock_configuration_director
         assert network_dict[key].endswith("Mb/s") or network_dict[key].endswith("Gb/s")
 
 
-def test_translate_ns3_logical_configuration(config, mock_configuration_directory):
+def test_translate_ns3_logical_configuration(config, resources_dir):
     """
     Tests ns3 logical configuration translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "logical.json")
+    test_file_path = os.path.join(resources_dir, "logical.json")
     TranslateConfig.translate_ns3_logical_configuration(test_file_path, config)
     logical_list = config.network_backend.ns3.logical_topology.logical_dimensions
     assert len(logical_list) >= 1
@@ -116,12 +116,12 @@ def test_translate_ns3_logical_configuration(config, mock_configuration_director
         assert isinstance(elem, str)
 
 
-def test_translate_analytical_network_configuration(config, mock_configuration_directory):
+def test_translate_analytical_network_configuration(config, resources_dir):
     """
     Tests analytical network configuration translation - script to schema
     """
     config.network_backend.choice = config.network_backend.ANALYTICAL_CONGESTION_AWARE
-    test_file_path = os.path.join(mock_configuration_directory, "network.yaml")
+    test_file_path = os.path.join(resources_dir, "network.yaml")
     TranslateConfig.translate_analytical_network(test_file_path, config, "analytical_congestion_aware")
     backend_choice = config.network_backend.choice.lower()
     config_network = getattr(config.network_backend, backend_choice)
@@ -134,11 +134,11 @@ def test_translate_analytical_network_configuration(config, mock_configuration_d
         assert isinstance(element["latency"], float)
 
 
-def test_translate_htsim_fattree_topo_configuration(config, mock_configuration_directory):
+def test_translate_htsim_fattree_topo_configuration(config, resources_dir):
     """
     Tests htsim fat tree topology translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "8nodes.topo")
+    test_file_path = os.path.join(resources_dir, "8nodes.topo")
     TranslateConfig.translate_htsim_fat_tree_topology(test_file_path, config)
     config_network_topo = (
         config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree
@@ -147,11 +147,11 @@ def test_translate_htsim_fattree_topo_configuration(config, mock_configuration_d
     assert config_network_topo.tier_1.bundle == 1
 
 
-def test_translate_ns3_trace_file_to_schema(config, mock_configuration_directory):
+def test_translate_ns3_trace_file_to_schema(config, resources_dir):
     """
     Tests ns3 trace file translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "trace.txt")
+    test_file_path = os.path.join(resources_dir, "trace.txt")
     TranslateConfig.translate_ns3_trace_file_to_schema(test_file_path, config)
     trace_list = config.network_backend.ns3.trace.trace_ids
     assert isinstance(trace_list, list)
@@ -159,11 +159,11 @@ def test_translate_ns3_trace_file_to_schema(config, mock_configuration_directory
     assert len(trace_list) == len(set(trace_list))
 
 
-def test_translate_logging_configuration_to_schema(config, mock_configuration_directory):
+def test_translate_logging_configuration_to_schema(config, resources_dir):
     """
     Tests logging configuration file translation - script to schema
     """
-    test_file_path = os.path.join(mock_configuration_directory, "logging_config.toml")
+    test_file_path = os.path.join(resources_dir, "logging_config.toml")
     TranslateConfig.translate_logging_file_to_schema(test_file_path, config)
     sinks = list(config.common_config.logging.sink)
     loggers = list(config.common_config.logging.logger)

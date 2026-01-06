@@ -20,7 +20,7 @@ def test_load_existing_et_example(port_number):
         # ##### Add existing workload execution traces by giving the path to the workload with basename included, mandatory for AstraSim workload configuration.
 
         cwd = os.path.dirname(os.path.abspath(__file__))
-        astra.configuration.common_config.workload = os.path.join(cwd, "../mock_configurations/example_workload/workload/all_reduce")
+        astra.configuration.common_config.workload = os.path.join(cwd, "../resources/example_workload/workload/all_reduce")
         print(astra.configuration.common_config.workload)
 
         # ##### Configure the system configurations

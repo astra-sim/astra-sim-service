@@ -11,7 +11,7 @@ ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simu
 The project uses VS Code Dev Containers to ensure a reproducible and isolated development setup.
 
 - Base image: ubuntu:22.04
-- Preinstalled dependencies: Python 3.x, gRPC tools, Make, CMake, and simulation dependencies. For all the dependent packages please check [Dockerfile.devenv](Dockerfile.devenv)
+- This will install dependencies like: Python 3.x, gRPC tools, Make, CMake, and simulation dependencies. For all the dependent packages please check [Dockerfile.devenv](Dockerfile.devenv)
 - The dev container automatically sets up your environment, installs packages, and provides consistent build behavior across developers.
 
 This environment is particularly useful for contributors who want a ready-to-use setup for model updates, client testing, or service development.
@@ -77,7 +77,7 @@ This command launches the ASTRA-sim gRPC server, exposing it for client connecti
 
 ### 3. Using the Client Notebooks
 
-You can run any of the client Jupyter notebooks provided under [client-scripts/notebooks](client-scripts/notebooks). The easiest approach is to opn the notebooks using the [VS Code Jupyter extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter). Configure the endpoint of the running ASTRA-sim service at the top of the notebook, and run the rest of the notebook interactively. Refer to the README one level above ([client-scripts/README.md](client-scripts/)) for a description of each notebook.
+You can run any of the client Jupyter notebooks provided under [client-scripts/notebooks](client-scripts/notebooks). The easiest approach is to open the notebooks using the [VS Code Jupyter extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter). Configure the server endpoint of the running ASTRA-sim service (the server endpoint is displayed in the service/docker logs) at the top of the notebook, and run the rest of the notebook interactively. Refer to the README one level above ([client-scripts/README.md](client-scripts/)) for a description of each notebook.
 
 
 ## Repository Overview
@@ -102,3 +102,10 @@ You can contribute to ASTRA-sim Service in the following ways:
 
 Contributions are welcome across models, clients, and service to improve schema definitions, enhance notebook scripts, and extend server performance.
 
+### Contributors
+
+| Name | Role | GitHub | Organization |
+|------|------|--------|--------|
+| Amos Rai | Contributor | [@Amos-Rai-KEYS](https://github.com/Amos-Rai-KEYS) | Keysight |
+| Harsh Sikhwal | Maintainer | [@harsh-sikhwal](https://github.com/harsh-sikhwal) | Keysight |
+| Jinsun Yoo | Maintainer | [@jinsun-yoo](https://github.com/jinsun-yoo) | Georgia Tech |

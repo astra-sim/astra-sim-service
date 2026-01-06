@@ -5,17 +5,28 @@ This directory contains the client-scripts, which include utility modules and sa
 ## Directory Structure
 
 - **notebooks/**
-  Contains sample notebooks for all supported backends:
-  - Analytical Congestion Aware and Unaware
-  - HTSim
-  - NS3
+  Contains sample notebooks for all supported backends. The notebooks are present in the notebooks folder and are as follows:
+
+    | Notebook Path                          | Description |
+    |----------------------------------------|-------------|
+    | analytical_congestion_aware_sample.ipynb | Simulation using analytical congestion-aware backend |
+    | analytical_congestion_unaware_sample.ipynb | Simulation using analytical congestion-unaware backend |
+    | config_to_schema_sample.ipynb          | Config files to Astra-sim schema conversion |
+    | htsim_sample.ipynb                     | htsim backend simulation |
+    | load_existing_et_example.ipynb         | Loads execution trace for ns-3 simulation |
+    | ns3_sample.ipynb                       | ns-3 backend simulation |
 
 - **notebooks/infragraph/**
   Contains the Infragraph notebook for the NS3 backend.
   Users can build fabrics using Infragraph and execute corresponding NS3 simulations.
-
-- **notebooks/config_to_schema_sample.ipynb**
-    This notebook holds samples which allows to convert a given ASTRA-sim file configuration to the schema. A folder infragraph/mock_configuration holds all the available schemas and this notebook translates all the file to the schema model using utilities and sdk.
+    | Notebook Path                                | Description |
+    |----------------------------------------------|-------------|
+    | infragraph/htsim_clos_fabric_2tier.ipynb     | htsim simulation: 2-tier Clos fabric |
+    | infragraph/htsim_clos_fabric_3tier.ipynb     | htsim simulation: 3-tier Clos fabric |
+    | infragraph/ns3_clos_fabric_2tier.ipynb       | ns-3 simulation: 2-tier Clos fabric |
+    | infragraph/ns3_clos_fabric_3tier.ipynb       | ns-3 simulation: 3-tier Clos fabric |
+    | infragraph/ns3_infragraph_sample_dgx_device.ipynb | ns-3 simulation: single-tier fabric with DGX devices |
+    | infragraph/ns3_infragraph_sample_generic_devices.ipynb | ns-3 simulation: single-tier fabric with generic devices |
 
 ## Notebook Sections
 
@@ -29,7 +40,7 @@ Each notebook follows a structured workflow, divided into these main sections:
 
 3. **Creating configurations with the SDK**
    The AstraSim object contains a configuration object that allows defining both the AstraSim and Infragraph configurations.
-   Users can also define workloads by specifying:
+   Users can either upload their existing execution traces or generate workloads by specifying:
    - The target collective operation
    - The data size
    - The NPU range `[0, n]`
