@@ -28,9 +28,6 @@ This directory contains the client-scripts, which include utility modules and sa
     | infragraph/ns3_infragraph_sample_dgx_device.ipynb | ns-3 simulation: single-tier fabric with DGX devices |
     | infragraph/ns3_infragraph_sample_generic_devices.ipynb | ns-3 simulation: single-tier fabric with generic devices |
 
-- **notebooks/config_to_schema_sample.ipynb**
-    This notebook holds samples which allows to convert a given ASTRA-sim file configuration to the schema. A folder infragraph/resources holds all the available schemas and this notebook translates all the file to the schema model using utilities and sdk.
-
 ## Notebook Sections
 
 Each notebook follows a structured workflow, divided into these main sections:
@@ -43,7 +40,7 @@ Each notebook follows a structured workflow, divided into these main sections:
 
 3. **Creating configurations with the SDK**
    The AstraSim object contains a configuration object that allows defining both the AstraSim and Infragraph configurations.
-   Users can also define workloads by specifying:
+   Users can either upload their existing execution traces or generate workloads by specifying:
    - The target collective operation
    - The data size
    - The NPU range `[0, n]`
