@@ -31,7 +31,7 @@ import astra_sim_sdk.astra_sim_sdk as astra_sim
 from google.protobuf import json_format
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-RESOURCE_DIR = os.path.join(SCRIPT_DIR, "..", "resources")
+RESOURCE_DIR = os.path.join(SCRIPT_DIR, "..", "test-resources")
 
 AR_8_ANALYTICAL_MIX = os.path.join(RESOURCE_DIR, "ar_8_analytical_mix")
 CONFIGURATION_ZIP = os.path.join(AR_8_ANALYTICAL_MIX, "configuration.zip")

@@ -25,12 +25,13 @@ SOFTWARE.
 import os
 import filecmp
 import pytest
+import json
 
 from astra_server.configuration_handler import ConfigurationHandler
 from astra_server.utils import Utilities
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-RESOURCES_DIR = os.path.join(SCRIPT_DIR, "..", "resources")
+RESOURCES_DIR = os.path.join(SCRIPT_DIR, "..", "test-resources")
 
 
 @pytest.mark.parametrize(
@@ -42,8 +43,15 @@ RESOURCES_DIR = os.path.join(SCRIPT_DIR, "..", "resources")
 )
 def test_generate_system_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
+    generated_file = os.path.join(temp_dir, filename)
+    actual_file = os.path.join(RESOURCES_DIR, "system.json")
     ConfigurationHandler()._process_system_configuration(configuration, os.path.join(temp_dir, filename))
-    assert Utilities.is_file_or_folder_present(os.path.join(temp_dir, filename)) is True
+    assert Utilities.is_file_or_folder_present(generated_file) is True
+
+    with open(actual_file) as f1, open(generated_file) as f2:
+        actual = json.load(f1)
+        expected = json.load(f2)
+    assert expected == actual
 
 
 @pytest.mark.parametrize(
@@ -55,10 +63,15 @@ def test_generate_system_configuration(config, filename, temp_dir, request):
 )
 def test_generate_comm_group_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
-    file_path = os.path.join(temp_dir, filename)
-    ConfigurationHandler()._process_communicator_group_configuration(configuration, file_path)
-    assert Utilities.is_file_or_folder_present(file_path) is True
-    assert filecmp.cmp(file_path, os.path.join(RESOURCES_DIR, "communicator_group_4_ranks.json"))
+    generated_file = os.path.join(temp_dir, filename)
+    actual_file = os.path.join(RESOURCES_DIR, "communicator_group.json")
+    ConfigurationHandler()._process_communicator_group_configuration(configuration, generated_file)
+    assert Utilities.is_file_or_folder_present(generated_file) is True
+
+    with open(actual_file) as f1, open(generated_file) as f2:
+        actual = json.load(f1)
+        expected = json.load(f2)
+    assert expected == actual
 
 
 @pytest.mark.parametrize(
@@ -70,27 +83,41 @@ def test_generate_comm_group_configuration(config, filename, temp_dir, request):
 )
 def test_generate_remote_memory_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
-    ConfigurationHandler()._process_remote_memory_configuration(
-        configuration, os.path.join(temp_dir, filename)
-    )
+    generated_file = os.path.join(temp_dir, filename)
+    actual_file = os.path.join(RESOURCES_DIR, "remote_memory.json")
+
+    ConfigurationHandler()._process_remote_memory_configuration(configuration, generated_file)
+    assert Utilities.is_file_or_folder_present(generated_file) is True
+    with open(actual_file) as f1, open(generated_file) as f2:
+        actual = json.load(f1)
+        expected = json.load(f2)
+    assert expected == actual
 
 
 def test_generate_ns3_network_configuration(ns3_schema_config, temp_dir):
-    ConfigurationHandler()._generate_ns3_network_configuration(
-        ns3_schema_config, os.path.join(temp_dir, "ns3_network_config.txt")
-    )
+    generated_file = os.path.join(temp_dir, "ns3_network_config.txt")
+    ConfigurationHandler()._generate_ns3_network_configuration(ns3_schema_config, generated_file)
+    assert Utilities.is_file_or_folder_present(generated_file) is True
 
 
 def test_generate_ns3_logical_topology(ns3_schema_config, temp_dir):
-    ConfigurationHandler()._generate_ns3_logical_topology(
-        ns3_schema_config, os.path.join(temp_dir, "ns3_logical_config.json")
-    )
+    generated_file = os.path.join(temp_dir, "ns3_logical_config.json")
+    actual_file = os.path.join(RESOURCES_DIR, "ns3_logical_config.json")
+
+    ConfigurationHandler()._generate_ns3_logical_topology(ns3_schema_config, generated_file)
+    assert Utilities.is_file_or_folder_present(generated_file) is True
+    with open(actual_file) as f1, open(generated_file) as f2:
+        actual = json.load(f1)
+        expected = json.load(f2)
+    assert expected == actual
 
 
 def test_generate_analytical_network_configuration(analytical_schema_config, temp_dir):
+    generated_file = os.path.join(temp_dir, "analytical_network.yaml")
     ConfigurationHandler()._generate_analytical_network_configuration(
-        analytical_schema_config, os.path.join(temp_dir, "analytical_network.yaml")
+        analytical_schema_config, generated_file
     )
+    assert Utilities.is_file_or_folder_present(generated_file) is True
 
 
 def test_process_command_arguments(htsim_schema_config):
