@@ -32,7 +32,7 @@ test-client-scripts:
 	cd client-scripts && make test
 
 .PHONY: build-service
-build-service: install-prerequisites version build-service
+build-service:
 	cd service && make build
 
 .PHONY: build-service-docker
