@@ -31,8 +31,8 @@ generate-sdk-doc:
 test-client-scripts:
 	cd client-scripts && make test
 
-.PHONY: install-prerequisites version build-service
-build-service:
+.PHONY: build-service
+build-service: install-prerequisites version build-service
 	cd service && make build
 
 .PHONY: build-service-docker

@@ -49,7 +49,7 @@ Once built, the image can be run independently and accessed remotely using the e
 #### 2b. Local build/run
 ##### 1) Build the service
 
-To build the astra-sim-service inside vs dev container:
+To build the astra-sim-service inside VS Code Dev Container:
 ```
 make install-prerequisites
 make build-all
