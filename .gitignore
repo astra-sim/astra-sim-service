@@ -301,6 +301,7 @@ service/astra_server/logout.dat
 service/tests/resources/*/*.zip
 service/astra_sim_service*
 service/idmap.txt
+service/tests/test-resources
 service/tests/resources
 
 # models
