@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "astra_server"
-version = "1.0.2+cleanup.fixes.1"
+version = "1.0.2"
 description = "Astra Sim Server Package"
 requires-python = ">=3.10"
-dependencies = [ "pytest", "pytest-cov", "pytest-asyncio", "pylint", "requests", "psutil", "black", "toml", "astra_sim_sdk===1.0.2+cleanup.fixes.0",]
+dependencies = [ "pytest", "pytest-cov", "pytest-asyncio", "pylint", "requests", "psutil", "black", "toml", "astra_sim_sdk===1.0.2",]
 [[project.authors]]
 name = "Keysight"
 email = "harsh.sikhwal@keysight.com"
