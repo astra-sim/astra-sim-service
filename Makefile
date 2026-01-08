@@ -31,12 +31,12 @@ generate-sdk-doc:
 test-client-scripts:
 	cd client-scripts && make test
 
-.PHONY: build-service
+.PHONY: install-prerequisites version build-service
 build-service:
 	cd service && make build
 
 .PHONY: build-service-docker
-build-service-docker:
+build-service-docker: install-prerequisites version
 	cd service && make build-docker
 
 .PHONY: build-astra-sim
