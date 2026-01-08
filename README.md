@@ -8,7 +8,7 @@ ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simu
 
 ### 1. Development Environment
 
-The project uses VS Code Dev Containers to ensure a reproducible and isolated development setup.
+The project uses **VS Code Dev Containers** to ensure a reproducible and isolated development setup.
 
 - Base image: ubuntu:22.04
 - This will install dependencies like: Python 3.x, gRPC tools, Make, CMake, and simulation dependencies. For all the dependent packages please check [Dockerfile.devenv](Dockerfile.devenv)
@@ -47,9 +47,9 @@ Once built, the image can be run independently and accessed remotely using the e
 ---
 
 #### 2b. Local build/run
-##### 1) Build the Service
+##### 1) Build the service
 
-To build the ASTRA-sim Service:
+To build the astra-sim-service inside VS Code Dev Container:
 ```
 make install-prerequisites
 make build-all

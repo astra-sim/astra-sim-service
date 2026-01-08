@@ -36,7 +36,7 @@ build-service:
 	cd service && make build
 
 .PHONY: build-service-docker
-build-service-docker:
+build-service-docker: install-prerequisites version build-models
 	cd service && make build-docker
 
 .PHONY: build-astra-sim

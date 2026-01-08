@@ -406,7 +406,7 @@ def test_clos_fabric_3_tier():
     server = Server()
     switch = Switch(port_count=8)
     clos_fat_tree = ClosFatTreeFabric(switch, server, 3, [])
-    dump_yaml(clos_fat_tree, "clos_fabric")
+    # dump_yaml(clos_fat_tree, "clos_fabric")
     configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
 
     # annotation
