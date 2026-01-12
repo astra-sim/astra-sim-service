@@ -16,7 +16,7 @@
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
     "remoteUser": "root",
-    "postCreateCommand": "make install-prerequisites && git config core.autocrlf false && git reset --hard",
+    "postCreateCommand": "make install-prerequisites",
     "features": {
         "docker-from-docker": "latest"
     },
