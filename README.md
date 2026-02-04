@@ -6,6 +6,8 @@ ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simu
 
 ## Getting Started
 
+[![ASTRA-sim-service Introduction & Getting Started ](https://img.youtube.com/vi/07GMOhLrX84/0.jpg)](https://youtu.be/07GMOhLrX84)
+
 ### 1. Development Environment
 
 The project uses **VS Code Dev Containers** to ensure a reproducible and isolated development setup.
