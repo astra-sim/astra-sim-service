@@ -6,7 +6,10 @@ ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simu
 
 ## Getting Started
 
-[![ASTRA-sim-service Introduction & Getting Started](https://img.youtube.com/vi/07GMOhLrX84/1.jpg)](https://youtu.be/07GMOhLrX84)
+### Watch the Video: Step-by-Step Introduction & Getting Started
+
+[![ASTRA-sim-service Introduction & Getting Started](resources/youtube_thumbnail.png)](https://youtu.be/07GMOhLrX84)
+
 
 ### 1. Development Environment
 
