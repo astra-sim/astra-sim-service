@@ -32,7 +32,7 @@ from infragraph.infragraph_service import InfraGraphService
 from astra_server.configuration_handler import ConfigurationHandler
 
 
-def test_3tier_8host_1npu(infra_single_gpu_server_factory, infra_switch_factory):
+def test_three_tier_eight_host_single_npu(infra_single_gpu_server_factory, infra_switch_factory):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
@@ -40,7 +40,7 @@ def test_3tier_8host_1npu(infra_single_gpu_server_factory, infra_switch_factory)
     server = infra_single_gpu_server_factory()
     switch = infra_switch_factory(4)
 
-    configuration.infragraph.infrastructure.name = "3tier-8host-1npu"
+    configuration.infragraph.infrastructure.name = "three_tier_eight_host_single_npu"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
 
     hosts = configuration.infragraph.infrastructure.instances.add(
@@ -186,7 +186,7 @@ def test_3tier_8host_1npu(infra_single_gpu_server_factory, infra_switch_factory)
     )
 
 
-def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory):
+def test_three_tier_sixteen_host_single_npu(infra_single_gpu_server_factory, infra_switch_factory):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
@@ -196,7 +196,7 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
     pod_switch_dev = infra_switch_factory(12)
     spine_switch_dev = infra_switch_factory(8)
 
-    configuration.infragraph.infrastructure.name = "3tier-8host-1npu"
+    configuration.infragraph.infrastructure.name = "three_tier_sixteen_host_single_npu"
     configuration.infragraph.infrastructure.devices.append(server).append(
         rack_switch_dev
     ).append(pod_switch_dev).append(spine_switch_dev)
@@ -337,16 +337,16 @@ def test_3tier_16host_1npu(infra_single_gpu_server_factory, infra_switch_factory
     )
 
 
-def dump_yaml(clos_fabric, filename):
-    import yaml
+# def dump_yaml(clos_fabric, filename):
+#     import yaml
 
-    with open(filename + ".yaml", "w") as file:
-        data = clos_fabric.serialize("dict")
-        yaml.dump(data, file, default_flow_style=False, indent=4)
-    pass
+#     with open(filename + ".yaml", "w") as file:
+#         data = clos_fabric.serialize("dict")
+#         yaml.dump(data, file, default_flow_style=False, indent=4)
+#     pass
 
 
-def test_clos_fabric_2_tier():
+def test_two_tier_clos_fabric():
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
@@ -398,7 +398,7 @@ def test_clos_fabric_2_tier():
     )
 
 
-def test_clos_fabric_3_tier():
+def test_three_tier_clos_fabric():
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
