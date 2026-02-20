@@ -29,9 +29,9 @@ import pytest
 from astra_sim_sdk import astra_sim_sdk as astra_sim
 from astra_sim_sdk import Device, Component, DeviceEdge
 from astra_server.configuration_handler import ConfigurationHandler
-from infragraph.blueprints.devices.dgx import Dgx
-from infragraph.blueprints.devices.server import Server
-from infragraph.blueprints.devices.generic_switch import Switch
+from infragraph.blueprints.devices.nvidia.dgx import NvidiaDGX
+from infragraph.blueprints.devices.generic.server import Server
+from infragraph.blueprints.devices.generic.generic_switch import Switch
 
 CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
 # Path to the folder you want to clear every test
@@ -300,7 +300,7 @@ def get_dgx():
     Fixture that returns a dgx device defined in Keysight infragraph repository
     """
     dgx = Device()
-    dgx.deserialize(Dgx().serialize())
+    dgx.deserialize(NvidiaDGX().serialize())
     return dgx
 
 

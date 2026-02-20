@@ -2,7 +2,7 @@ def test_htsim_sample(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
         sys.path.append("../client-scripts/utils")
@@ -10,16 +10,16 @@ def test_htsim_sample(port_number):
         sys.path.append("./client-scripts/utils")
         from astra_sim import AstraSim, Collective, NetworkBackend
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs.
 
-        astra = AstraSim(f"0.0.0.0:{port_number}",tag = "htsim_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}",tag = "htsim_sample")
 
-        # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
+        # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
         astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 1 * 1024 * 1024, npu_range=[0, 8])
         print(astra.configuration.common_config.workload)
 
-        # ##### Configure the system configurations
+        # ##### Configure ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -34,12 +34,12 @@ def test_htsim_sample(port_number):
         astra.configuration.common_config.system.roofline_enabled = 0
         print(astra.configuration.common_config.system)
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the Network_backend, topology and protocol
+        # ##### Configure the network backend, htsim protocol and topology
 
         astra.configuration.network_backend.htsim.topology.network_topology_configuration.network.clear()
         astra.configuration.network_backend.htsim.topology.network_topology_configuration.network.add("ring", 8, 100, 0.005) # add(type_of_topology, number_of_nodes, bandwidth_in_gbps, latency_in_ns)
@@ -84,7 +84,7 @@ def test_htsim_sample(port_number):
         astra.configuration.network_backend.htsim.htsim_protocol.tcp.nodes = "8"
         print(astra.configuration.network_backend.htsim.topology.network_topology_configuration)
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.HTSIM)
 

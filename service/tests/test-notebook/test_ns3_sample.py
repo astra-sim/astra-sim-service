@@ -2,7 +2,7 @@ def test_ns3_sample(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
         sys.path.append("../client-scripts/utils")
@@ -10,16 +10,16 @@ def test_ns3_sample(port_number):
         sys.path.append("./client-scripts/utils")
         from astra_sim import AstraSim, Collective, NetworkBackend
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs.
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag="ns3_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag="ns3_sample")
 
-        # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
+        # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
         astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 8 *1024*1024, npu_range=[0,8])
         print(astra.configuration.common_config.workload)
 
-        # ##### Configure the system configurations
+        # ##### Configure ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -31,12 +31,12 @@ def test_ns3_sample(port_number):
         astra.configuration.common_config.system.local_mem_bw = 1600
         print(astra.configuration.common_config.system)
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the Network_backend
+        # ##### Configure the network backend
 
         # astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
         astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
@@ -67,7 +67,7 @@ def test_ns3_sample(port_number):
         print(astra.configuration.network_backend.ns3.topology.choice)
         print(astra.configuration.network_backend.ns3.topology.nc_topology)
 
-        # ##### Configure the cmd parameters, non-mandatory parameters
+        # ##### Configure ASTRA-sim cmd parameters
 
         astra.configuration.common_config.cmd_parameters.comm_scale = 1
         astra.configuration.common_config.cmd_parameters.injection_scale = 1
@@ -75,7 +75,7 @@ def test_ns3_sample(port_number):
 
         print(astra.configuration.common_config.cmd_parameters)
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.NS3)
 
@@ -90,7 +90,6 @@ def test_ns3_sample(port_number):
         from common import FileFolderUtils
         df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "fct.csv"))
         df.head()
-
         df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "flow_stats.csv"))
         df.head()
 

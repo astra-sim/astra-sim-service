@@ -145,8 +145,12 @@ class NS3Topology:
                 if len(xpu_connected) == len(npu_nodes) and len(xpu_connected) > 1:
                     # if more than 1 npu is connected
                     self.switches.append(switch)
-                    self.annotation.device_to_id[switch] = self.annotation.last_rank_identifier
-                    self.annotation.last_rank_identifier = self.annotation.last_rank_identifier + 1
+                    self.annotation.device_to_id[
+                        switch
+                    ] = self.annotation.last_rank_identifier
+                    self.annotation.last_rank_identifier = (
+                        self.annotation.last_rank_identifier + 1
+                    )
 
     def _process_infra(self, infrastructure: astra_sim.Infrastructure):
 
@@ -306,7 +310,8 @@ class NS3Topology:
             # case 1: both source and destination are hosts - switch to xpu and xpu - xpu
             if (
                 topology.graph.nodes[source]["device"] in topology.annotation.hosts
-                and topology.graph.nodes[destination]["device"] in topology.annotation.hosts
+                and topology.graph.nodes[destination]["device"]
+                in topology.annotation.hosts
             ):
                 # if either one is a switch and the other one is an npu:
                 if (

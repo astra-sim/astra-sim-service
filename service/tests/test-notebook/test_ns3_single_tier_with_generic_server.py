@@ -1,8 +1,8 @@
-def test_ns3_infragraph_sample_generic_devices(port_number):
+def test_ns3_single_tier_with_generic_server(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
         sys.path.append("../client-scripts/utils")
@@ -12,20 +12,20 @@ def test_ns3_infragraph_sample_generic_devices(port_number):
         from astra_sim_sdk import Device, Component
         from infragraph import Component, InfrastructureEdge
         from infragraph.infragraph_service import InfraGraphService
-        from infragraph.blueprints.devices.server import Server
-        from infragraph.blueprints.devices.generic_switch import Switch
+        from infragraph.blueprints.devices.generic.server import Server
+        from infragraph.blueprints.devices.generic.generic_switch import Switch
         import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "infragraph_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "ns3_single_tier_with_generic_server")
 
-        # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
+        # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
         astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 8 *1024*1024, npu_range=[0,8])
         print(astra.configuration.common_config.workload)
 
-        # ##### Configure the system configurations
+        # ##### Configure the ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -37,24 +37,21 @@ def test_ns3_infragraph_sample_generic_devices(port_number):
         astra.configuration.common_config.system.local_mem_bw = 1600
         print(astra.configuration.common_config.system)
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the network backend choice and the topology choice for that backend
-        # 
+        # ##### Configure the selected network backend and the topology (infragraph or nc_topology)
 
         # We need to configure the network backend here since we are translating the topology from infragraph and not creating it directly from the sdk.
-
         astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
         astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.INFRAGRAPH
         astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
         astra.configuration.network_backend.ns3.logical_topology.logical_dimensions = [8]
         astra.configuration.network_backend.ns3.trace.trace_ids = [0, 1, 2, 3, 4, 5, 6, 7]
 
-        # ##### Creating Infrastructure with 4 Hosts & 1 Rack Device
-        # 
+        # ##### Creating Infrastructure with four host and one rack Device
 
         astra.configuration.infragraph.infrastructure.name = "1host-4ranks"
 
@@ -119,13 +116,13 @@ def test_ns3_infragraph_sample_generic_devices(port_number):
             switch_device_spec
         )
 
-        # ##### Configure the cmd parameters, non-mandatory parameters
+        # ##### Configure ASTRA-sim cmd parameters
 
         astra.configuration.common_config.cmd_parameters.comm_scale = 1
         astra.configuration.common_config.cmd_parameters.injection_scale = 1
         astra.configuration.common_config.cmd_parameters.rendezvous_protocol = False
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.NS3)
 
@@ -143,6 +140,17 @@ def test_ns3_infragraph_sample_generic_devices(port_number):
 
         df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "flow_stats.csv"))
         df.head()
+
+        # ##### Save infragraph as a yaml
+
+        import yaml
+        import os
+        from common import FileFolderUtils
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_tier_with_dgx"),"w") as f:
+            data = astra.configuration.infragraph.infrastructure.serialize("dict")
+            yaml.dump(data, f, default_flow_style=False, indent=4)
+
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_single_tier_with_dgx.yaml"))
 
         assert True
     except Exception as e:

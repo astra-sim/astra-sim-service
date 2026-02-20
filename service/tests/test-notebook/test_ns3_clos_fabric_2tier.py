@@ -2,46 +2,45 @@ def test_ns3_clos_fabric_2tier(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
-        import networkx
-        import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
         sys.path.append("../client-scripts/utils")
         sys.path.append("../../client-scripts/utils")
         sys.path.append("./client-scripts/utils")
+        import networkx
+        import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
         from astra_sim import AstraSim, Collective, NetworkBackend
         from infragraph.infragraph_service import InfraGraphService
         from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
-        from infragraph.blueprints.devices.server import Server
-        from infragraph.blueprints.devices.generic_switch import Switch
+        from infragraph.blueprints.devices.generic.server import Server
+        from infragraph.blueprints.devices.generic.generic_switch import Switch
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "infragraph_clos_2tier_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "ns3_clos_fabric_2tier")
 
-        # ##### Creating Infragraph for 2 tier clos fabric
+        # ##### Create a two-tier clos fabric using infragraph fabric blueprint
 
         server = Server()
         switch = Switch(port_count=8)
-        clos_fat_tree = ClosFatTreeFabric(switch, server, 2,[])
-        astra.configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
+        infrastructure = ClosFatTreeFabric(switch, server, 2,[])
+        astra.configuration.infragraph.infrastructure.deserialize(infrastructure.serialize())
         print(astra.configuration.infragraph.infrastructure)
 
-        # ##### Display Fabric
+        # ##### Initialize the Infragraph service, display the fabric topology, and retrieve/set the total number of NPUs to generate the collective
 
         service = InfraGraphService()
-        service.set_graph(clos_fat_tree)
+        service.set_graph(infrastructure)
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
-
         total_npus = 32
 
-        # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
+        # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
         astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 8 *1024*1024, npu_range=[0, total_npus])
 
-        # ##### Configure the system configurations
+        # ##### Configure ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -52,13 +51,12 @@ def test_ns3_clos_fabric_2tier(port_number):
         astra.configuration.common_config.system.collective_optimization = astra.configuration.common_config.system.LOCALBWAWARE
         astra.configuration.common_config.system.local_mem_bw = 1600
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the network backend choice and the topology choice for that backend
-        # 
+        # ##### Configure the selected network backend and the topology (infragraph or nc_topology)
 
         astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
         astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.INFRAGRAPH
@@ -71,7 +69,7 @@ def test_ns3_clos_fabric_2tier(port_number):
         for i in range(0, total_npus):
             astra.configuration.network_backend.ns3.trace.trace_ids.append(i)
 
-        # ##### Adding ASTRA-sim specific annotation
+        # ##### Adding ASTRA-sim - Infragraph specific annotation
 
         host_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
         host_device_spec.device_bandwidth_gbps = 100
@@ -95,7 +93,7 @@ def test_ns3_clos_fabric_2tier(port_number):
         astra.configuration.common_config.cmd_parameters.injection_scale = 1
         astra.configuration.common_config.cmd_parameters.rendezvous_protocol = False
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.NS3)
 
@@ -117,11 +115,13 @@ def test_ns3_clos_fabric_2tier(port_number):
         # ##### Save infragraph as a yaml
 
         import yaml
-        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","2tier.yaml"),"w") as f:
-            data = clos_fat_tree.serialize("dict")
+        import os
+        from common import FileFolderUtils
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_clos_fabric_2tier.yaml"),"w") as f:
+            data = infrastructure.serialize("dict")
             yaml.dump(data, f, default_flow_style=False, indent=4)
 
-        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","2tier.yaml"))
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_clos_fabric_2tier.yaml"))
 
         assert True
     except Exception as e:

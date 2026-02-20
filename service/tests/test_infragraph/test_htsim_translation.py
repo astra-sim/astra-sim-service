@@ -25,14 +25,16 @@ SOFTWARE.
 import astra_sim_sdk.astra_sim_sdk as astra_sim
 from astra_server.infrastructure.htsim_topology import HTSimTopology
 from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
-from infragraph.blueprints.devices.generic_switch import Switch
-from infragraph.blueprints.devices.server import Server
+from infragraph.blueprints.devices.generic.generic_switch import Switch
+from infragraph.blueprints.devices.generic.server import Server
 from infragraph import Component, InfrastructureEdge
 from infragraph.infragraph_service import InfraGraphService
 from astra_server.configuration_handler import ConfigurationHandler
 
 
-def test_three_tier_eight_host_single_npu(infra_single_gpu_server_factory, infra_switch_factory):
+def test_three_tier_eight_host_single_npu(
+    infra_single_gpu_server_factory, infra_switch_factory
+):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
@@ -186,7 +188,9 @@ def test_three_tier_eight_host_single_npu(infra_single_gpu_server_factory, infra
     )
 
 
-def test_three_tier_sixteen_host_single_npu(infra_single_gpu_server_factory, infra_switch_factory):
+def test_three_tier_sixteen_host_single_npu(
+    infra_single_gpu_server_factory, infra_switch_factory
+):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "htsim"
