@@ -37,6 +37,7 @@ from astra_sim_sdk.astra_sim_sdk import Device
 from infragraph import Infrastructure
 import pytest
 
+
 def test_single_host_eight_npus(infra_multi_gpu_server_factory):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
@@ -133,7 +134,7 @@ def test_single_tier_four_server(infra_single_gpu_server_factory, infra_switch_f
         ("dgx_a100", 14, 48, 6),
         ("dgx_h100", 12, 32, 4),
         # ("dgx_gb200", 4, 1, 1),
-    ]
+    ],
 )
 def test_dgx(dgx_variant, nodes_count, links_count, switch_count):
     # infrastructure - infragraph
@@ -160,41 +161,21 @@ def test_dgx(dgx_variant, nodes_count, links_count, switch_count):
     configuration.infragraph.annotations.device_specifications.append(host_device_spec)
 
     NS3Topology.generate_topology(configuration)
-    dump_ns3(configuration.network_backend.ns3.topology.nc_topology, dgx_variant)
 
-    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == nodes_count
-    assert configuration.network_backend.ns3.topology.nc_topology.total_links == links_count
-    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == switch_count
+    assert (
+        configuration.network_backend.ns3.topology.nc_topology.total_nodes
+        == nodes_count
+    )
+    assert (
+        configuration.network_backend.ns3.topology.nc_topology.total_links
+        == links_count
+    )
+    assert (
+        len(configuration.network_backend.ns3.topology.nc_topology.switch_ids)
+        == switch_count
+    )
     # assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 8
 
-def dump_ns3(nc_topology, filename):
-    """
-    Dump nc topology file from configuration. Used for debugging purpose.
-    """
-    config = (
-        str(nc_topology.total_nodes)
-        + " "
-        + str(nc_topology.total_switches)
-        + " "
-        + str(nc_topology.total_links)
-    )
-    config = config + "\n" + " ".join(str(num) for num in nc_topology.switch_ids)
-    for connection in nc_topology.connections:
-        config = (
-            config
-            + "\n"
-            + str(connection.source_index)
-            + " "
-            + str(connection.destination_index)
-            + " "
-            + str(connection.bandwidth)
-            + " "
-            + str(connection.latency)
-            + " "
-            + str(connection.error_rate)
-        )
-    with open(filename + ".txt", "w", encoding="utf-8") as file:
-        file.write(config)
 
 def test_single_ironwood():
     configuration = astra_sim.Config()
@@ -344,7 +325,6 @@ def test_two_dgx_single_switch(infra_switch_factory):
     )
 
     NS3Topology.generate_topology(configuration)
-    dump_ns3(configuration.network_backend.ns3.topology.nc_topology, "test_two_dgx_single_switch")
 
     assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 25
     assert configuration.network_backend.ns3.topology.nc_topology.total_links == 80

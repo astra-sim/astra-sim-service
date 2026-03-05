@@ -372,8 +372,8 @@ class NS3Topology:
                         "Link missing", grpc.StatusCode.NOT_FOUND, 404
                     )
 
-                bandwidth = link["bandwidth"].to_str()
-                latency = link["latency"].to_str()
+                bandwidth = str(link["bandwidth"])
+                latency = str(link["latency"])
                 error_rate = str(link["link_error_rate"])
 
                 configuration.network_backend.ns3.topology.nc_topology.connections.add(

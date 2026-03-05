@@ -291,6 +291,8 @@ class Annotation:
                 "link_name": link_spec.link_name,
                 "packet_loss_rate": link_spec.packet_loss_rate,
                 "link_error_rate": link_spec.link_error_rate,
+                "bandwidth": link_spec.link_bandwidth_gbps,
+                "latency": link_spec.link_latency_ms,
             }
 
     def _parse_rank_annotation(self, annotations: Annotations):
@@ -373,8 +375,8 @@ class Annotation:
             "link_name": link_name,
             "packet_loss_rate": 0,
             "link_error_rate": 0,
-            "bandwidth": DeviceRateMetrics(100),
-            "latency": Latency(0.005),
+            "bandwidth": 100,
+            "latency": 0.005,
         }
 
     def add_link(self, link: astra_sim.Link):
@@ -388,29 +390,32 @@ class Annotation:
         if link.get("physical") is not None:
             if link.physical.get("bandwidth") is not None:
                 if link.physical.bandwidth.choice == "gigabits_per_second":
-                    self.link_specification[link.name]["bandwidth"] = DeviceRateMetrics(
-                        link.physical.bandwidth.gigabits_per_second
-                    )
+                    self.link_specification[link.name][
+                        "bandwidth"
+                    ] = link.physical.bandwidth.gigabits_per_second
                 elif link.physical.bandwidth.choice == "gigabytes_per_second":
-                    self.link_specification[link.name]["bandwidth"] = DeviceRateMetrics(
+                    self.link_specification[link.name]["bandwidth"] = (
                         link.physical.bandwidth.gigabytes_per_second * 8
                     )
+
                 elif link.physical.bandwidth.choice == "gigatransfers_per_second":
-                    self.link_specification[link.name]["bandwidth"] = DeviceRateMetrics(
+                    self.link_specification[link.name]["bandwidth"] = (
                         link.physical.bandwidth.gigatransfers_per_second * 8
                     )
 
             if link.physical.get("latency") is not None:
                 if link.physical.latency.choice == "ms":
-                    self.link_specification[link.name]["latency"] = Latency(
-                        link.physical.latency.ms
-                    )
+                    self.link_specification[link.name][
+                        "latency"
+                    ] = link.physical.latency.ms
+
                 elif link.physical.latency.choice == "ns":
-                    self.link_specification[link.name]["latency"] = Latency(
+                    self.link_specification[link.name]["latency"] = (
                         link.physical.latency.ns * 0.000001
                     )
+
                 elif link.physical.latency.choice == "us":
-                    self.link_specification[link.name]["latency"] = Latency(
+                    self.link_specification[link.name]["latency"] = (
                         link.physical.latency.us * 0.001
                     )
 
