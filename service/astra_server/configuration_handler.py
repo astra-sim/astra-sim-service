@@ -553,7 +553,9 @@ class ConfigurationHandler:
         if nc_topology.switch_ids is None or len(nc_topology.switch_ids) == 0:
             config = config + "\n"
         else:
-            config = config + "\n" + " ".join(str(num) for num in nc_topology.switch_ids)
+            config = (
+                config + "\n" + " ".join(str(num) for num in nc_topology.switch_ids)
+            )
         for connection in nc_topology.connections:
             config = (
                 config

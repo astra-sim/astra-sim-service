@@ -6,8 +6,7 @@ import nbformat
 import textwrap
 
 ignore_notebooks = {
-    "config_to_schema_sample",
-    "ns3_single_ironwood_device"
+    "config_to_schema_sample"
 }
 
 def wrap_notebook_in_function(input_nb_path: Path, output_py_path: Path, function_name: str):

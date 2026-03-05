@@ -375,8 +375,8 @@ class Annotation:
             "link_name": link_name,
             "packet_loss_rate": 0,
             "link_error_rate": 0,
-            "bandwidth": 100,
-            "latency": 0.005,
+            "bandwidth": 100,  # in Gbps
+            "latency": 0.005,  # in ms
         }
 
     def add_link(self, link: astra_sim.Link):

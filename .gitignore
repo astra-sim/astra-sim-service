@@ -313,3 +313,7 @@ models/.GENERATED_VERSION
 # notebook
 client-scripts/trial/*
 client-scripts/chakra
+
+# root dir
+log/*
+logs/*

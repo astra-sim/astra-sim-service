@@ -1,4 +1,4 @@
-def test_analytical_ironwood_rack(port_number):
+def test_ns3_single_ironwood_device(port_number):
 
     try:
 
@@ -17,14 +17,13 @@ def test_analytical_ironwood_rack(port_number):
 
         # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "analytical_ironwood_rack")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "ns3_single_ironwood")
 
         # ##### Create a ironwood rack device fabric using infragraph device blueprint
 
         server = IronwoodRack()
         infrastructure = Infrastructure()
         infrastructure.devices.append(server)
-
         infrastructure.instances.add(name=server.name, device=server.name, count=1)
         astra.configuration.infragraph.infrastructure.deserialize(infrastructure.serialize())
         print(astra.configuration.infragraph.infrastructure)
@@ -33,9 +32,10 @@ def test_analytical_ironwood_rack(port_number):
 
         service = InfraGraphService()
         service.set_graph(infrastructure)
-        total_npus = service.get_component(device=server, type="xpu").count
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
+        total_npus = service.get_component(server, "xpu").count
+        print(total_npus)
 
         # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
@@ -57,9 +57,18 @@ def test_analytical_ironwood_rack(port_number):
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure network backend to ANALYTICAL_CONGESTION_AWARE
+        # ##### Configure the selected network backend and the topology (infragraph or nc_topology)
 
-        astra.configuration.network_backend.analytical_congestion_unaware.topology.choice = astra.configuration.network_backend.analytical_congestion_unaware.topology.INFRAGRAPH
+        astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
+        astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.INFRAGRAPH
+        astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
+
+        # ##### Adding ns3 trace and logical dimension 
+
+        astra.configuration.network_backend.ns3.logical_topology.logical_dimensions = [4, 4, 4]
+        astra.configuration.network_backend.ns3.trace.trace_ids = []
+        for i in range(0, total_npus):
+            astra.configuration.network_backend.ns3.trace.trace_ids.append(i)
 
         # ##### Adding ASTRA-sim - Infragraph specific annotation
 
@@ -78,22 +87,30 @@ def test_analytical_ironwood_rack(port_number):
 
         # #### Start the simulation by specifying the network backend
 
-        astra.run_simulation(NetworkBackend.ANALYTICAL_CONGESTION_UNAWARE)
+        astra.run_simulation(NetworkBackend.NS3)
 
         # ##### Download all the configurations as a zip
 
         astra.download_configuration()
+
+        # ##### Read output files
+
+        import pandas as pd
+        import os
+        from common import FileFolderUtils
+        df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "fct.csv"))
+        df.head()
 
         # ##### Save infragraph as a yaml
 
         import yaml
         import os
         from common import FileFolderUtils
-        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","analytical_dgx_device.yaml"),"w") as f:
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_ironwood"),"w") as f:
             data = infrastructure.serialize("dict")
             yaml.dump(data, f, default_flow_style=False, indent=4)
 
-        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","analytical_dgx_device.yaml"))
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_single_ironwood.yaml"))
 
         assert True
     except Exception as e:

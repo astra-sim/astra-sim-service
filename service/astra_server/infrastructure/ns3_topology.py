@@ -361,8 +361,8 @@ class NS3Topology:
                     dest_dev = topology.annotation.device_to_id[destination]
 
             if source_dev > -1 and dest_dev > -1:
-                print(f"Edge from {source} to {destination} with attributes {attr}")
-                print(f"ns3: {source_dev} {dest_dev}")
+                # print(f"Edge from {source} to {destination} with attributes {attr}")
+                # print(f"ns3: {source_dev} {dest_dev}")
 
                 link = topology.annotation.get_link_specification(
                     attr["link"]
@@ -372,8 +372,8 @@ class NS3Topology:
                         "Link missing", grpc.StatusCode.NOT_FOUND, 404
                     )
 
-                bandwidth = str(link["bandwidth"])
-                latency = str(link["latency"])
+                bandwidth = str(int(link["bandwidth"])) + "Gbps"
+                latency = str(int(link["latency"])) + "ms"
                 error_rate = str(link["link_error_rate"])
 
                 configuration.network_backend.ns3.topology.nc_topology.connections.add(
