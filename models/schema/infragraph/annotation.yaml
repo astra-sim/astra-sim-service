@@ -37,6 +37,16 @@ components:
           format: float
           description: The link error rate indicating transmission errors
           x-field-uid: 3
+        link_latency_ms:
+          type: number
+          format: float
+          description: The latency of the link in milliseconds
+          x-field-uid: 4
+        link_bandwidth_gbps:
+          type: number
+          format: float
+          description: The bandwidth capacity of the link in Gbps
+          x-field-uid: 5
     Annotation.Device.Specifications:
       type: object
       description: Specifications of a device including its name, type, latency, bandwidth, and queue details

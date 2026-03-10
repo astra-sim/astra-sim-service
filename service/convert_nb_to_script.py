@@ -1,9 +1,13 @@
+import os
 import re
 from pathlib import Path
 from nbconvert import PythonExporter
 import nbformat
 import textwrap
 
+ignore_notebooks = {
+    "config_to_schema_sample"
+}
 
 def wrap_notebook_in_function(input_nb_path: Path, output_py_path: Path, function_name: str):
     """
@@ -50,15 +54,19 @@ def wrap_notebook_in_function(input_nb_path: Path, output_py_path: Path, functio
     print(f"Converted: {input_nb_path} → {output_py_path}")
 
 
-def convert_all_notebooks(root_dir: str = "../client-scripts/notebooks"):
+def convert_all_notebooks():
     """
     Recursively converts all .ipynb notebooks under `root_dir` into Python files
     wrapped in functions, saving them under a `tests/` subfolder.
     """
-    for notebook_path in Path(root_dir).rglob("*.ipynb"):
+    current_folder = os.path.dirname(os.path.abspath(__file__))
+    notebook_dir = os.path.join(current_folder, "..", "client-scripts", "notebooks")
+    for notebook_path in Path(notebook_dir).rglob("*.ipynb"):
         if ".ipynb_checkpoints" in notebook_path.parts:
             continue
-        if not notebook_path.stem.startswith("config_to_schema"):
+        if notebook_path.stem in ignore_notebooks:
+            continue
+        else:
             output_name = f"test_{notebook_path.stem}.py"
             output_path = Path("tests") / "test-notebook" / output_name
 

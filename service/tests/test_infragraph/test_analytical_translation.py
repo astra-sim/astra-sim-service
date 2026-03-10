@@ -27,17 +27,53 @@ from astra_server.infrastructure.analytical_topology import AnalyticalTopology
 
 
 from infragraph import Component, InfrastructureEdge
+from infragraph.blueprints.devices.ironwood_rack import IronwoodRack
+from infragraph.blueprints.devices.nvidia.dgx import NvidiaDGX
 from infragraph.infragraph_service import InfraGraphService
+from infragraph import Infrastructure
 
 
-def test_1host_4rank(infra_single_gpu_server_factory, infra_switch_factory):
+def test_single_tier_single_host_eight_ranks(infra_multi_gpu_server_factory):
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "ns3"
+    # load infrastructure and annotation?
+    server = infra_multi_gpu_server_factory(4)
+    configuration.infragraph.infrastructure.name = "single_tier_single_host_eight_ranks"
+    configuration.infragraph.infrastructure.devices.append(server)
+    configuration.infragraph.infrastructure.instances.add(
+        name="host", device=server.name, count=1
+    )
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = "server"
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    AnalyticalTopology.generate_topology(configuration)
+
+    print(configuration.network_backend.analytical_congestion_unaware.topology.network)
+    assert (
+        len(
+            configuration.network_backend.analytical_congestion_unaware.topology.network
+        )
+        > 0
+    )
+
+
+def test_single_tier_single_host_four_rank(
+    infra_single_gpu_server_factory, infra_switch_factory
+):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "analytical_congestion_unaware"
     # load infrastructure and annotation?
     server = infra_single_gpu_server_factory()
     switch = infra_switch_factory()
-    configuration.infragraph.infrastructure.name = "1host-4ranks"
+    configuration.infragraph.infrastructure.name = "single_tier_single_host_four_rank"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
     hosts = configuration.infragraph.infrastructure.instances.add(
         name="host", device=server.name, count=4
@@ -93,14 +129,324 @@ def test_1host_4rank(infra_single_gpu_server_factory, infra_switch_factory):
     )
 
 
-def test_1tier_1host_8npu(infra_multi_gpu_server_factory, infra_switch_factory):
+def test_single_dgx_h100():
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "analytical_congestion_unaware"
+    # load infrastructure and annotation?
+    server = NvidiaDGX()
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "dgx"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    # configuration.infragraph.infrastructure.devices.append(server)
+    # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    link_spec = astra_sim.AnnotationLinkSpecifications()
+    link_spec.link_error_rate = 0
+    link_spec.link_name = "pcie"
+    link_spec.packet_loss_rate = 0
+    link_spec.link_bandwidth_gbps = 1600
+    link_spec.link_latency_ms = 0.005
+    configuration.infragraph.annotations.link_specifications.append(link_spec)
+
+    AnalyticalTopology.generate_topology(configuration)
+
+    print(configuration.network_backend.analytical_congestion_unaware.topology.network)
+    assert (
+        len(
+            configuration.network_backend.analytical_congestion_unaware.topology.network
+        )
+        > 0
+    )
+
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].topology
+        == "switch"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].npus_count
+        == 8
+    )
+
+
+def test_single_dgx1():
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "analytical_congestion_unaware"
+    # load infrastructure and annotation?
+    server = NvidiaDGX("dgx1")
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "dgx"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    # configuration.infragraph.infrastructure.devices.append(server)
+    # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    link_spec = astra_sim.AnnotationLinkSpecifications()
+    link_spec.link_error_rate = 0
+    link_spec.link_name = "xpu_fabric"
+    link_spec.packet_loss_rate = 0
+    link_spec.link_bandwidth_gbps = 1600
+    link_spec.link_latency_ms = 0.005
+    configuration.infragraph.annotations.link_specifications.append(link_spec)
+
+    AnalyticalTopology.generate_topology(configuration)
+
+    print(configuration.network_backend.analytical_congestion_unaware.topology.network)
+    assert (
+        len(
+            configuration.network_backend.analytical_congestion_unaware.topology.network
+        )
+        == 2
+    )
+
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].topology
+        == "fullyconnected"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            1
+        ].topology
+        == "ring"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].npus_count
+        == 4
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            1
+        ].npus_count
+        == 2
+    )
+
+
+def test_single_dgx_gb200():
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "analytical_congestion_unaware"
+    # load infrastructure and annotation?
+    server = NvidiaDGX("dgx_gb200")
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "dgx"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    # configuration.infragraph.infrastructure.devices.append(server)
+    # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    link_spec = astra_sim.AnnotationLinkSpecifications()
+    link_spec.link_error_rate = 0
+    link_spec.link_name = "xpu_fabric"
+    link_spec.packet_loss_rate = 0
+    link_spec.link_bandwidth_gbps = 1600
+    link_spec.link_latency_ms = 0.005
+    configuration.infragraph.annotations.link_specifications.append(link_spec)
+
+    AnalyticalTopology.generate_topology(configuration)
+
+    print(configuration.network_backend.analytical_congestion_unaware.topology.network)
+    assert (
+        len(
+            configuration.network_backend.analytical_congestion_unaware.topology.network
+        )
+        == 1
+    )
+
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].topology
+        == "switch"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].npus_count
+        == 4
+    )
+
+
+def test_single_dgx_a100():
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "analytical_congestion_unaware"
+    # load infrastructure and annotation?
+    server = NvidiaDGX("dgx_a100")
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "dgx"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    # configuration.infragraph.infrastructure.devices.append(server)
+    # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    link_spec = astra_sim.AnnotationLinkSpecifications()
+    link_spec.link_error_rate = 0
+    link_spec.link_name = "xpu_fabric"
+    link_spec.packet_loss_rate = 0
+    link_spec.link_bandwidth_gbps = 1600
+    link_spec.link_latency_ms = 0.005
+    configuration.infragraph.annotations.link_specifications.append(link_spec)
+
+    AnalyticalTopology.generate_topology(configuration)
+
+    print(configuration.network_backend.analytical_congestion_unaware.topology.network)
+    assert (
+        len(
+            configuration.network_backend.analytical_congestion_unaware.topology.network
+        )
+        == 1
+    )
+
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].topology
+        == "switch"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].npus_count
+        == 8
+    )
+
+
+def test_single_ironwood_rack():
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "analytical_congestion_unaware"
+    # load infrastructure and annotation?
+    server = IronwoodRack()
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "ironwood"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    # configuration.infragraph.infrastructure.devices.append(server)
+    # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    AnalyticalTopology.generate_topology(configuration)
+
+    print(configuration.network_backend.analytical_congestion_unaware.topology.network)
+    assert (
+        len(
+            configuration.network_backend.analytical_congestion_unaware.topology.network
+        )
+        == 3
+    )
+
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].topology
+        == "ring"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            1
+        ].topology
+        == "ring"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            2
+        ].topology
+        == "ring"
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            0
+        ].npus_count
+        == 4
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            1
+        ].npus_count
+        == 4
+    )
+    assert (
+        configuration.network_backend.analytical_congestion_unaware.topology.network[
+            2
+        ].npus_count
+        == 4
+    )
+
+
+def test_single_tier_single_host_eight_ranks(
+    infra_multi_gpu_server_factory, infra_switch_factory
+):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "analytical_congestion_unaware"
     # load infrastructure and annotation?
     server = infra_multi_gpu_server_factory(4)
     switch = infra_switch_factory()
-    configuration.infragraph.infrastructure.name = "1host-8ranks"
+    configuration.infragraph.infrastructure.name = "single_tier_single_host_eight_ranks"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
     hosts = configuration.infragraph.infrastructure.instances.add(
         name="host", device=server.name, count=1

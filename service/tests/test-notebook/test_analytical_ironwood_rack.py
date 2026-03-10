@@ -1,4 +1,4 @@
-def test_ns3_clos_fabric_3tier(port_number):
+def test_analytical_ironwood_rack(port_number):
 
     try:
 
@@ -12,19 +12,20 @@ def test_ns3_clos_fabric_3tier(port_number):
         import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
         from astra_sim import AstraSim, Collective, NetworkBackend
         from infragraph.infragraph_service import InfraGraphService
-        from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
-        from infragraph.blueprints.devices.generic.server import Server
-        from infragraph.blueprints.devices.generic.generic_switch import Switch
+        from infragraph.blueprints.devices.ironwood_rack import IronwoodRack
+        from infragraph import Infrastructure
 
         # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "ns3_clos_fabric_3tier")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "analytical_ironwood_rack")
 
-        # ##### Create a three-tier clos fabric using infragraph fabric blueprint
+        # ##### Create a ironwood rack device fabric using infragraph device blueprint
 
-        server = Server()
-        switch = Switch(port_count=4)
-        infrastructure = ClosFatTreeFabric(switch, server, 3,[])
+        server = IronwoodRack()
+        infrastructure = Infrastructure()
+        infrastructure.devices.append(server)
+
+        infrastructure.instances.add(name=server.name, device=server.name, count=1)
         astra.configuration.infragraph.infrastructure.deserialize(infrastructure.serialize())
         print(astra.configuration.infragraph.infrastructure)
 
@@ -32,9 +33,9 @@ def test_ns3_clos_fabric_3tier(port_number):
 
         service = InfraGraphService()
         service.set_graph(infrastructure)
+        total_npus = service.get_component(device=server, type="xpu").count
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
-        total_npus = 16
 
         # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
@@ -45,9 +46,9 @@ def test_ns3_clos_fabric_3tier(port_number):
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
         astra.configuration.common_config.system.active_chunks_per_dimension = 1
-        astra.configuration.common_config.system.all_gather_implementation = [astra.configuration.common_config.system.RING]
-        astra.configuration.common_config.system.all_to_all_implementation = [astra.configuration.common_config.system.DIRECT]
-        astra.configuration.common_config.system.all_reduce_implementation = [astra.configuration.common_config.system.ONERING]
+        astra.configuration.common_config.system.all_gather_implementation = [astra.configuration.common_config.system.RING, astra.configuration.common_config.system.RING, astra.configuration.common_config.system.RING]
+        astra.configuration.common_config.system.all_to_all_implementation = [astra.configuration.common_config.system.RING, astra.configuration.common_config.system.RING, astra.configuration.common_config.system.RING]
+        astra.configuration.common_config.system.all_reduce_implementation = [astra.configuration.common_config.system.RING, astra.configuration.common_config.system.RING, astra.configuration.common_config.system.RING]
         astra.configuration.common_config.system.collective_optimization = astra.configuration.common_config.system.LOCALBWAWARE
         astra.configuration.common_config.system.local_mem_bw = 1600
 
@@ -56,36 +57,18 @@ def test_ns3_clos_fabric_3tier(port_number):
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the selected network backend and the topology (infragraph or nc_topology)
+        # ##### Configure network backend to ANALYTICAL_CONGESTION_AWARE
 
-        astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
-        astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.INFRAGRAPH
-        astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
-
-        # ##### Adding ns3 trace and logical dimension 
-
-        astra.configuration.network_backend.ns3.logical_topology.logical_dimensions = [total_npus]
-        astra.configuration.network_backend.ns3.trace.trace_ids = []
-        for i in range(0, total_npus):
-            astra.configuration.network_backend.ns3.trace.trace_ids.append(i)
+        astra.configuration.network_backend.analytical_congestion_unaware.topology.choice = astra.configuration.network_backend.analytical_congestion_unaware.topology.INFRAGRAPH
 
         # ##### Adding ASTRA-sim - Infragraph specific annotation
 
         host_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
         host_device_spec.device_bandwidth_gbps = 100
         host_device_spec.device_latency_ms = 0.05
-        host_device_spec.device_name = "server"
+        host_device_spec.device_name = server.name
         host_device_spec.device_type = "host"
         astra.configuration.infragraph.annotations.device_specifications.append(host_device_spec)
-
-        switch_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
-        switch_device_spec.device_bandwidth_gbps = 100
-        switch_device_spec.device_latency_ms = 0.05
-        switch_device_spec.device_name = "switch"
-        switch_device_spec.device_type = "switch"
-        astra.configuration.infragraph.annotations.device_specifications.append(
-            switch_device_spec
-        )
 
         # ##### Configure ASTRA-sim cmd parameters
 
@@ -95,30 +78,22 @@ def test_ns3_clos_fabric_3tier(port_number):
 
         # #### Start the simulation by specifying the network backend
 
-        astra.run_simulation(NetworkBackend.NS3)
+        astra.run_simulation(NetworkBackend.ANALYTICAL_CONGESTION_UNAWARE)
 
         # ##### Download all the configurations as a zip
 
         astra.download_configuration()
-
-        # ##### Read output files
-
-        import pandas as pd
-        import os
-        from common import FileFolderUtils
-        df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "fct.csv"))
-        df.head()
 
         # ##### Save infragraph as a yaml
 
         import yaml
         import os
         from common import FileFolderUtils
-        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_clos_fabric_3tier"),"w") as f:
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","analytical_dgx_device.yaml"),"w") as f:
             data = infrastructure.serialize("dict")
             yaml.dump(data, f, default_flow_style=False, indent=4)
 
-        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_clos_fabric_3tier.yaml"))
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","analytical_dgx_device.yaml"))
 
         assert True
     except Exception as e:

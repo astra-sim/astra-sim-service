@@ -2,7 +2,7 @@ def test_load_existing_et_example(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
         import os
@@ -11,19 +11,20 @@ def test_load_existing_et_example(port_number):
         sys.path.append("../../client-scripts/utils")
         sys.path.append("./client-scripts/utils")
         from common import FileFolderUtils
-        from astra_sim import AstraSim, Collective, NetworkBackend
+        from astra_sim import AstraSim, NetworkBackend
+        from pathlib import Path
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs.
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag="ns3_trial_existing_ets")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag="load_existing_et_example")
 
         # ##### Add existing workload execution traces by giving the path to the workload with basename included, mandatory for AstraSim workload configuration.
 
-        cwd = os.path.dirname(os.path.abspath(__file__))
+        cwd = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else os.getcwd()
         astra.configuration.common_config.workload = os.path.join(cwd, "../resources/example_workload/workload/all_reduce")
         print(astra.configuration.common_config.workload)
 
-        # ##### Configure the system configurations
+        # ##### Configure ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -35,12 +36,12 @@ def test_load_existing_et_example(port_number):
         astra.configuration.common_config.system.local_mem_bw = 1600
         print(astra.configuration.common_config.system)
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the Network_backend
+        # ##### Configure the network backend
 
         # astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
         astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
@@ -51,7 +52,7 @@ def test_load_existing_et_example(port_number):
         print(astra.configuration.network_backend.ns3.logical_topology)
         print(astra.configuration.network_backend.ns3.trace)
 
-        # ##### Set up the network topology
+        # ##### Configure the network topology
 
         # astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.NC_TOPOLOGY
         # the topology configuration will be set automatically if we configure the nc_topology
@@ -71,7 +72,7 @@ def test_load_existing_et_example(port_number):
         print(astra.configuration.network_backend.ns3.topology.choice)
         print(astra.configuration.network_backend.ns3.topology.nc_topology)
 
-        # ##### Configure the cmd parameters, non-mandatory parameters
+        # ##### Configure ASTRA-sim cmd parameters
 
         astra.configuration.common_config.cmd_parameters.comm_scale = 1
         astra.configuration.common_config.cmd_parameters.injection_scale = 1
@@ -79,7 +80,7 @@ def test_load_existing_et_example(port_number):
 
         print(astra.configuration.common_config.cmd_parameters)
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.NS3)
 

@@ -256,10 +256,8 @@ class HTSimFatTree:
                 elif destination_device_index in low_tier_devices:
                     tier.radix_down = tier.radix_down + 1
                     link = self.annotation.get_link_specification(attr["link"])
-                    tier.downlink_speed_gbps = link["bandwidth"].to_float()
-                    tier.downlink_latency_ns = link["latency"].to_time_unit_float(
-                        TimeUnit.NANOSECOND
-                    )
+                    tier.downlink_speed_gbps = link["bandwidth"]
+                    tier.downlink_latency_ns = link["latency"] * 1000000
                     if downlink_device == "":
                         downlink_device = destination_device_index
 
@@ -269,10 +267,8 @@ class HTSimFatTree:
                 elif source_device_index in low_tier_devices:
                     tier.radix_down = tier.radix_down + 1
                     link = self.annotation.get_link_specification(attr["link"])
-                    tier.downlink_speed_gbps = link["bandwidth"].to_float()
-                    tier.downlink_latency_ns = link["latency"].to_time_unit_float(
-                        TimeUnit.NANOSECOND
-                    )
+                    tier.downlink_speed_gbps = link["bandwidth"]
+                    tier.downlink_latency_ns = link["latency"] * 1000000
                     if downlink_device == "":
                         downlink_device = source_device_index
 
@@ -507,17 +503,7 @@ class HTSimTopology:
         # TODO Need to check for multiple gpus in a host
         # analytical topology generation here
         npu_count = 1
-        # infrastructure = configuration.infragraph.infrastructure
-        # annotations = configuration.infragraph.annotations
-        # analytical_topology = AnalyticalTopology(infrastructure, annotations)
-        # if analytical_topology.analytical_1d is not None:
-        #     npu_count = analytical_topology.analytical_1d.node_count
-        #     configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
-        #         topology=analytical_topology.analytical_1d.topology,  # type: ignore
-        #         npus_count=analytical_topology.analytical_1d.node_count,
-        #         bandwidth=analytical_topology.analytical_1d.bandwidth,
-        #         latency=analytical_topology.analytical_1d.latency,
-        #     )
+
         if podsize == nodes:
             configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
                 topology="switch",  # type: ignore

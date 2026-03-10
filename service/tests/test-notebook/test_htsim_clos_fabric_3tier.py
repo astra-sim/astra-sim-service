@@ -2,46 +2,45 @@ def test_htsim_clos_fabric_3tier(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
-        import networkx
-        import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
         sys.path.append("../client-scripts/utils")
         sys.path.append("../../client-scripts/utils")
         sys.path.append("./client-scripts/utils")
+        import networkx
+        import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
         from astra_sim import AstraSim, Collective, NetworkBackend
         from infragraph.infragraph_service import InfraGraphService
         from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
-        from infragraph.blueprints.devices.server import Server
-        from infragraph.blueprints.devices.generic_switch import Switch
+        from infragraph.blueprints.devices.generic.server import Server
+        from infragraph.blueprints.devices.generic.generic_switch import Switch
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "htsim_clos_3tier_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "htsim_clos_fabric_3tier")
 
-        # ##### Creating Infragraph for 3 tier clos fabric
+        # ##### Create a three-tier clos fabric using infragraph fabric blueprint
 
         server = Server()
         switch = Switch(port_count=8)
-        clos_fat_tree = ClosFatTreeFabric(switch, server, 3,[])
-        astra.configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
+        infrastructure = ClosFatTreeFabric(switch, server, 3,[])
+        astra.configuration.infragraph.infrastructure.deserialize(infrastructure.serialize())
         print(astra.configuration.infragraph.infrastructure)
 
-        # ##### Initialize Infragraph service and Display Fabric
+        # ##### Initialize the Infragraph service, display the fabric topology, and retrieve/set the total number of NPUs to generate the collective
 
         service = InfraGraphService()
-        service.set_graph(clos_fat_tree)
+        service.set_graph(infrastructure)
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
-
         total_npus = 64
 
-        # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
+        # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
         astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 1 *1024*1024, npu_range=[0, total_npus])
 
-        # ##### Configure the system configurations
+        # ##### Configure ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -56,19 +55,17 @@ def test_htsim_clos_fabric_3tier(port_number):
         astra.configuration.common_config.system.roofline_enabled = 0
         print(astra.configuration.common_config.system)
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the network backend choice and the topology choice for that backend
-        # 
+        # ##### Configure the selected network backend and the topology (infragraph or network_topology_configuration)
 
         astra.configuration.network_backend.choice = astra.configuration.network_backend.HTSIM
         astra.configuration.network_backend.htsim.topology.choice = astra.configuration.network_backend.htsim.topology.INFRAGRAPH
-        # astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
 
-        # ##### Configure the protocol choice
+        # ##### Select htsim protocol
 
         astra.configuration.network_backend.htsim.htsim_protocol.choice = astra.configuration.network_backend.htsim.htsim_protocol.TCP
         print("Network backend set to", astra.configuration.network_backend.choice)
@@ -76,7 +73,7 @@ def test_htsim_clos_fabric_3tier(port_number):
         print("protocol set to", astra.configuration.network_backend.htsim.htsim_protocol)
         astra.configuration.network_backend.htsim.htsim_protocol.tcp.nodes = str(total_npus)
 
-        # ##### Adding ASTRA-sim specific annotation
+        # ##### Adding ASTRA-sim - Infragraph specific annotation
 
         host_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
         host_device_spec.device_bandwidth_gbps = 1000
@@ -100,7 +97,7 @@ def test_htsim_clos_fabric_3tier(port_number):
         astra.configuration.common_config.cmd_parameters.injection_scale = 1
         astra.configuration.common_config.cmd_parameters.rendezvous_protocol = False
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.HTSIM)
 
@@ -113,11 +110,11 @@ def test_htsim_clos_fabric_3tier(port_number):
         import yaml
         import os
         from common import FileFolderUtils
-        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","2tier.yaml"),"w") as f:
-            data = clos_fat_tree.serialize("dict")
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","htsim_clos_fabric_3tier.yaml"),"w") as f:
+            data = infrastructure.serialize("dict")
             yaml.dump(data, f, default_flow_style=False, indent=4)
 
-        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","3tier.yaml"))
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","htsim_clos_fabric_3tier.yaml"))
 
         assert True
     except Exception as e:

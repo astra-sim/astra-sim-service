@@ -25,23 +25,55 @@ SOFTWARE.
 import astra_sim_sdk.astra_sim_sdk as astra_sim
 from astra_server.infrastructure.ns3_topology import NS3Topology
 
-from infragraph.blueprints.devices.generic_switch import Switch
+from infragraph.blueprints.devices.generic.generic_switch import Switch
 from infragraph import Component, InfrastructureEdge
 from infragraph.infragraph_service import InfraGraphService
-from infragraph.blueprints.devices.dgx import Dgx
-from infragraph.blueprints.devices.server import Server
+from infragraph.blueprints.devices.nvidia.dgx import NvidiaDGX
+from infragraph.blueprints.devices.generic.server import Server
 from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
+from infragraph.blueprints.fabrics.single_tier_fabric import SingleTierFabric
+from infragraph.blueprints.devices.ironwood_rack import IronwoodRack
 from astra_sim_sdk.astra_sim_sdk import Device
+from infragraph import Infrastructure
+import pytest
 
 
-def test_1host_4rank(infra_single_gpu_server_factory, infra_switch_factory):
+def test_single_host_eight_npus(infra_multi_gpu_server_factory):
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "ns3"
+    # load infrastructure and annotation?
+    server = infra_multi_gpu_server_factory(4)
+    configuration.infragraph.infrastructure.name = "1host-8ranks"
+    configuration.infragraph.infrastructure.devices.append(server)
+    configuration.infragraph.infrastructure.instances.add(
+        name="host", device=server.name, count=1
+    )
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = "server"
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    NS3Topology.generate_topology(configuration)
+
+    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 9
+    assert configuration.network_backend.ns3.topology.nc_topology.total_links == 8
+    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 1
+    assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 8
+
+
+def test_single_tier_four_server(infra_single_gpu_server_factory, infra_switch_factory):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "ns3"
     # load infrastructure and annotation?
     server = infra_single_gpu_server_factory()
     switch = infra_switch_factory()
-    configuration.infragraph.infrastructure.name = "1host-4ranks"
+    configuration.infragraph.infrastructure.name = "single-tier-four-servers"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
     hosts = configuration.infragraph.infrastructure.instances.add(
         name="host", device=server.name, count=4
@@ -94,14 +126,93 @@ def test_1host_4rank(infra_single_gpu_server_factory, infra_switch_factory):
     assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 4
 
 
-def test_1tier_1host_8npu(infra_multi_gpu_server_factory, infra_switch_factory):
+@pytest.mark.parametrize(
+    "dgx_variant, nodes_count, links_count, switch_count",
+    [
+        ("dgx1", 8, 16, 0),
+        # ("dgx2", 16, 1, 1),
+        ("dgx_a100", 14, 48, 6),
+        ("dgx_h100", 12, 32, 4),
+        # ("dgx_gb200", 4, 1, 1),
+    ],
+)
+def test_dgx(dgx_variant, nodes_count, links_count, switch_count):
+    # infrastructure - infragraph
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "analytical_congestion_unaware"
+    # load infrastructure and annotation?
+    server = NvidiaDGX(dgx_variant)
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "dgx"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    # configuration.infragraph.infrastructure.devices.append(server)
+    # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
+
+    # annotation
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 1000
+    host_device_spec.device_latency_ms = 0.005
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    NS3Topology.generate_topology(configuration)
+
+    assert (
+        configuration.network_backend.ns3.topology.nc_topology.total_nodes
+        == nodes_count
+    )
+    assert (
+        configuration.network_backend.ns3.topology.nc_topology.total_links
+        == links_count
+    )
+    assert (
+        len(configuration.network_backend.ns3.topology.nc_topology.switch_ids)
+        == switch_count
+    )
+    # assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 8
+
+
+def test_single_ironwood():
+    configuration = astra_sim.Config()
+    configuration.network_backend.choice = "ns3"
+
+    server = IronwoodRack()
+    infra = Infrastructure()
+    infra.devices.append(server)
+    infra.instances.add(name=server.name, device=server.name, count=1)
+
+    configuration.infragraph.infrastructure.name = "ironwood"
+    configuration.infragraph.infrastructure.deserialize(infra.serialize())
+
+    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
+    host_device_spec.device_bandwidth_gbps = 100
+    host_device_spec.device_latency_ms = 0.05
+    host_device_spec.device_name = server.name
+    host_device_spec.device_type = "host"
+    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+
+    NS3Topology.generate_topology(configuration)
+
+    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 64
+    assert configuration.network_backend.ns3.topology.nc_topology.total_links == 192
+    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 0
+
+
+def test_single_tier_single_host_eight_npus(
+    infra_multi_gpu_server_factory, infra_switch_factory
+):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "ns3"
     # load infrastructure and annotation?
     server = infra_multi_gpu_server_factory(4)
     switch = infra_switch_factory()
-    configuration.infragraph.infrastructure.name = "1host-8ranks"
+    configuration.infragraph.infrastructure.name = "single_tier_single_host_eight_npus"
     configuration.infragraph.infrastructure.devices.append(server).append(switch)
     hosts = configuration.infragraph.infrastructure.instances.add(
         name="host", device=server.name, count=1
@@ -148,21 +259,21 @@ def test_1tier_1host_8npu(infra_multi_gpu_server_factory, infra_switch_factory):
 
     NS3Topology.generate_topology(configuration)
 
-    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 14
-    assert configuration.network_backend.ns3.topology.nc_topology.total_links == 24
-    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 6
+    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 10
+    assert configuration.network_backend.ns3.topology.nc_topology.total_links == 16
+    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 2
     assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 8
 
 
-def test_2dgx_1switch(infra_switch_factory):
+def test_two_dgx_single_switch(infra_switch_factory):
     # infrastructure - infragraph
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "ns3"
     # load infrastructure and annotation?
     server = Device()
-    server.deserialize(Dgx().serialize())
+    server.deserialize(NvidiaDGX().serialize())
     switch = infra_switch_factory()
-    configuration.infragraph.infrastructure.name = "2dgx-1switch"
+    configuration.infragraph.infrastructure.name = "two_dgx_single_switch"
 
     hosts = configuration.infragraph.infrastructure.instances.add(
         name="dgx_host", device=server.name, count=2
@@ -200,14 +311,14 @@ def test_2dgx_1switch(infra_switch_factory):
     host_device_spec = astra_sim.AnnotationDeviceSpecifications()
     host_device_spec.device_bandwidth_gbps = 200
     host_device_spec.device_latency_ms = 0.05
-    host_device_spec.device_name = "dgx"
+    host_device_spec.device_name = server.name
     host_device_spec.device_type = "host"
     configuration.infragraph.annotations.device_specifications.append(host_device_spec)
 
     switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
     switch_device_spec.device_bandwidth_gbps = 200
     switch_device_spec.device_latency_ms = 0.05
-    switch_device_spec.device_name = "switch"
+    switch_device_spec.device_name = switch.name
     switch_device_spec.device_type = "switch"
     configuration.infragraph.annotations.device_specifications.append(
         switch_device_spec
@@ -215,13 +326,13 @@ def test_2dgx_1switch(infra_switch_factory):
 
     NS3Topology.generate_topology(configuration)
 
-    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 17
-    assert configuration.network_backend.ns3.topology.nc_topology.total_links == 16
-    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 1
+    assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 25
+    assert configuration.network_backend.ns3.topology.nc_topology.total_links == 80
+    assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 9
     assert configuration.network_backend.ns3.topology.nc_topology.switch_ids[0] == 16
 
 
-def test_2_tier_clos_fabric():
+def test_two_tier_clos_fabric():
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "ns3"
     server = Server()
@@ -251,7 +362,7 @@ def test_2_tier_clos_fabric():
     assert len(configuration.network_backend.ns3.topology.nc_topology.switch_ids) == 44
 
 
-def test_3_tier_clos_fabric():
+def test_three_tier_clos_fabric():
     configuration = astra_sim.Config()
     configuration.network_backend.choice = "ns3"
     server = Server()

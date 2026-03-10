@@ -1,4 +1,4 @@
-def test_htsim_clos_fabric_2tier(port_number):
+def test_analytical_dgx_device(port_number):
 
     try:
 
@@ -12,19 +12,24 @@ def test_htsim_clos_fabric_2tier(port_number):
         import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
         from astra_sim import AstraSim, Collective, NetworkBackend
         from infragraph.infragraph_service import InfraGraphService
-        from infragraph.blueprints.fabrics.clos_fat_tree_fabric import ClosFatTreeFabric
-        from infragraph.blueprints.devices.generic.server import Server
-        from infragraph.blueprints.devices.generic.generic_switch import Switch
+        from infragraph.blueprints.devices.nvidia.dgx import NvidiaDGX, DgxProfile
+        from infragraph import Infrastructure
 
-        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "htsim_clos_fabric_2tier")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "analytical_dgx_device")
 
-        # ##### Create a two-tier clos fabric using infragraph fabric blueprint
+        # ##### Get all available DGX variants
 
-        server = Server()
-        switch = Switch(port_count=8)
-        infrastructure = ClosFatTreeFabric(switch, server, 2,[])
+        from typing import get_args
+        print(get_args(DgxProfile))
+
+        # ##### Create a Nvidia DGX device fabric using infragraph device blueprint
+
+        server = NvidiaDGX()
+        infrastructure = Infrastructure()
+        infrastructure.devices.append(server)
+        infrastructure.instances.add(name=server.name, device=server.name, count=1)
         astra.configuration.infragraph.infrastructure.deserialize(infrastructure.serialize())
         print(astra.configuration.infragraph.infrastructure)
 
@@ -32,9 +37,9 @@ def test_htsim_clos_fabric_2tier(port_number):
 
         service = InfraGraphService()
         service.set_graph(infrastructure)
+        total_npus = service.get_component(device=server, type="xpu").count
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
-        total_npus = 16
 
         # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
@@ -45,51 +50,29 @@ def test_htsim_clos_fabric_2tier(port_number):
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
         astra.configuration.common_config.system.active_chunks_per_dimension = 1
-        astra.configuration.common_config.system.preferred_dataset_splits = 4
         astra.configuration.common_config.system.all_gather_implementation = [astra.configuration.common_config.system.RING]
         astra.configuration.common_config.system.all_to_all_implementation = [astra.configuration.common_config.system.DIRECT]
-        astra.configuration.common_config.system.all_reduce_implementation = [astra.configuration.common_config.system.RING]
+        astra.configuration.common_config.system.all_reduce_implementation = [astra.configuration.common_config.system.ONERING]
         astra.configuration.common_config.system.collective_optimization = astra.configuration.common_config.system.LOCALBWAWARE
         astra.configuration.common_config.system.local_mem_bw = 1600
-        astra.configuration.common_config.system.peak_perf = 900
-        astra.configuration.common_config.system.roofline_enabled = 0
-        print(astra.configuration.common_config.system)
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the selected network backend and the topology (infragraph or network_topology_configuration)
+        # ##### Set ASTRA-sim network backend to ANALYTICAL_CONGESTION_AWARE
 
-        astra.configuration.network_backend.choice = astra.configuration.network_backend.HTSIM
-        astra.configuration.network_backend.htsim.topology.choice = astra.configuration.network_backend.htsim.topology.INFRAGRAPH
-
-        # ##### Select htsim protocol
-
-        astra.configuration.network_backend.htsim.htsim_protocol.choice = astra.configuration.network_backend.htsim.htsim_protocol.TCP
-        print("Network backend set to", astra.configuration.network_backend.choice)
-        print("network topology choice set to:",astra.configuration.network_backend.htsim.topology.choice)
-        print("protocol set to", astra.configuration.network_backend.htsim.htsim_protocol)
-        astra.configuration.network_backend.htsim.htsim_protocol.tcp.nodes = str(total_npus)
+        astra.configuration.network_backend.analytical_congestion_aware.topology.choice = astra.configuration.network_backend.analytical_congestion_aware.topology.INFRAGRAPH
 
         # ##### Adding ASTRA-sim - Infragraph specific annotation
 
         host_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
-        host_device_spec.device_bandwidth_gbps = 1000
-        host_device_spec.device_latency_ms = 0.005
-        host_device_spec.device_name = "server"
+        host_device_spec.device_bandwidth_gbps = 100
+        host_device_spec.device_latency_ms = 0.05
+        host_device_spec.device_name = server.name
         host_device_spec.device_type = "host"
         astra.configuration.infragraph.annotations.device_specifications.append(host_device_spec)
-
-        switch_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
-        switch_device_spec.device_bandwidth_gbps = 1000
-        switch_device_spec.device_latency_ms = 0.005
-        switch_device_spec.device_name = "switch"
-        switch_device_spec.device_type = "switch"
-        astra.configuration.infragraph.annotations.device_specifications.append(
-            switch_device_spec
-        )
 
         # ##### Configure ASTRA-sim cmd parameters
 
@@ -99,22 +82,18 @@ def test_htsim_clos_fabric_2tier(port_number):
 
         # #### Start the simulation by specifying the network backend
 
-        astra.run_simulation(NetworkBackend.HTSIM)
-
-        # ##### Download all the configurations as a zip
-
-        astra.download_configuration()
+        astra.run_simulation(NetworkBackend.ANALYTICAL_CONGESTION_AWARE)
 
         # ##### Save infragraph as a yaml
 
         import yaml
         import os
         from common import FileFolderUtils
-        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","htsim_clos_fabric_2tier.yaml"),"w") as f:
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","analytical_dgx_device.yaml"),"w") as f:
             data = infrastructure.serialize("dict")
             yaml.dump(data, f, default_flow_style=False, indent=4)
 
-        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","htsim_clos_fabric_2tier.yaml"))
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","analytical_dgx_device.yaml"))
 
         assert True
     except Exception as e:

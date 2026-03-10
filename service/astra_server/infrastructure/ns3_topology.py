@@ -44,6 +44,7 @@ class NS3Topology:
         infrastructure: astra_sim.Infrastructure,
         annotations: astra_sim.Annotations,
     ):
+        self._single_device = False
         self.switches = []
         # read the annotation and store the link and device data
         self.annotation = Annotation(annotations)
@@ -101,63 +102,47 @@ class NS3Topology:
                 self.infragraph_service, "xpu", instance_name, int(instance_index)
             )
 
-            # get the neighbour nics
-            for npu in npu_nodes:
-                nics = NetworkxUtils.get_neighbour_nodes_for_component_type(
-                    self.graph, npu, "nic"
+            if not self._single_device:
+                # add handler for port?
+                nic_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
+                    self.infragraph_service, "nic", instance_name, int(instance_index)
                 )
-                if len(nics) <= 0:
-                    # here we get equivalent nic
-                    nic_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
-                        self.infragraph_service,
-                        "nic",
-                        instance_name,
-                        int(instance_index),
+                if len(nic_nodes) <= 0:
+                    raise InfragraphError(
+                        f"nic nodes missing for npu: {npu}",
+                        grpc.StatusCode.NOT_FOUND,
+                        404,
                     )
-                    if len(nic_nodes) <= 0:
-                        raise InfragraphError(
-                            f"nic nodes missing for npu: {npu}",
-                            grpc.StatusCode.NOT_FOUND,
-                            404,
-                        )
 
-                    if len(nic_nodes) < len(npu_nodes):
-                        raise InfragraphError(
-                            "the nics are less than the npu count in the device",
-                            grpc.StatusCode.INVALID_ARGUMENT,
-                            400,
-                        )
-
-                    nic_instance_index = nic_nodes[0]
-                    nic_component_name = (
-                        nic_instance_index.split(".")[0]
-                        + "."
-                        + nic_instance_index.split(".")[1]
-                        + "."
-                        + nic_instance_index.split(".")[2]
+                # handle less nic case?
+                if len(nic_nodes) < len(npu_nodes):
+                    raise InfragraphError(
+                        "the nics are less than the npu count in the device",
+                        grpc.StatusCode.INVALID_ARGUMENT,
+                        400,
                     )
-                    npu_index = npu.split(".")[3]
-                    connected_nic = nic_component_name + "." + str(npu_index)
-                    nics = [connected_nic]
 
-                rank_id = self.annotation.device_to_id[npu]
-                for nic in nics:
+                # assign nics to npus
+                npu_nodes.sort()
+                nic_nodes.sort()
+
+                for i, nic in enumerate(nic_nodes):
+                    npu = npu_nodes[i % len(npu_nodes)]
+                    rank_id = self.annotation.device_to_id[npu]
                     self.annotation.device_to_id[nic] = rank_id
 
+            # add nvswitch
+            # nvswitch - all nodes are connected to switch
             switch_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
                 self.infragraph_service, "switch", instance_name, int(instance_index)
             )
 
             # chances are switch nodes can be empty
             for switch in switch_nodes:
-                if (
-                    len(
-                        NetworkxUtils.get_neighbour_nodes_for_component_type(
-                            self.graph, switch, "xpu"
-                        )
-                    )
-                    > 1
-                ):
+                xpu_connected = NetworkxUtils.get_neighbour_nodes_for_component_type(
+                    self.graph, switch, "xpu"
+                )
+                if len(xpu_connected) == len(npu_nodes) and len(xpu_connected) > 1:
                     # if more than 1 npu is connected
                     self.switches.append(switch)
                     self.annotation.device_to_id[
@@ -193,6 +178,10 @@ class NS3Topology:
                     device_name=instance.device,
                 )
                 instance_map[instance.name].append(instance.name + "." + str(i))
+
+        # single device
+        if len(infrastructure.instances) == 1:
+            self._single_device = True
 
         # assign ranks or identifiers to host components like nic, npu, switch
         self._host_rank_assignment(infrastructure)
@@ -318,7 +307,7 @@ class NS3Topology:
             source_device_index = source_split[0] + "." + source_split[1]
             destination_device_index = destination_split[0] + "." + destination_split[1]
 
-            # case 1: both source and destination are hosts
+            # case 1: both source and destination are hosts - switch to xpu and xpu - xpu
             if (
                 topology.graph.nodes[source]["device"] in topology.annotation.hosts
                 and topology.graph.nodes[destination]["device"]
@@ -331,6 +320,16 @@ class NS3Topology:
                 ) or (
                     topology.graph.nodes[source]["type"] == "xpu"
                     and topology.graph.nodes[destination]["type"] == "switch"
+                ):
+                    if source in topology.annotation.device_to_id:
+                        source_dev = topology.annotation.device_to_id[source]
+                    if destination in topology.annotation.device_to_id:
+                        dest_dev = topology.annotation.device_to_id[destination]
+                # if either one is a switch and the other one is an npu:
+                elif (
+                    topology.graph.nodes[source]["type"] == "xpu"
+                    and topology.graph.nodes[destination]["type"] == "xpu"
+                    and source != destination
                 ):
                     if source in topology.annotation.device_to_id:
                         source_dev = topology.annotation.device_to_id[source]
@@ -362,8 +361,8 @@ class NS3Topology:
                     dest_dev = topology.annotation.device_to_id[destination]
 
             if source_dev > -1 and dest_dev > -1:
-                print(f"Edge from {source} to {destination} with attributes {attr}")
-                print(f"ns3: {source_dev} {dest_dev}")
+                # print(f"Edge from {source} to {destination} with attributes {attr}")
+                # print(f"ns3: {source_dev} {dest_dev}")
 
                 link = topology.annotation.get_link_specification(
                     attr["link"]
@@ -373,8 +372,8 @@ class NS3Topology:
                         "Link missing", grpc.StatusCode.NOT_FOUND, 404
                     )
 
-                bandwidth = link["bandwidth"].to_str()
-                latency = link["latency"].to_str()
+                bandwidth = str(int(link["bandwidth"])) + "Gbps"
+                latency = str(int(link["latency"])) + "ms"
                 error_rate = str(link["link_error_rate"])
 
                 configuration.network_backend.ns3.topology.nc_topology.connections.add(

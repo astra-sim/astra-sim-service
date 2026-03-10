@@ -1,45 +1,47 @@
-def test_ns3_infragraph_sample_dgx_device(port_number):
+def test_ns3_single_tier_with_dgx(port_number):
 
     try:
 
-        # ##### Imports the necessary modules and sets the system path to locate them.
+        # ##### Import the required modules and configure the system path to locate them
 
         import sys
         sys.path.append("../client-scripts/utils")
         sys.path.append("../../client-scripts/utils")
         sys.path.append("./client-scripts/utils")
         from astra_sim import AstraSim, Collective, NetworkBackend
-        from infragraph.blueprints.devices.dgx import Dgx
+        from infragraph.blueprints.devices.nvidia.dgx import NvidiaDGX
         from infragraph.blueprints.fabrics.single_tier_fabric import SingleTierFabric
         import networkx
         from infragraph.infragraph_service import InfraGraphService
         import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
 
-        # ##### Connects the client to the AstraSim gRPC server, initializes the AstraSim SDK, and creates a folder (tagged as specified) containing all configuration details, generated results, and logs.
+        # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
-        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "infragraph_dgx_trial")
+        astra = AstraSim(f"0.0.0.0:{port_number}", tag = "ns3_single_tier_with_dgx")
 
-        # ##### Creating Infragraph with 2 dgx Hosts & 1 rack switch
-        # 
+        # ##### Create a single tier rack device with two Nvidia DGX and a single switch using infragraph device, fabric blueprint
 
         dgx_count = 2
-        fabric = SingleTierFabric(Dgx(), dgx_count)
-        astra.configuration.infragraph.infrastructure.deserialize(fabric.serialize())
-        total_npus = dgx_count * 8 # dgx has 8 npus to total npus = dgx_count * npu_count_per_dgx
+        server = NvidiaDGX()
+        infrastructure = SingleTierFabric(server, dgx_count)
+        astra.configuration.infragraph.infrastructure.deserialize(infrastructure.serialize())
 
-        # ##### Display Fabric
+        # ##### Initialize the Infragraph service, display the fabric topology, and retrieve/set the total number of NPUs to generate the collective
 
         service = InfraGraphService()
-        service.set_graph(fabric)
+        service.set_graph(infrastructure)
 
         g = service.get_networkx_graph()
         print(networkx.write_network_text(g, vertical_chains=True))
 
-        # ##### Generates workload execution traces for each rank and configures the data size, which is mandatory for AstraSim workload configuration.
+        total_npus = service.get_component(server, "xpu").count * dgx_count
+        print(total_npus)
+
+        # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
         astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 8 *1024*1024, npu_range=[0, total_npus])
 
-        # ##### Configure the system configurations
+        # ##### Configure ASTRA-sim system config
 
         astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
         astra.configuration.common_config.system.endpoint_delay = 10
@@ -50,13 +52,12 @@ def test_ns3_infragraph_sample_dgx_device(port_number):
         astra.configuration.common_config.system.collective_optimization = astra.configuration.common_config.system.LOCALBWAWARE
         astra.configuration.common_config.system.local_mem_bw = 1600
 
-        # ##### Configure the remote memory configuration
+        # ##### Configure ASTRA-sim remote memory configuration
 
         astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
         print(astra.configuration.common_config.remote_memory)
 
-        # ##### Configure the network backend choice and the topology choice for that backend
-        # 
+        # ##### Configure the selected network backend and the topology (infragraph or nc_topology)
 
         astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
         astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.INFRAGRAPH
@@ -69,12 +70,12 @@ def test_ns3_infragraph_sample_dgx_device(port_number):
         for i in range(0, total_npus):
             astra.configuration.network_backend.ns3.trace.trace_ids.append(i)
 
-        # ##### Adding ASTRA-sim specific annotation
+        # ##### Adding ASTRA-sim - Infragraph specific annotation
 
         host_device_spec = astra_sim_kit.AnnotationDeviceSpecifications()
         host_device_spec.device_bandwidth_gbps = 100
         host_device_spec.device_latency_ms = 0.05
-        host_device_spec.device_name = "dgx"
+        host_device_spec.device_name = server.name
         host_device_spec.device_type = "host"
         astra.configuration.infragraph.annotations.device_specifications.append(host_device_spec)
 
@@ -93,7 +94,7 @@ def test_ns3_infragraph_sample_dgx_device(port_number):
         astra.configuration.common_config.cmd_parameters.injection_scale = 1
         astra.configuration.common_config.cmd_parameters.rendezvous_protocol = False
 
-        # #### Start the simulation by providing the network backend name in uppercase letters.
+        # #### Start the simulation by specifying the network backend
 
         astra.run_simulation(NetworkBackend.NS3)
 
@@ -109,7 +110,16 @@ def test_ns3_infragraph_sample_dgx_device(port_number):
         df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "fct.csv"))
         df.head()
 
-        df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "flow_stats.csv"))
+        # ##### Save infragraph as a yaml
+
+        import yaml
+        import os
+        from common import FileFolderUtils
+        with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_tier_with_dgx"),"w") as f:
+            data = infrastructure.serialize("dict")
+            yaml.dump(data, f, default_flow_style=False, indent=4)
+
+        print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_single_tier_with_dgx.yaml"))
 
         assert True
     except Exception as e:

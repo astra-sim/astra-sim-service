@@ -29,9 +29,9 @@ import pytest
 from astra_sim_sdk import astra_sim_sdk as astra_sim
 from astra_sim_sdk import Device, Component, DeviceEdge
 from astra_server.configuration_handler import ConfigurationHandler
-from infragraph.blueprints.devices.dgx import Dgx
-from infragraph.blueprints.devices.server import Server
-from infragraph.blueprints.devices.generic_switch import Switch
+from infragraph.blueprints.devices.nvidia.dgx import NvidiaDGX
+from infragraph.blueprints.devices.generic.server import Server
+from infragraph.blueprints.devices.generic.generic_switch import Switch
 
 CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
 # Path to the folder you want to clear every test
@@ -300,7 +300,7 @@ def get_dgx():
     Fixture that returns a dgx device defined in Keysight infragraph repository
     """
     dgx = Device()
-    dgx.deserialize(Dgx().serialize())
+    dgx.deserialize(NvidiaDGX().serialize())
     return dgx
 
 
@@ -342,12 +342,6 @@ def infra_single_gpu_server_factory():
             count=1,
         )
         xpu.choice = Component.XPU
-        nvlsw = server.components.add(
-            name="nvlsw",
-            description="NVLink Switch",
-            count=1,
-        )
-        nvlsw.choice = Component.SWITCH
 
         nic = server.components.add(
             name="nic",
@@ -356,12 +350,7 @@ def infra_single_gpu_server_factory():
         )
         nic.choice = Component.NIC
 
-        nvlink = server.links.add(name="nvlink")
         pcie = server.links.add(name="pcie")
-
-        edge = server.edges.add(scheme=DeviceEdge.MANY2MANY, link=nvlink.name)  # type: ignore
-        edge.ep1.component = xpu.name
-        edge.ep2.component = nvlsw.name
 
         edge = server.edges.add(scheme=DeviceEdge.ONE2ONE, link=pcie.name)  # type: ignore
         edge.ep1.component = xpu.name
