@@ -22,9 +22,8 @@ version:
 	echo "Version generated in .VERSION file"
 
 .PHONY: clean
-clean: ## recreate clean virtual environment
+clean: 
 	rm -rf venv || true
-	python3 -m venv venv
 
 .PHONY: build-models
 build-models:
@@ -60,4 +59,5 @@ build-all: version
 .PHONY: build-bare-metal
 build-bare-metal: clean
 	bash bare_metal_setup.sh
+	python3 -m venv venv
 	source venv/bin/activate && make install-prerequisites && make build-all
