@@ -32,6 +32,11 @@ clone-astra-sim: clean clean-astrasim
 	cd astra-sim && \
  	git checkout $(ASTRA_SIM_COMMIT_HASH) && \
 	git submodule update --init --recursive
+	make apply-headroom-patch
+
+.PHONY: apply-headroom-patch
+apply-headroom-patch:
+	cd astra-sim/extern/network_backend/ns-3 && git apply ../../../../headroom_size.patch
 
 .PHONY: build-astra-sim
 build-astra-sim: clean-astrasim clone-astra-sim
