@@ -8,6 +8,7 @@ echo "Installing base packages..."
 sudo apt install -y \
 python3.11 \
 python3-pip \
+python3-venv \
 python3.11-dev \
 coreutils \
 wget \
@@ -50,9 +51,6 @@ sudo apt update
 echo "Installing Node.js 18..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash -
 sudo apt install -y nodejs
-
-echo "Allow pip to install system packages..."
-python3 -m pip config set global.break-system-packages true
 
 echo "Installing Redoc CLI..."
 sudo npm install -g @redocly/cli
