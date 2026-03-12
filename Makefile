@@ -21,6 +21,11 @@ version:
 	grep version models/schema/api/api.yaml | cut -d: -f2 | sed -e 's/ //g' | tr -d '\n' > .VERSION
 	echo "Version generated in .VERSION file"
 
+.PHONY: clean
+clean: ## recreate clean virtual environment
+	rm -rf venv || true
+	python3 -m venv venv
+
 .PHONY: build-models
 build-models:
 	cd models && make build && make redocly
@@ -53,7 +58,6 @@ build-all: version
 	make build-service
 
 .PHONY: build-bare-metal
-build-bare-metal:
+build-bare-metal: clean
 	bash bare_metal_setup.sh
-	python3 -m venv venv
 	source venv/bin/activate && make install-prerequisites && make build-all
