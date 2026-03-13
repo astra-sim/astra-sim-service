@@ -30,4 +30,5 @@ openapiart
 semantic-version
 jupyterlab-lsp
 semantic-version
+jupytext
 
