@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 help:
 	@awk -F ':|##' '/^[^\t].+:.*##/ { printf "\033[36mmake %-28s\033[0m -%s\n", $$1, $$NF }' $(MAKEFILE_LIST) | sort
 
@@ -18,6 +20,10 @@ version:
 	rm -rf .VERSION
 	grep version models/schema/api/api.yaml | cut -d: -f2 | sed -e 's/ //g' | tr -d '\n' > .VERSION
 	echo "Version generated in .VERSION file"
+
+.PHONY: clean
+clean: 
+	rm -rf venv || true
 
 .PHONY: build-models
 build-models:
@@ -49,3 +55,9 @@ build-all: version
 	make test-client-scripts
 	make build-astra-sim
 	make build-service
+
+.PHONY: build-bare-metal
+build-bare-metal: clean
+	bash bare_metal_setup.sh
+	python3 -m venv venv
+	source venv/bin/activate && make install-prerequisites && make build-all

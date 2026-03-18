@@ -13,15 +13,22 @@ ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simu
 
 ### 1. Development Environment
 
-The project uses **VS Code Dev Containers** to ensure a reproducible and isolated development setup.
+This project provides two options for setting up the development environment. You can choose between a containerized setup for consistency or a bare-metal setup for flexibility.
 
+Option 1: **VS Code Dev Containers** to ensure a reproducible and isolated development setup.
 - Base image: ubuntu:22.04
 - This will install dependencies like: Python 3.x, gRPC tools, Make, CMake, and simulation dependencies. For all the dependent packages please check [Dockerfile.devenv](Dockerfile.devenv)
 - The dev container automatically sets up your environment, installs packages, and provides consistent build behavior across developers.
 
 This environment is particularly useful for contributors who want a ready-to-use setup for model updates, client testing, or service development.
 
----
+Option 2: **Bare-Metal Setup** If you prefer to run the project directly on your Linux machine (recommended: Ubuntu 22.04) without containers, you can use the bare-metal setup.
+
+To build bare-metal setup:
+```
+make build-bare-metal
+```
+- This command installs all required system dependencies, creates a clean virtual environment, and sets up all necessary Python packages and builds, including the steps described in [Build the service](#1-build-the-service).
 
 ### 2. Deploy ASTRA-sim Service
 #### 2a. As a Docker Container
@@ -46,12 +53,25 @@ Where tag == version. For example for version 0.0.6, the command would be
 docker run -it astra_sim_service:0.0.6
 ```
 
-
 Once built, the image can be run independently and accessed remotely using the exposed host IP and port. Clients (via notebooks or scripts) can connect to this containerized service for distributed simulation execution.
 
----
+#### 2b. Pull from Docker Hub
 
-#### 2b. Local build/run
+You can also directly pull a pre-built image from Docker Hub:
+```
+docker pull astrasim/astra-sim-service:<tag>
+```
+Then run it:
+```
+docker run -it astrasim/astra-sim-service:<tag>
+```
+
+Check all published tags here:
+https://hub.docker.com/r/astrasim/astra-sim-service/tags
+
+
+
+#### 2c. Local build/run
 ##### 1) Build the service
 
 To build the astra-sim-service inside VS Code Dev Container:
