@@ -1,7 +1,7 @@
 PACKAGE_NAME := astra_sim_sdk
 CI_COMMIT_REF_NAME ?= $(shell git symbolic-ref --short HEAD)
 VERSION_FROM_FILE := $(shell cat ../.VERSION)
-INFRAGRAPH_VERSION := $(shell cat ../service/.INFRAGRAPH_VERSION)
+INFRAGRAPH_VERSION := $(shell cat ../.INFRAGRAPH_VERSION)
 
 .PHONY: clean
 clean:

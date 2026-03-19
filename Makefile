@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-INFRAGRAPH_VERSION := $(shell cat service/.INFRAGRAPH_VERSION)
+INFRAGRAPH_VERSION := $(shell cat .INFRAGRAPH_VERSION)
 
 help:
 	@awk -F ':|##' '/^[^\t].+:.*##/ { printf "\033[36mmake %-28s\033[0m -%s\n", $$1, $$NF }' $(MAKEFILE_LIST) | sort
@@ -44,7 +44,9 @@ build-service:
 
 .PHONY: build-service-docker
 build-service-docker: install-prerequisites version build-models
+	cp .INFRAGRAPH_VERSION service/
 	cd service && make build-docker
+	rm service/.INFRAGRAPH_VERSION
 
 .PHONY: build-astra-sim
 build-astra-sim:
