@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+INFRAGRAPH_VERSION := $(shell cat .INFRAGRAPH_VERSION)
 
 help:
 	@awk -F ':|##' '/^[^\t].+:.*##/ { printf "\033[36mmake %-28s\033[0m -%s\n", $$1, $$NF }' $(MAKEFILE_LIST) | sort
@@ -10,9 +11,9 @@ install-prerequisites:
 	cd client-scripts && make install-prerequisites
 	cd service && make install-prerequisites
 	pip install -r requirements.txt
-	wget https://github.com/Keysight/infragraph/releases/download/v0.8.0/infragraph-0.8.0-py3-none-any.whl
-	pip install infragraph-0.8.0-py3-none-any.whl
-	rm -f infragraph-0.8.0-py3-none-any.whl
+	wget https://github.com/Keysight/infragraph/releases/download/v0.8.0/infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
+	pip install infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
+	rm -f infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
 
 .PHONY: version
 version:
@@ -22,7 +23,7 @@ version:
 	echo "Version generated in .VERSION file"
 
 .PHONY: clean
-clean: 
+clean:
 	rm -rf venv || true
 
 .PHONY: build-models
@@ -43,7 +44,9 @@ build-service:
 
 .PHONY: build-service-docker
 build-service-docker: install-prerequisites version build-models
+	cp .INFRAGRAPH_VERSION service/
 	cd service && make build-docker
+	rm service/.INFRAGRAPH_VERSION
 
 .PHONY: build-astra-sim
 build-astra-sim:
