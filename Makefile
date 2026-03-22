@@ -1,4 +1,7 @@
 SHELL := /bin/bash
+ASTRA_SIM_SERVICE_IMAGE := astrasim/astra-sim-service
+ASTRA_SIM_SERVICE_LATEST := $(ASTRA_SIM_SERVICE_IMAGE):latest
+VERSION := $(shell cat .VERSION)
 
 help:
 	@awk -F ':|##' '/^[^\t].+:.*##/ { printf "\033[36mmake %-28s\033[0m -%s\n", $$1, $$NF }' $(MAKEFILE_LIST) | sort
@@ -22,7 +25,7 @@ version:
 	echo "Version generated in .VERSION file"
 
 .PHONY: clean
-clean: 
+clean:
 	rm -rf venv || true
 
 .PHONY: build-models
@@ -61,3 +64,10 @@ build-bare-metal: clean
 	bash bare_metal_setup.sh
 	python3 -m venv venv
 	source venv/bin/activate && make install-prerequisites && make build-all
+
+.PHONY: publish-service-docker
+publish-service-docker:
+	docker tag astra_sim_service:$(VERSION) $(ASTRA_SIM_SERVICE_IMAGE):$(VERSION)
+	docker tag astra_sim_service:$(VERSION) $(ASTRA_SIM_SERVICE_LATEST)
+	docker push $(ASTRA_SIM_SERVICE_IMAGE):$(VERSION)
+	docker push $(ASTRA_SIM_SERVICE_LATEST)
