@@ -1,6 +1,7 @@
 PACKAGE_NAME := astra_sim_sdk
 CI_COMMIT_REF_NAME ?= $(shell git symbolic-ref --short HEAD)
 VERSION_FROM_FILE := $(shell cat ../.VERSION)
+INFRAGRAPH_VERSION := $(shell cat ../.INFRAGRAPH_VERSION)
 
 .PHONY: clean
 clean:
@@ -29,7 +30,7 @@ clean-openapiart:
 infragraph:
 	rm -rf ./schema/infragraph/infragraph.yaml
 	rm -rf infragraph
-	git clone --branch v0.8.0 --depth 1 https://github.com/Keysight/infragraph
+	git clone --branch v${INFRAGRAPH_VERSION} --depth 1 https://github.com/Keysight/infragraph
 	cp infragraph/models/infrastructure.yaml ./schema/infragraph/infragraph.yaml
 	cp infragraph/models/device.yaml ./schema/infragraph/device.yaml
 	cp infragraph/models/link.yaml ./schema/infragraph/link.yaml

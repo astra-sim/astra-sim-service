@@ -1,4 +1,6 @@
 SHELL := /bin/bash
+
+INFRAGRAPH_VERSION := $(shell cat .INFRAGRAPH_VERSION)
 ASTRA_SIM_SERVICE_IMAGE := astrasim/astra-sim-service
 ASTRA_SIM_SERVICE_LATEST := $(ASTRA_SIM_SERVICE_IMAGE):latest
 VERSION := $(shell cat .VERSION)
@@ -13,9 +15,9 @@ install-prerequisites:
 	cd client-scripts && make install-prerequisites
 	cd service && make install-prerequisites
 	pip install -r requirements.txt
-	wget https://github.com/Keysight/infragraph/releases/download/v0.8.0/infragraph-0.8.0-py3-none-any.whl
-	pip install infragraph-0.8.0-py3-none-any.whl
-	rm -f infragraph-0.8.0-py3-none-any.whl
+	wget https://github.com/Keysight/infragraph/releases/download/v0.8.0/infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
+	pip install infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
+	rm -f infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
 
 .PHONY: version
 version:
@@ -46,7 +48,9 @@ build-service:
 
 .PHONY: build-service-docker
 build-service-docker: install-prerequisites version build-models
+	cp .INFRAGRAPH_VERSION service/
 	cd service && make build-docker
+	rm service/.INFRAGRAPH_VERSION
 
 .PHONY: build-astra-sim
 build-astra-sim:
