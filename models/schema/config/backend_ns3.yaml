@@ -508,4 +508,12 @@ components:
             nic pause time.
           x-field-uid: 48
           x-astra-sim-name: NIC_TOTAL_PAUSE_TIME
+        headroom_factor:
+          type: integer
+          format: int32
+          default: 3
+          description: >
+            headroom size for switch
+          x-field-uid: 49
+          x-astra-sim-name: HEADROOM_FACTOR
 
