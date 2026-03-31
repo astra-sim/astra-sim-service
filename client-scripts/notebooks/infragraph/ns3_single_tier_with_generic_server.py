@@ -17,6 +17,7 @@
 
 # %%
 import sys
+
 sys.path.append("../../utils")
 from astra_sim import AstraSim, Collective, NetworkBackend
 from astra_sim_sdk import Device, Component
@@ -24,19 +25,26 @@ from infragraph import Component, InfrastructureEdge
 from infragraph.infragraph_service import InfraGraphService
 from infragraph.blueprints.devices.generic.server import Server
 from infragraph.blueprints.devices.generic.generic_switch import Switch
+from common import FileFolderUtils
 import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
+import yaml
+import os
+import subprocess
+
 
 # %% [markdown]
 # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
 
 # %%
-astra = AstraSim(server_endpoint="172.17.0.2:8989", tag = "ns3_single_tier_with_generic_server")
+astra = AstraSim(server_endpoint="172.17.0.2:8989", tag="ns3_single_tier_with_generic_server")
 
 # %% [markdown]
 # ##### Generate workload execution traces for each rank and set the required data size for AstraSim configuration
 
 # %%
-astra.configuration.common_config.workload = astra.generate_collective(collective=Collective.ALLREDUCE, coll_size= 8 *1024*1024, npu_range=[0,8])
+astra.configuration.common_config.workload = astra.generate_collective(
+    collective=Collective.ALLREDUCE, coll_size=8 * 1024 * 1024, npu_range=[0, 8]
+)
 print(astra.configuration.common_config.workload)
 
 
@@ -47,10 +55,18 @@ print(astra.configuration.common_config.workload)
 astra.configuration.common_config.system.scheduling_policy = astra.configuration.common_config.system.LIFO
 astra.configuration.common_config.system.endpoint_delay = 10
 astra.configuration.common_config.system.active_chunks_per_dimension = 1
-astra.configuration.common_config.system.all_gather_implementation = [astra.configuration.common_config.system.RING]
-astra.configuration.common_config.system.all_to_all_implementation = [astra.configuration.common_config.system.DIRECT]
-astra.configuration.common_config.system.all_reduce_implementation = [astra.configuration.common_config.system.ONERING]
-astra.configuration.common_config.system.collective_optimization = astra.configuration.common_config.system.LOCALBWAWARE
+astra.configuration.common_config.system.all_gather_implementation = [
+    astra.configuration.common_config.system.RING
+]
+astra.configuration.common_config.system.all_to_all_implementation = [
+    astra.configuration.common_config.system.DIRECT
+]
+astra.configuration.common_config.system.all_reduce_implementation = [
+    astra.configuration.common_config.system.ONERING
+]
+astra.configuration.common_config.system.collective_optimization = (
+    astra.configuration.common_config.system.LOCALBWAWARE
+)
 astra.configuration.common_config.system.local_mem_bw = 1600
 print(astra.configuration.common_config.system)
 
@@ -58,7 +74,9 @@ print(astra.configuration.common_config.system)
 # ##### Configure ASTRA-sim remote memory configuration
 
 # %%
-astra.configuration.common_config.remote_memory.memory_type = astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
+astra.configuration.common_config.remote_memory.memory_type = (
+    astra.configuration.common_config.remote_memory.NO_MEMORY_EXPANSION
+)
 print(astra.configuration.common_config.remote_memory)
 
 # %% [markdown]
@@ -67,7 +85,9 @@ print(astra.configuration.common_config.remote_memory)
 # %%
 # We need to configure the network backend here since we are translating the topology from infragraph and not creating it directly from the sdk.
 astra.configuration.network_backend.choice = astra.configuration.network_backend.NS3
-astra.configuration.network_backend.ns3.topology.choice = astra.configuration.network_backend.ns3.topology.INFRAGRAPH
+astra.configuration.network_backend.ns3.topology.choice = (
+    astra.configuration.network_backend.ns3.topology.INFRAGRAPH
+)
 astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
 astra.configuration.network_backend.ns3.logical_topology.logical_dimensions = [8]
 astra.configuration.network_backend.ns3.trace.trace_ids = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -81,9 +101,7 @@ astra.configuration.infragraph.infrastructure.name = "1host-4ranks"
 server = Device()
 server.deserialize((Server(npu_factor=1).serialize()))
 
-hosts = astra.configuration.infragraph.infrastructure.instances.add(
-    name="host", device=server.name, count=4
-)
+hosts = astra.configuration.infragraph.infrastructure.instances.add(name="host", device=server.name, count=4)
 switch = Device()
 switch.deserialize(Switch(port_count=16).serialize())
 
@@ -92,7 +110,6 @@ rack_switch = astra.configuration.infragraph.infrastructure.instances.add(
 )
 
 astra.configuration.infragraph.infrastructure.devices.append(server).append(switch)
-
 
 
 # %% [markdown]
@@ -141,8 +158,38 @@ switch_device_spec.device_bandwidth_gbps = 200
 switch_device_spec.device_latency_ms = 0.05
 switch_device_spec.device_name = "switch"
 switch_device_spec.device_type = "switch"
-astra.configuration.infragraph.annotations.device_specifications.append(
-    switch_device_spec
+astra.configuration.infragraph.annotations.device_specifications.append(switch_device_spec)
+
+# %% [markdown]
+# ##### Save infragraph as a yaml
+
+# %%
+
+with open(
+    os.path.join(
+        FileFolderUtils.get_instance().OUTPUT_DIR, "../infrastructure", "ns3_single_tier_with_dgx.yaml"
+    ),
+    "w",
+) as f:
+    data = astra.configuration.infragraph.infrastructure.serialize("dict")
+    yaml.dump(data, f, default_flow_style=False, indent=4)
+
+print(
+    "saved yaml to:",
+    os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "..", "ns3_single_tier_with_dgx.yaml"),
+)
+
+# %% [markdown]
+# ##### Visualize the infragraph
+
+# %%
+infra_yaml_dir = os.path.join(
+    FileFolderUtils.get_instance().OUTPUT_DIR, "../infrastructure", "ns3_single_tier_with_dgx.yaml"
+)
+visual_output_dir = os.path.join(infra_yaml_dir, "../../visuals")
+
+subprocess.run(
+    ["infragraph", "visualize", "--input", infra_yaml_dir, "--output", visual_output_dir], check=True
 )
 
 # %% [markdown]
@@ -172,21 +219,12 @@ astra.download_configuration()
 import pandas as pd
 import os
 from common import FileFolderUtils
+
 df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "fct.csv"))
 df.head()
 
 df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "flow_stats.csv"))
 df.head()
 
-# %% [markdown]
-# ##### Save infragraph as a yaml
 
 # %%
-import yaml
-import os
-from common import FileFolderUtils
-with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_tier_with_dgx"),"w") as f:
-    data = astra.configuration.infragraph.infrastructure.serialize("dict")
-    yaml.dump(data, f, default_flow_style=False, indent=4)
-
-print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_single_tier_with_dgx.yaml"))
