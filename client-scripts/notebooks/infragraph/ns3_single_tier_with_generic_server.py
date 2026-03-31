@@ -24,7 +24,12 @@ from infragraph import Component, InfrastructureEdge
 from infragraph.infragraph_service import InfraGraphService
 from infragraph.blueprints.devices.generic.server import Server
 from infragraph.blueprints.devices.generic.generic_switch import Switch
+from common import FileFolderUtils
 import astra_sim_sdk.astra_sim_sdk as astra_sim_kit
+import yaml
+import os
+import subprocess
+
 
 # %% [markdown]
 # ##### Call the AstraSim client helper with the server endpoint and tag to connect to the ASTRA-sim gRPC server, initialize the SDK, and create a tagged folder for configs, results, and logs
@@ -146,6 +151,33 @@ astra.configuration.infragraph.annotations.device_specifications.append(
 )
 
 # %% [markdown]
+# ##### Save infragraph as a yaml
+
+# %%
+
+with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_tier_with_dgx.yaml"),"w") as f:
+    data = astra.configuration.infragraph.infrastructure.serialize("dict")
+    yaml.dump(data, f, default_flow_style=False, indent=4)
+
+print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_single_tier_with_dgx.yaml"))
+
+# %% [markdown]
+# ##### Visualize the infragraph
+
+# %%
+infra_yaml_dir = os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_tier_with_dgx.yaml")
+visual_output_dir = os.path.join(infra_yaml_dir,"../../visuals")
+
+# !infragraph visualize \
+#   --input {infra_yaml_dir} \
+#   --output {visual_output_dir}
+subprocess.run([
+    "infragraph", "visualize",
+    "--input", infra_yaml_dir,
+    "--output", visual_output_dir
+], check=True)
+
+# %% [markdown]
 # ##### Configure ASTRA-sim cmd parameters
 
 # %%
@@ -178,15 +210,5 @@ df.head()
 df = pd.read_csv(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR, "flow_stats.csv"))
 df.head()
 
-# %% [markdown]
-# ##### Save infragraph as a yaml
 
 # %%
-import yaml
-import os
-from common import FileFolderUtils
-with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_tier_with_dgx"),"w") as f:
-    data = astra.configuration.infragraph.infrastructure.serialize("dict")
-    yaml.dump(data, f, default_flow_style=False, indent=4)
-
-print("saved yaml to:", os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"..","ns3_single_tier_with_dgx.yaml"))

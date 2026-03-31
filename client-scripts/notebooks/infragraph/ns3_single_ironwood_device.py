@@ -89,7 +89,7 @@ astra.configuration.network_backend.ns3.network.packet_payload_size = int(8192)
 
 
 # %% [markdown]
-# ##### Adding ns3 trace and logical dimension 
+# ##### Adding ns3 trace and logical dimension
 
 # %%
 astra.configuration.network_backend.ns3.logical_topology.logical_dimensions = [4, 4, 4]
@@ -145,7 +145,7 @@ df.head()
 import yaml
 import os
 from common import FileFolderUtils
-with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_ironwood"),"w") as f:
+with open(os.path.join(FileFolderUtils.get_instance().OUTPUT_DIR,"../infrastructure","ns3_single_ironwood.yaml"),"w") as f:
     data = infrastructure.serialize("dict")
     yaml.dump(data, f, default_flow_style=False, indent=4)
 
