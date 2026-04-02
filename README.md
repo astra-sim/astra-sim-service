@@ -1,5 +1,12 @@
 # ASTRA-sim Service
 
+[![CI/CD](https://github.com/astra-sim/astra-sim-service/actions/workflows/workflow.yml/badge.svg)](https://github.com/astra-sim/astra-sim-service/actions/workflows/workflow.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker Hub](https://img.shields.io/docker/pulls/astrasim/astra-sim-service)](https://hub.docker.com/r/astrasim/astra-sim-service)
+[![GitHub issues](https://img.shields.io/github/issues/astra-sim/astra-sim-service)](https://github.com/astra-sim/astra-sim-service/issues)
+[![GitHub stars](https://img.shields.io/github/stars/astra-sim/astra-sim-service)](https://github.com/astra-sim/astra-sim-service/stargazers)
+[![InfraGraph](https://img.shields.io/badge/InfraGraph-v0.8.0-blue)](https://infragraph.dev/)
+
 ASTRA-sim Service hides the complexity of configuring and running ASTRA-sim simulations by providing an OpenAPI-based [OpenAPIArt](https://github.com/open-traffic-generator/openapiart/tree/main) interface. It allows users to set up, control, and monitor simulations as remote services. The service supports flexible workload configuration using [MLCommons Chakra](https://github.com/mlcommons/chakra) and infrastructure modeling with [InfraGraph](https://infragraph.dev/). Users can easily configure simulation settings through Jupyter notebooks for interactive experimentation. The repository offers options for both Docker-based and standalone services, and includes ready-to-use sample notebooks for quick start.
 
 ![ASTRA-sim service](resources/ASTRA-Sim-Service.png)
