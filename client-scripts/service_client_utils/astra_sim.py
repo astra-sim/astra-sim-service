@@ -42,9 +42,9 @@ from chakra.schema.protobuf.et_def_pb2 import (
     GATHER,
 )
 
-from common import Utilities, FileFolderUtils, StatUtil
+from service_client_utils.common import Utilities, FileFolderUtils, StatUtil
 
-from astra_sim_client import AstraSimClient
+from service_client_utils.astra_sim_client import AstraSimClient
 import astra_sim_sdk.astra_sim_sdk as astra_sim_sdk
 
 pd.options.mode.chained_assignment = None

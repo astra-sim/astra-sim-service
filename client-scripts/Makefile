@@ -3,7 +3,7 @@ install-prerequisites:  ## Install dependencies
 	python3 -m pip install --upgrade pip
 	rm -rf chakra
 	git clone https://github.com/mlcommons/chakra.git
-	cp utils/pyproject.toml chakra
+	cp service_client_utils/pyproject.toml chakra
 	cd chakra && pip install .
 	rm -rf chakra
 
