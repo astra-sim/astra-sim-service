@@ -65,6 +65,7 @@ pre-test:
 .PHONY: post-test
 post-test:
 	rm -rf tests/resources
+	rm -rf tests/test-notebook
 
 .PHONY: build
 build: clean version
