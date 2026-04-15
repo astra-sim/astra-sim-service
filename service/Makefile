@@ -5,7 +5,6 @@ BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 PACKAGE_NAME := astra_server
 ASTRA_SIM_SERVICE_IMAGE := astra_sim_service
 GENERATED_VERSION := $(shell cat ../.VERSION)
-NOTEBOOK_DIR := ../client-scripts/notebooks
 export PATH:=$(PY_PATHS):$(PATH)
 
 help:
@@ -60,15 +59,13 @@ version: ## Generate build version
 .PHONY: pre-test
 pre-test:
 	rm -rf tests/test-notebook
-	find $(NOTEBOOK_DIR) -name "*.py" -exec jupytext --to notebook {} \;
 	python3 convert_nb_to_script.py
 	cp -r ../client-scripts/resources tests
-	rm -f $(NOTEBOOK_DIR)/*.ipynb
-	rm -f $(NOTEBOOK_DIR)/infragraph/*.ipynb
 
 .PHONY: post-test
 post-test:
 	rm -rf tests/resources
+	rm -rf tests/test-notebook
 
 .PHONY: build
 build: clean version

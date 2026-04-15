@@ -236,7 +236,7 @@ class StatUtil:
         """
         df = pd.read_csv(
             os.path.join(FileFolderUtils().OUTPUT_DIR, "fct.txt"),
-            delim_whitespace=True,
+            sep=r"\s+",
             header=None,
         )
 
@@ -273,7 +273,7 @@ class StatUtil:
         """
         df = pd.read_csv(
             os.path.join(FileFolderUtils().OUTPUT_DIR, "fct.txt"),
-            delim_whitespace=True,
+            sep=r"\s+",
             header=None,
         )
         df.columns = [

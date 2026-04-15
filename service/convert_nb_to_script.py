@@ -5,9 +5,8 @@ from nbconvert import PythonExporter
 import nbformat
 import textwrap
 
-ignore_notebooks = {
-    "config_to_schema_sample"
-}
+ignore_notebooks = {"config_to_schema_sample"}
+
 
 def wrap_notebook_in_function(input_nb_path: Path, output_py_path: Path, function_name: str):
     """
@@ -29,6 +28,7 @@ def wrap_notebook_in_function(input_nb_path: Path, output_py_path: Path, functio
 
     cleaned_script = "\n".join(cleaned_code)
     cleaned_script = re.sub(r"\n\s*\n+", "\n\n", cleaned_script)
+    cleaned_script = re.sub(r"# VISUALIZER_START[\s\S]*?# VISUALIZER_END", "", cleaned_script)
     cleaned_script = re.sub(
         r"sys\.path\.append\s*\(.*?\)",
         'sys.path.append("../client-scripts/utils")\nsys.path.append("../../client-scripts/utils")\nsys.path.append("./client-scripts/utils")',

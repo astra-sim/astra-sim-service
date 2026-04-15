@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ASTRA-sim APIs
-  version: 1.2.2
+  version: 1.3.0
   description: The ASTRA-sim API provides a standardized interface for submitting configurations, executing jobs, checking job status, and retrieving results.
   license:
     name: MIT
