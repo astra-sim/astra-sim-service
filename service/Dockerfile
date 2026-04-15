@@ -41,8 +41,6 @@ WORKDIR /app
 
 # Copy the commit SHA file into the image
 COPY .ASTRA_SIM_GIT_COMMIT_SHA /tmp/.ASTRA_SIM_GIT_COMMIT_SHA
-# Copy the infragraph version file into the image
-COPY .INFRAGRAPH_VERSION /tmp/.INFRAGRAPH_VERSION
 # Clone the repo and checkout the commit from the file
 RUN REPO=https://github.com/astra-sim/astra-sim.git && \
     COMMIT_SHA=$(cat /tmp/.ASTRA_SIM_GIT_COMMIT_SHA) && \
@@ -58,11 +56,7 @@ COPY requirements.txt /app/requirements.txt
 COPY *.whl /app/
 RUN chmod +x build_script/build_backend.sh
 RUN ./build_script/build_backend.sh
-# Install infragraph from GitHub release
-RUN INFRAGRAPH_VERSION=$(cat /tmp/.INFRAGRAPH_VERSION) && \
-    wget https://github.com/Keysight/infragraph/releases/download/v${INFRAGRAPH_VERSION}/infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl && \
-    pip install infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl && \
-    rm -f infragraph-${INFRAGRAPH_VERSION}-py3-none-any.whl
+
 RUN pip install *.whl
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
