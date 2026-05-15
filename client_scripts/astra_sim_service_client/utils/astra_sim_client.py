@@ -28,7 +28,7 @@ import logging
 import threading
 
 import astra_sim_sdk.astra_sim_sdk as astra_sim
-from common import Utilities, FileFolderUtils
+from astra_sim_service_client.utils.common import Utilities, FileFolderUtils
 
 
 class AstraSimClient:
