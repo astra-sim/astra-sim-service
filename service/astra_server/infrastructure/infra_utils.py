@@ -251,7 +251,7 @@ class Annotation:
         - device instance & component to identifier
     """
 
-    def __init__(self, annotations: Annotations):
+    def __init__(self, nx_graph):
         self.device_specification = {}
         self.link_specification = {}
         self.device_to_id = {}
@@ -267,46 +267,65 @@ class Annotation:
         self.hosts = set()
         self.last_rank_identifier = -1
 
-        self._parse_device_specification(annotations)
-        self._parse_link_specification(annotations)
-        self._parse_rank_annotation(annotations)
+        self._parse_device_specification(nx_graph)
+        self._parse_link_specification(nx_graph)
+        self._parse_rank_annotation(nx_graph)
 
-    def _parse_device_specification(self, annotations: Annotations):
-        for device_spec in annotations.device_specifications:
-            self.device_specification[device_spec.device_name] = {
-                "device_name": device_spec.device_name,
-                "device_type": device_spec.device_type,
-                "device_latency_ms": device_spec.device_latency_ms,
-                "device_bandwidth_gbps": device_spec.device_bandwidth_gbps,
-                "radix_up": device_spec.radix_up,
-                "radix_down": device_spec.radix_down,
-                "queue_up": device_spec.queue_up,
-                "queue_down": device_spec.queue_down,
+    def _parse_device_specification(self, nx_graph):
+        for _, data in nx_graph.nodes(data=True):
+            device_name = data.get("device_name")
+            # only nodes carrying the device specification annotation are relevant
+            if device_name is None:
+                continue
+            self.device_specification[device_name] = {
+                "device_name": device_name,
+                "device_type": data.get("device_type"),
+                "device_latency_ms": self._to_float(data.get("device_latency_ms")),
+                "device_bandwidth_gbps": self._to_float(
+                    data.get("device_bandwidth_gbps")
+                ),
+                "radix_up": self._to_int(data.get("radix_up")),
+                "radix_down": self._to_int(data.get("radix_down")),
+                "queue_up": self._to_int(data.get("queue_up")),
+                "queue_down": self._to_int(data.get("queue_down")),
             }
         self._infer_host_devices()
 
-    def _parse_link_specification(self, annotations: Annotations):
-        for link_spec in annotations.link_specifications:
-            self.link_specification[link_spec.link_name] = {
-                "link_name": link_spec.link_name,
-                "packet_loss_rate": link_spec.packet_loss_rate,
-                "link_error_rate": link_spec.link_error_rate,
-                "bandwidth": link_spec.link_bandwidth_gbps,
-                "latency": link_spec.link_latency_ms,
+    @staticmethod
+    def _to_float(value):
+        # annotation values arrive as strings; keep None when unset
+        return None if value is None else float(value)
+
+    @staticmethod
+    def _to_int(value):
+        return None if value is None else int(value)
+
+    def _parse_link_specification(self, nx_graph):
+        for _, _, data in nx_graph.edges(data=True):
+            link_name = data.get("link_name")
+            if link_name is None:
+                continue
+            self.link_specification[link_name] = {
+                "link_name": link_name,
+                "packet_loss_rate": self._to_float(data.get("packet_loss_rate")),
+                "link_error_rate": self._to_float(data.get("link_error_rate")),
+                "bandwidth": self._to_float(data.get("link_bandwidth_gbps")),
+                "latency": self._to_float(data.get("link_latency_ms")),
             }
 
-    def _parse_rank_annotation(self, annotations: Annotations):
+    def _parse_rank_annotation(self, nx_graph):
         rank_to_npu = {}
-        for rank_assignment in annotations.rank_assignment:
+        # rank assignments are annotated on the npu nodes via a "rank" attribute;
+        # the node id itself is the npu identifier
+        for node, data in nx_graph.nodes(data=True):
+            rank = self._to_int(data.get("rank"))
+            if rank is None:
+                continue
             # assign to rank -> npu and npu -> rank #two way map
-            rank_to_npu[
-                rank_assignment.rank_identifier
-            ] = rank_assignment.npu_identifier
-            self.device_to_id[
-                rank_assignment.npu_identifier
-            ] = rank_assignment.rank_identifier
+            rank_to_npu[rank] = node
+            self.device_to_id[node] = rank
 
-        # if ranks are not assigned?
+        # if ranks are not assigned this stays 0 and ranks are assigned linearly later
         self.last_rank_identifier = len(rank_to_npu)
 
         host_instance = ""

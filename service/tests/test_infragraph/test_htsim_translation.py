@@ -153,21 +153,29 @@ def test_three_tier_eight_host_single_npu(
         pod_component_count = pod_component_count + 1
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("pod_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("spine_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     HTSimTopology.generate_topology(configuration)
     assert (
@@ -306,21 +314,29 @@ def test_three_tier_sixteen_host_single_npu(
         edge.ep2.component = f"{spine_switch_component.name}[{index}]"
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("pod_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("spine_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     HTSimTopology.generate_topology(configuration)
     assert (
@@ -362,21 +378,23 @@ def test_two_tier_clos_fabric():
     configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("server")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("tier_0")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("tier_1")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     HTSimTopology.generate_topology(configuration)
     configuration.network_backend.htsim.htsim_protocol.choice = "tcp"
@@ -414,21 +432,29 @@ def test_three_tier_clos_fabric():
     configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("server")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("tier_0")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("tier_1")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("tier_2")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     HTSimTopology.generate_topology(configuration)
     configuration.network_backend.htsim.htsim_protocol.choice = "tcp"
