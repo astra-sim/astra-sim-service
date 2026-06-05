@@ -38,6 +38,7 @@ infragraph:
 	cp infragraph/models/edge.yaml ./schema/infragraph/edge.yaml
 	cp infragraph/models/common.yaml ./schema/infragraph/common.yaml
 	cp infragraph/models/component.yaml ./schema/infragraph/component.yaml
+	cp infragraph/models/annotation.yaml ./schema/infragraph/annotation.yaml
 	rm -rf infragraph
 
 .PHONY: version
