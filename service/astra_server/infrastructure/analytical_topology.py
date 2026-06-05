@@ -548,7 +548,7 @@ class AnalyticalTopology:
     def __init__(
         self,
         infrastructure: astra_sim.Infrastructure,
-        annotations: astra_sim.Annotations,
+        annotations: astra_sim.Annotation,
     ):
         self.analytical_topology = []
         self.total_npu_nodes = 0

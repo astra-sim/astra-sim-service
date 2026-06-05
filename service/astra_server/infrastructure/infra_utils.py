@@ -24,7 +24,6 @@ SOFTWARE.
 
 from enum import Enum
 import grpc
-from astra_sim_sdk.astra_sim_sdk import Annotations
 import astra_sim_sdk.astra_sim_sdk as astra_sim
 from infragraph import QueryRequest, QueryNodeFilter, QueryNodeId
 
