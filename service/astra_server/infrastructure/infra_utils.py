@@ -272,12 +272,11 @@ class Annotation:
 
     def _parse_device_specification(self, nx_graph):
         for _, data in nx_graph.nodes(data=True):
-            device_name = data.get("device_name")
+            device_name = data.get("device")
             # only nodes carrying the device specification annotation are relevant
             if device_name is None:
                 continue
             self.device_specification[device_name] = {
-                "device_name": device_name,
                 "device_type": data.get("device_type"),
                 "device_latency_ms": self._to_float(data.get("device_latency_ms")),
                 "device_bandwidth_gbps": self._to_float(
