@@ -548,15 +548,16 @@ class AnalyticalTopology:
     def __init__(
         self,
         infrastructure: astra_sim.Infrastructure,
-        annotations: astra_sim.Annotations,
+        annotations: astra_sim.Annotation,
     ):
         self.analytical_topology = []
         self.total_npu_nodes = 0
-        self.annotation = Annotation(annotations)
         self.infragraph_service = InfraGraphService()
         self.infragraph_service.set_graph(infrastructure.__str__())
+        self.infragraph_service.annotate_graph(annotations.serialize())
         # store the network graph
         self.graph = self.infragraph_service.get_networkx_graph()
+        self.annotation = Annotation(self.graph)
         # self._print_graph()
         self._process_infra(infrastructure)
 

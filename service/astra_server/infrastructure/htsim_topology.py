@@ -73,13 +73,16 @@ class HTSimFatTree:
         self.racks_per_pod = 0
         self.pod_size = 0
         self.top_to_bottom_device_map = {}
-        self.annotation = Annotation(configuration.infragraph.annotations)
         self.infragraph_service = InfraGraphService()
         self.infragraph_service.set_graph(
             configuration.infragraph.infrastructure.__str__()
         )
+        self.infragraph_service.annotate_graph(
+            configuration.infragraph.annotations.serialize()
+        )
         # store the network graph
         self.graph = self.infragraph_service.get_networkx_graph()
+        self.annotation = Annotation(self.graph)
         # self._print_graph()
         self._process_infra(configuration)
 

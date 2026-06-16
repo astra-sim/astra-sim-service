@@ -51,12 +51,11 @@ def test_single_host_eight_npus(infra_multi_gpu_server_factory):
     )
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
     NS3Topology.generate_topology(configuration)
 
@@ -102,21 +101,17 @@ def test_single_tier_four_server(infra_single_gpu_server_factory, infra_switch_f
         edge.ep2.component = f"{switch_component.name}[{idx}]"
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     NS3Topology.generate_topology(configuration)
 
@@ -153,12 +148,11 @@ def test_dgx(dgx_variant, nodes_count, links_count, switch_count):
     # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
     NS3Topology.generate_topology(configuration)
 
@@ -189,12 +183,11 @@ def test_single_ironwood():
     configuration.infragraph.infrastructure.name = "ironwood"
     configuration.infragraph.infrastructure.deserialize(infra.serialize())
 
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 100
-    host_device_spec.device_latency_ms = 0.05
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
     NS3Topology.generate_topology(configuration)
 
@@ -241,21 +234,17 @@ def test_single_tier_single_host_eight_npus(
         edge.ep2.component = f"{switch_component.name}[{idx}]"
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     NS3Topology.generate_topology(configuration)
 
@@ -308,21 +297,17 @@ def test_two_dgx_single_switch(infra_switch_factory):
         edge.ep2.component = f"{switch_component.name}[{idx}]"
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 200
-    host_device_spec.device_latency_ms = 0.05
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("dgx_host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="200")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 200
-    switch_device_spec.device_latency_ms = 0.05
-    switch_device_spec.device_name = switch.name
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="200")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value=switch.name)
+    node.attributes.add(attribute="device_type", value="switch")
 
     NS3Topology.generate_topology(configuration)
 
@@ -341,21 +326,23 @@ def test_two_tier_clos_fabric():
     configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
     service = InfraGraphService()
     service.set_graph(clos_fat_tree)
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 100
-    host_device_spec.device_latency_ms = 0.05
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("server")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 100
-    switch_device_spec.device_latency_ms = 0.05
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("tier_0")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("tier_1")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
     NS3Topology.generate_topology(configuration)
     assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 76
     assert configuration.network_backend.ns3.topology.nc_topology.total_links == 128
@@ -371,24 +358,29 @@ def test_three_tier_clos_fabric():
     configuration.infragraph.infrastructure.deserialize(clos_fat_tree.serialize())
     service = InfraGraphService()
     service.set_graph(clos_fat_tree)
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 100
-    host_device_spec.device_latency_ms = 0.05
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("server")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 100
-    switch_device_spec.device_latency_ms = 0.05
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("tier_0")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("tier_1")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
+
+    node = configuration.infragraph.annotations.nodes.add("tier_2")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="100")
+    node.attributes.add(attribute="device_latency_ms", value="0.05")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
     NS3Topology.generate_topology(configuration)
     assert configuration.network_backend.ns3.topology.nc_topology.total_nodes == 52
     assert configuration.network_backend.ns3.topology.nc_topology.total_links == 80
