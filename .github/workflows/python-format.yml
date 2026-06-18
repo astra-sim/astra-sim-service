@@ -1,0 +1,30 @@
+name: Python Format Check
+
+# Fails the PR if astra_server or tests aren't formatted to the
+# pinned ruff config in service/pyproject.toml.
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ruff-format:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: service
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install ruff
+        run: pip install ruff==0.15.17
+
+      - name: Check formatting
+        run: ruff format --check astra_server tests
