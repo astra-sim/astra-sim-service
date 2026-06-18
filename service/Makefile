@@ -67,10 +67,17 @@ post-test:
 	rm -rf tests/resources
 	rm -rf tests/test-notebook
 
+.PHONY: format
+format: ## Format astra_server and tests with ruff
+	ruff format astra_server tests
+
+.PHONY: format-check
+format-check: ## Check astra_server and tests formatting without changing files (matches CI)
+	ruff format --check astra_server tests
+
 .PHONY: build
 build: clean version
-	ruff format astra_server
-	ruff format tests
+	make format
 	python3 assign_version.py
 	export PIP_EXTRA_INDEX_URL; python3 -m build
 	pip install dist/*.whl
