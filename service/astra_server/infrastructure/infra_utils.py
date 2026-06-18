@@ -407,9 +407,9 @@ class Annotation:
         if link.get("physical") is not None:
             if link.physical.get("bandwidth") is not None:
                 if link.physical.bandwidth.choice == "gigabits_per_second":
-                    self.link_specification[link.name][
-                        "bandwidth"
-                    ] = link.physical.bandwidth.gigabits_per_second
+                    self.link_specification[link.name]["bandwidth"] = (
+                        link.physical.bandwidth.gigabits_per_second
+                    )
                 elif link.physical.bandwidth.choice == "gigabytes_per_second":
                     self.link_specification[link.name]["bandwidth"] = (
                         link.physical.bandwidth.gigabytes_per_second * 8
@@ -422,9 +422,9 @@ class Annotation:
 
             if link.physical.get("latency") is not None:
                 if link.physical.latency.choice == "ms":
-                    self.link_specification[link.name][
-                        "latency"
-                    ] = link.physical.latency.ms
+                    self.link_specification[link.name]["latency"] = (
+                        link.physical.latency.ms
+                    )
 
                 elif link.physical.latency.choice == "ns":
                     self.link_specification[link.name]["latency"] = (

@@ -166,9 +166,9 @@ class HTSimFatTree:
                             destination_device_index
                             not in self.top_to_bottom_device_map
                         ):
-                            self.top_to_bottom_device_map[
-                                destination_device_index
-                            ] = set()
+                            self.top_to_bottom_device_map[destination_device_index] = (
+                                set()
+                            )
                             self.top_to_bottom_device_map[destination_device_index].add(
                                 source_device_index
                             )
@@ -357,35 +357,24 @@ class HTSimFatTree:
         self.racks_per_pod = self._get_rack_switches_per_pod()
         self.hosts_per_rack = self._get_nodes_per_rack()
         if tier0 is not None:
-
             if tier0.downlink_speed_gbps > 0:
                 configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_speed_gbps = str(
                     tier0.downlink_speed_gbps
                 )
             if tier0.radix_up > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_up = (
-                    tier0.radix_up
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_up = tier0.radix_up
             if tier0.radix_down > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down = (
-                    tier0.radix_down
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down = tier0.radix_down
             if tier0.queue_up > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.queue_up = (
-                    tier0.queue_up
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.queue_up = tier0.queue_up
             if tier0.queue_down > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.queue_down = (
-                    tier0.queue_down
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.queue_down = tier0.queue_down
             # if tier0.oversubscribed > 1:
             #     configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.oversubscribed = (
             #         tier0.oversubscribed
             #     )
             if tier0.bundle > 1:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.bundle = (
-                    tier0.bundle
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.bundle = tier0.bundle
             if tier0.switch_latency_ns > 0:
                 configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.switch_latency_ns = str(
                     tier0.switch_latency_ns
@@ -394,9 +383,7 @@ class HTSimFatTree:
                 configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_latency_ns = str(
                     tier0.downlink_latency_ns
                 )
-            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = (
-                1
-            )
+            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = 1
         tier1 = self._get_tier_information(
             low_tier="tier0", mid_tier="tier1", up_tier="tier2"
         )
@@ -407,25 +394,15 @@ class HTSimFatTree:
                     tier1.downlink_speed_gbps
                 )
             if tier1.radix_up > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_up = (
-                    tier1.radix_up
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_up = tier1.radix_up
             if tier1.radix_down > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_down = (
-                    tier1.radix_down
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_down = tier1.radix_down
             if tier1.queue_up > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.queue_up = (
-                    tier1.queue_up
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.queue_up = tier1.queue_up
             if tier1.queue_down > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.queue_down = (
-                    tier1.queue_down
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.queue_down = tier1.queue_down
             if tier1.oversubscribed > 1:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.oversubscribed = (
-                    tier1.oversubscribed
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.oversubscribed = tier1.oversubscribed
             configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.bundle = int(
                 tier0.radix_up  # ignore
             )
@@ -437,9 +414,7 @@ class HTSimFatTree:
                 configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_latency_ns = str(
                     tier1.downlink_latency_ns
                 )
-            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = (
-                2
-            )
+            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = 2
         tier2 = self._get_tier_information(
             low_tier="tier1", mid_tier="tier2", up_tier="tier3"
         )
@@ -450,17 +425,11 @@ class HTSimFatTree:
                     tier2.downlink_speed_gbps
                 )
             if tier2.radix_down > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.radix_down = (
-                    tier2.radix_down
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.radix_down = tier2.radix_down
             if tier2.queue_down > 0:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.queue_down = (
-                    tier2.queue_down
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.queue_down = tier2.queue_down
             if tier2.oversubscribed > 1:
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.oversubscribed = (
-                    tier2.oversubscribed
-                )
+                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.oversubscribed = tier2.oversubscribed
             configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.bundle = int(
                 tier1.radix_up // (spine_switch_count // agg_switch_count_per_pod)
             )
@@ -473,13 +442,9 @@ class HTSimFatTree:
                 configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.downlink_latency_ns = str(
                     tier2.downlink_latency_ns
                 )
-            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = (
-                3
-            )
+            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = 3
 
-        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize = (
-            self.pod_size
-        )
+        configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize = self.pod_size
 
 
 class HTSimTopology:
@@ -496,12 +461,8 @@ class HTSimTopology:
 
         # TODO: a switch is required between various topologies
         topology = HTSimFatTree(configuration)
-        nodes = (
-            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes
-        )
-        podsize = (
-            configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize
-        )
+        nodes = configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes
+        podsize = configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize
 
         # TODO Need to check for multiple gpus in a host
         # analytical topology generation here
@@ -531,9 +492,7 @@ class HTSimTopology:
                     configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_latency_ns
                 ),
             )
-            if (
-                configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1
-            ):
+            if configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1:
                 configuration.network_backend.htsim.topology.network_topology_configuration.network.add(
                     topology="switch",  # type: ignore
                     npus_count=(nodes // topology.hosts_per_rack),

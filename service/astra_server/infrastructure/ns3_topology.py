@@ -81,9 +81,9 @@ class NS3Topology:
                         )
 
                         for node in nodes:
-                            self.annotation.device_to_id[
-                                node
-                            ] = self.annotation.last_rank_identifier
+                            self.annotation.device_to_id[node] = (
+                                self.annotation.last_rank_identifier
+                            )
                             self.annotation.last_rank_identifier = (
                                 self.annotation.last_rank_identifier + 1
                             )
@@ -144,9 +144,9 @@ class NS3Topology:
                 if len(xpu_connected) == len(npu_nodes) and len(xpu_connected) > 1:
                     # if more than 1 npu is connected
                     self.switches.append(switch)
-                    self.annotation.device_to_id[
-                        switch
-                    ] = self.annotation.last_rank_identifier
+                    self.annotation.device_to_id[switch] = (
+                        self.annotation.last_rank_identifier
+                    )
                     self.annotation.last_rank_identifier = (
                         self.annotation.last_rank_identifier + 1
                     )
@@ -197,7 +197,6 @@ class NS3Topology:
 
         # we need to know the connection of devices - mainly how switches are connected to each other
         for source, destination, _ in self.graph.edges(data=True):
-
             source_split = source.split(".")
             destination_split = destination.split(".")
             source_device_index = source_split[0] + "." + source_split[1]
@@ -273,14 +272,14 @@ class NS3Topology:
                 device_instances = instance_map[device]
                 for instance in device_instances:
                     self.switches.append(instance)
-                    self.annotation.device_to_id[
-                        instance
-                    ] = self.annotation.last_rank_identifier
+                    self.annotation.device_to_id[instance] = (
+                        self.annotation.last_rank_identifier
+                    )
                     # add the device_components with same identifier
                     for component in device_component_map[instance]:
-                        self.annotation.device_to_id[
-                            component
-                        ] = self.annotation.last_rank_identifier
+                        self.annotation.device_to_id[component] = (
+                            self.annotation.last_rank_identifier
+                        )
                     self.annotation.last_rank_identifier = (
                         self.annotation.last_rank_identifier + 1
                     )

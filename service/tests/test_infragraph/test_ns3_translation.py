@@ -93,7 +93,8 @@ def test_single_tier_four_server(infra_single_gpu_server_factory, infra_switch_f
     # link each host to one leaf switch
     for idx in range(hosts.count):
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[{idx}]"
         edge.ep1.component = host_component.name
@@ -226,7 +227,8 @@ def test_single_tier_single_host_eight_npus(
     # link each host to one leaf switch
     for idx in range(0, 8):
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[0]"
         edge.ep1.component = f"{host_component.name}[{idx}]"
@@ -289,7 +291,8 @@ def test_two_dgx_single_switch(infra_switch_factory):
         dgx_index = 0 if idx < 8 else 1
         dgx_component_index = idx % 8
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[{dgx_index}]"
         edge.ep1.component = f"{host_component.name}[{dgx_component_index}]"
