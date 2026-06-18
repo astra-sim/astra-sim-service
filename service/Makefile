@@ -69,8 +69,8 @@ post-test:
 
 .PHONY: build
 build: clean version
-	black astra_server
-	black tests
+	ruff format astra_server
+	ruff format tests
 	python3 assign_version.py
 	export PIP_EXTRA_INDEX_URL; python3 -m build
 	pip install dist/*.whl
