@@ -480,7 +480,11 @@ class ConfigurationHandler:
     def _process_network_backend(self, configuration: astra_sim.Config):
         module_logger.info("Processing network backend")
         if configuration.get("network_backend") is None:
-            raise ConfigurationError("network backend configuration not found", grpc.StatusCode.NOT_FOUND,404,)
+            raise ConfigurationError(
+                "network backend configuration not found",
+                grpc.StatusCode.NOT_FOUND,
+                404,
+            )
         if configuration.network_backend.choice == "ns3":
             self._process_ns3_backend(configuration)
         elif "analytical" in configuration.network_backend.choice:
