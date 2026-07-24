@@ -31,14 +31,14 @@ infragraph:
 	rm -rf ./schema/infragraph/infragraph.yaml
 	rm -rf infragraph
 	git clone --branch v${INFRAGRAPH_VERSION} --depth 1 https://github.com/Keysight/infragraph
-	cp infragraph/models/infrastructure.yaml ./schema/infragraph/infragraph.yaml
-	cp infragraph/models/device.yaml ./schema/infragraph/device.yaml
-	cp infragraph/models/link.yaml ./schema/infragraph/link.yaml
-	cp infragraph/models/instance.yaml ./schema/infragraph/instance.yaml
-	cp infragraph/models/edge.yaml ./schema/infragraph/edge.yaml
-	cp infragraph/models/common.yaml ./schema/infragraph/common.yaml
-	cp infragraph/models/component.yaml ./schema/infragraph/component.yaml
-	cp infragraph/models/annotation.yaml ./schema/infragraph/annotation.yaml
+	cp infragraph/schema/infrastructure.yaml ./schema/infragraph/infragraph.yaml
+	cp infragraph/schema/device.yaml ./schema/infragraph/device.yaml
+	cp infragraph/schema/link.yaml ./schema/infragraph/link.yaml
+	cp infragraph/schema/instance.yaml ./schema/infragraph/instance.yaml
+	cp infragraph/schema/edge.yaml ./schema/infragraph/edge.yaml
+	cp infragraph/schema/common.yaml ./schema/infragraph/common.yaml
+	cp infragraph/schema/component.yaml ./schema/infragraph/component.yaml
+	cp infragraph/schema/annotation.yaml ./schema/infragraph/annotation.yaml
 	rm -rf infragraph
 
 .PHONY: version

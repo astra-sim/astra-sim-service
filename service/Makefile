@@ -83,4 +83,6 @@ test:
 	pip uninstall -y $(PACKAGE_NAME) || true
 	pip uninstall -y dist/*.whl || true
 	pip install dist/*.whl
+	pip uninstall -y protobuf
+	pip install protobuf
 	export PYTHONPATH="$${PYTHONPATH}:./${PY_PATHS}"; pytest --cov=astra_server/  tests -s -vvvv
