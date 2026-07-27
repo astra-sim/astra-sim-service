@@ -1,0 +1,107 @@
+components:
+  schemas:
+    Annotation.Attribute:
+      description: Defines an annotation to be applied to a graph node.
+      type: object
+      properties:
+        attribute:
+          description: |-
+            The attribute name that will be added to the endpoint.
+          type: string
+          x-field-uid: 1
+        value:
+          description: |-
+            The attribute value that will be added to the endpoint.
+          type: string
+          x-field-uid: 2
+    Annotation.Node:
+      description: Defines an annotation to be applied to a graph node.
+      type: object
+      properties:
+        name:
+          description: |-
+            Node name that MUST exist or match nodes present in the graph. This supports slicing operator and converts to expanded format:
+            - server[0]xpu[0]
+            - server[0:2]
+            - switch
+          type: string
+          x-field-uid: 1
+        attributes:
+          description: |-
+            An inventory of attributes and values.
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Attribute"
+          x-field-uid: 2
+    Annotation.Link:
+      description: Defines an annotation to be applied to a graph link.
+      type: object
+      properties:
+        name:
+          description: |-
+            A fully qualified link name that MUST exist in the graph.
+            - pcie
+          type: string
+          x-field-uid: 1
+        attributes:
+          description: |-
+            An inventory of attributes and values.
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Attribute"
+          x-field-uid: 2
+    Annotation.Edge:
+      description: Defines an annotation to be applied to a graph edge.
+      type: object
+      properties:
+        ep1:
+          description: |-
+            Endpoint name that MUST exist or match edges present in the graph. This supports slicing operator and expands to the networkx expanded format:
+            - server[0]xpu[0]
+            - server[0:2]
+            - switch
+          type: string
+          x-field-uid: 1
+        ep2:
+          description: |-
+            Endpoint name that MUST exist or match edges present in the graph. This supports slicing operator and expands to the networkx expanded format:
+            - server[0]xpu[0]
+            - server[0:2]
+            - switch
+          type: string
+          x-field-uid: 2
+        attributes:
+          description: |-
+            An inventory of attributes and values.
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Attribute"
+          x-field-uid: 3
+    Annotation:
+      description: Request object specifying which graph elements (nodes or edges) to annotate and the annotations to apply.
+      type: object
+      properties:
+        nodes:
+          description: List of annotations to apply to nodes.
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Node"
+          x-field-uid: 1
+        edges:
+          type: array
+          description:  List of annotations to apply to edges.
+          items:
+            $ref: "#/components/schemas/Annotation.Edge"
+          x-field-uid: 2
+        links:
+          type: array
+          description: List of annotations to apply to links.
+          items:
+            $ref: "#/components/schemas/Annotation.Link"
+          x-field-uid: 3
+        graph:
+          description: List of attributes to apply to the whole graph.
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation.Attribute"
+          x-field-uid: 4
