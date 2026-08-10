@@ -31,7 +31,6 @@ import grpc
 import astra_sim_sdk.astra_sim_sdk as astra_sim
 from infragraph.infragraph_service import InfraGraphService
 
-
 if __package__ is None or __package__ == "":
     from errors import InfragraphError
     from infrastructure.infra_utils import (
@@ -61,9 +60,7 @@ class AnalyticalNetworkConfig:
     RING = "ring"
     UNDEFINED = "undefined"
 
-    def __init__(
-        self, topology="undefined", node_count=-1, bandwidth=-1.0, latency=-1.0
-    ):
+    def __init__(self, topology="undefined", node_count=-1, bandwidth=-1.0, latency=-1.0):
         self.topology = topology
         self.node_count = node_count
         self.bandwidth = bandwidth
@@ -102,17 +99,11 @@ class DeviceTopologyDetector:
         self.switch_latency = switch_latency
         self.detection_level = detection_level
 
-    def _get_node_neighbors(
-        self, node: str, exclude_switches: bool = False
-    ) -> Set[str]:
+    def _get_node_neighbors(self, node: str, exclude_switches: bool = False) -> Set[str]:
         """Get neighbors of a node, optionally excluding switches."""
         neighbors = set(self.graph.neighbors(node))
         if exclude_switches:
-            neighbors = {
-                n
-                for n in neighbors
-                if n.startswith(self.node_prefix) and self.node_prefix != ""
-            }
+            neighbors = {n for n in neighbors if n.startswith(self.node_prefix) and self.node_prefix != ""}
         return neighbors
 
     def _get_direct_node_edges(self, nodes: List[str]) -> Set[Tuple[str, str]]:
@@ -212,9 +203,7 @@ class DeviceTopologyDetector:
         for node in node_subset:
             neighbors = set(self.graph.neighbors(node))
             node_switches = {
-                n
-                for n in neighbors
-                if n.startswith(self.switch_prefix) and self.switch_prefix != ""
+                n for n in neighbors if n.startswith(self.switch_prefix) and self.switch_prefix != ""
             }
 
             if not node_switches:
@@ -285,25 +274,19 @@ class DeviceTopologyDetector:
         dim1_groups = []
         for y in range(dim2):
             for z in range(dim3):
-                group = [
-                    n for n, (x, yy, zz) in coord_map.items() if yy == y and zz == z
-                ]
+                group = [n for n, (x, yy, zz) in coord_map.items() if yy == y and zz == z]
                 dim1_groups.append(group)
 
         dim2_groups = []
         for x in range(dim1):
             for z in range(dim3):
-                group = [
-                    n for n, (xx, y, zz) in coord_map.items() if xx == x and zz == z
-                ]
+                group = [n for n, (xx, y, zz) in coord_map.items() if xx == x and zz == z]
                 dim2_groups.append(group)
 
         dim3_groups = []
         for x in range(dim1):
             for y in range(dim2):
-                group = [
-                    n for n, (xx, yy, z) in coord_map.items() if xx == x and yy == y
-                ]
+                group = [n for n, (xx, yy, z) in coord_map.items() if xx == x and yy == y]
                 dim3_groups.append(group)
 
         return dim1_groups, dim2_groups, dim3_groups
@@ -321,9 +304,7 @@ class DeviceTopologyDetector:
             return self._is_switch_connected(node_group)
         return False
 
-    def _check_2d_structure(
-        self, nodes: List[str], dim1: int, dim2: int, topo1: str, topo2: str
-    ) -> bool:
+    def _check_2d_structure(self, nodes: List[str], dim1: int, dim2: int, topo1: str, topo2: str) -> bool:
         """
         Check if nodes form a 2D dimensional structure.
         dim1 x dim2 = total nodes
@@ -359,9 +340,7 @@ class DeviceTopologyDetector:
         Check if nodes form a 3D dimensional structure.
         dim1 x dim2 x dim3 = total nodes
         """
-        dim1_groups, dim2_groups, dim3_groups = self._partition_by_3d(
-            nodes, dim1, dim2, dim3
-        )
+        dim1_groups, dim2_groups, dim3_groups = self._partition_by_3d(nodes, dim1, dim2, dim3)
 
         if not dim1_groups or not dim2_groups or not dim3_groups:
             return False
@@ -463,9 +442,7 @@ class DeviceTopologyDetector:
                         if topo == AnalyticalNetworkConfig.SWITCH:
                             bandwidth = self.switch_bandwidth
                             latency = self.switch_latency
-                        analytical_dimensions.append(
-                            AnalyticalNetworkConfig(topo, dim, bandwidth, latency)
-                        )
+                        analytical_dimensions.append(AnalyticalNetworkConfig(topo, dim, bandwidth, latency))
                     return analytical_dimensions
         return []
 
@@ -492,9 +469,7 @@ class DeviceTopologyDetector:
                 tested_combinations.add(combo_key)
 
                 for topo1, topo2, topo3 in product(topologies, topologies, topologies):
-                    if self._check_3d_structure(
-                        self.nodes, dim1, dim2, dim3, topo1, topo2, topo3
-                    ):
+                    if self._check_3d_structure(self.nodes, dim1, dim2, dim3, topo1, topo2, topo3):
                         analytical_dimensions = []
                         for topo, dim in zip([topo1, topo2, topo3], [dim1, dim2, dim3]):
                             bandwidth = self.npu_bandwidth
@@ -617,9 +592,7 @@ class AnalyticalTopology:
 
         nvswitch_nodes = []
         for switch in all_switch_nodes:
-            xpu_connected = NetworkxUtils.get_neighbour_nodes_for_component_type(
-                self.graph, switch, "xpu"
-            )
+            xpu_connected = NetworkxUtils.get_neighbour_nodes_for_component_type(self.graph, switch, "xpu")
             if len(xpu_connected) == len(npu_nodes) and len(xpu_connected) > 1:
                 # if more than 1 npu is connected
                 nvswitch_nodes.append(switch)
@@ -697,9 +670,7 @@ class AnalyticalTopology:
 
     def _process_rack(self, host_instance: str):
         host_split = host_instance.split(".")
-        tor_instance, rack_downlink_name = self._get_rack_name_and_downlink(
-            host_instance
-        )
+        tor_instance, rack_downlink_name = self._get_rack_name_and_downlink(host_instance)
         # reverse parse and get the rack uplink data?
         if tor_instance == "":
             return
@@ -720,8 +691,7 @@ class AnalyticalTopology:
                 and destination_instance
                 != tor_instance  # we do not want the destination to be the same switch
                 and destination_instance != host_instance
-                and destination_split[0]
-                != host_split  # we do not want the destination to be a host
+                and destination_split[0] != host_split  # we do not want the destination to be a host
             ):
                 rack_uplink_name = attrs["link"]
 
@@ -749,17 +719,13 @@ class AnalyticalTopology:
                 rack_downlink_nodes = rack_downlink_nodes + 1
 
         if rack_downlink_name == "":
-            raise InfragraphError(
-                "rack to host link is not defined", grpc.StatusCode.NOT_FOUND, 404
-            )
+            raise InfragraphError("rack to host link is not defined", grpc.StatusCode.NOT_FOUND, 404)
 
         # we get the downlink nodes
         if len(self.analytical_topology) == 0:
             # if none then set to 1d
             # from annotations get the attributes
-            link_specification = self.annotation.get_link_specification(
-                rack_downlink_name
-            )
+            link_specification = self.annotation.get_link_specification(rack_downlink_name)
             bandwidth = link_specification["bandwidth"]
             latency = link_specification["latency"]
 
@@ -776,13 +742,9 @@ class AnalyticalTopology:
             if rack_uplink_name != "":
                 # set the upper level
                 if self.total_npu_nodes // self.analytical_topology[0].node_count > 1:
-                    node_count = (
-                        self.total_npu_nodes // self.analytical_topology[0].node_count
-                    )
+                    node_count = self.total_npu_nodes // self.analytical_topology[0].node_count
 
-                    link_specification = self.annotation.get_link_specification(
-                        rack_uplink_name
-                    )
+                    link_specification = self.annotation.get_link_specification(rack_uplink_name)
                     bandwidth = link_specification["bandwidth"]
                     latency = link_specification["latency"]
                     self.analytical_topology.append(
@@ -798,12 +760,8 @@ class AnalyticalTopology:
             if self.total_npu_nodes > rack_downlink_nodes:  # multiple racks are present
                 # rack can be connected to a host with same number of nics?
                 if rack_downlink_nodes // self.analytical_topology[0].node_count > 1:
-                    node_count = (
-                        rack_downlink_nodes // self.analytical_topology[0].node_count
-                    )
-                    link_specification = self.annotation.get_link_specification(
-                        rack_downlink_name
-                    )
+                    node_count = rack_downlink_nodes // self.analytical_topology[0].node_count
+                    link_specification = self.annotation.get_link_specification(rack_downlink_name)
                     bandwidth = link_specification["bandwidth"]
                     latency = link_specification["latency"]
                     self.analytical_topology.append(
@@ -817,19 +775,13 @@ class AnalyticalTopology:
 
                     if rack_uplink_name != "":  # a third layer exists
                         # set the upper level
-                        if (
-                            self.total_npu_nodes
-                            // self.analytical_topology[1].node_count
-                            > 1
-                        ):
+                        if self.total_npu_nodes // self.analytical_topology[1].node_count > 1:
                             node_count = (
                                 self.total_npu_nodes
                                 // self.analytical_topology[0].node_count
                                 // self.analytical_topology[1].node_count
                             )
-                            link_specification = self.annotation.get_link_specification(
-                                rack_uplink_name
-                            )
+                            link_specification = self.annotation.get_link_specification(rack_uplink_name)
                             bandwidth = link_specification["bandwidth"]
                             latency = link_specification["latency"]
                             self.analytical_topology.append(
@@ -842,44 +794,52 @@ class AnalyticalTopology:
                             )
 
     def _process_infra(self, infrastructure: astra_sim.Infrastructure):
-        for device in infrastructure.devices:
-            self.annotation.add_device(device.name)
-            for link in device.links:
-                self.annotation.add_link(link)
+        device_instance_map = NetworkxUtils.get_instance_data_from_graph(self.graph)
 
-        # add links
-        for link in infrastructure.links:
-            self.annotation.add_link(link)
-
+        # get the devices
+        devices = set()
+        instance_map = {}
         host_instance = ""
-        for instance in infrastructure.instances:
+        for instance_name, instance_obj in device_instance_map.items():
+            devices.add(instance_obj.device_name)
+
             self.annotation.add_device_instance(
-                device_instance=instance.name, device_name=instance.device
+                device_instance=instance_name, device_name=instance_obj.device_name
             )
-            for i in range(0, instance.count):
+            instance_map[instance_name] = []
+            for i in range(0, instance_obj.count):
                 self.annotation.add_device_instance(
-                    device_instance=instance.name + "." + str(i),
-                    device_name=instance.device,
+                    device_instance=instance_name + "." + str(i),
+                    device_name=instance_obj.device_name,
                 )
-                if instance.device in self.annotation.hosts:
+                instance_map[instance_name].append(instance_name + "." + str(i))
+
+                if instance_obj.device_name in self.annotation.hosts:
                     npu_nodes = NetworkxUtils.get_component_node_from_type_and_instance(
-                        self.infragraph_service, "xpu", instance.name, i
+                        self.infragraph_service, "xpu", instance_name, i
                     )
                     self.total_npu_nodes = self.total_npu_nodes + len(npu_nodes)
-            if host_instance == "":
-                device_name = self.annotation.instance_to_device_name[instance.name]
-                if device_name in self.annotation.hosts:
-                    host_instance = instance.name + ".0"  # the first instance of host
+                    if host_instance == "":
+                        device_name = self.annotation.instance_to_device_name[instance_name]
+                        if device_name in self.annotation.hosts:
+                            host_instance = instance_name + ".0"  # the first instance of host
 
-        if host_instance == "":
-            raise InfragraphError(
-                "host instance is not set. This is required to form the first dimension",
-                grpc.StatusCode.NOT_FOUND,
-                404,
-            )
+            if host_instance == "":
+                raise InfragraphError(
+                    "host instance is not set. This is required to form the first dimension",
+                    grpc.StatusCode.NOT_FOUND,
+                    404,
+                )
+
+        for device in devices:
+            self.annotation.add_device(instance_obj.device_name)
+
+        links = NetworkxUtils.get_links_from_graph(self.graph)
+        for _, _, attrs in self.graph.edges(data=True):
+            self.annotation.add_link(link_data=attrs)
 
         multi_tier = True
-        if len(infrastructure.instances) == 1:
+        if len(device_instance_map) == 1:
             # get the instance and check for count, should be 1
             multi_tier = False
 
@@ -890,19 +850,13 @@ class AnalyticalTopology:
                 self._process_rack(host_instance=host_instance)
             else:
                 # directly add a switch on top of the device
-                remaining_npu_nodes = (
-                    self.total_npu_nodes // self.analytical_topology[0].node_count
-                )
+                remaining_npu_nodes = self.total_npu_nodes // self.analytical_topology[0].node_count
                 # add it as the third or second dimension
                 if remaining_npu_nodes > 1:
-                    _, rack_downlink_name = self._get_rack_name_and_downlink(
-                        host_instance
-                    )
+                    _, rack_downlink_name = self._get_rack_name_and_downlink(host_instance)
                     if rack_downlink_name != "":
                         # it may so happen that npus are not connected with each other
-                        link_specification = self.annotation.get_link_specification(
-                            rack_downlink_name
-                        )
+                        link_specification = self.annotation.get_link_specification(rack_downlink_name)
                         bandwidth = link_specification["bandwidth"]
                         latency = link_specification["latency"]
                         self.analytical_topology.append(

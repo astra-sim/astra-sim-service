@@ -28,13 +28,11 @@ import grpc
 
 if __package__ is None or __package__ == "":
     from errors import InfragraphError
-    from infrastructure.infra_utils import Annotation, TimeUnit
-    from infrastructure.analytical_topology import AnalyticalTopology
+    from infrastructure.infra_utils import Annotation, NetworkxUtils
 
 else:
     from astra_server.errors import InfragraphError
-    from astra_server.infrastructure.infra_utils import Annotation, TimeUnit
-    from astra_server.infrastructure.analytical_topology import AnalyticalTopology
+    from astra_server.infrastructure.infra_utils import Annotation, NetworkxUtils
 
 
 class Tier:
@@ -74,12 +72,8 @@ class HTSimFatTree:
         self.pod_size = 0
         self.top_to_bottom_device_map = {}
         self.infragraph_service = InfraGraphService()
-        self.infragraph_service.set_graph(
-            configuration.infragraph.infrastructure.__str__()
-        )
-        self.infragraph_service.annotate_graph(
-            configuration.infragraph.annotations.serialize()
-        )
+        self.infragraph_service.set_graph(configuration.infragraph.infrastructure.__str__())
+        self.infragraph_service.annotate_graph(configuration.infragraph.annotations.serialize())
         # store the network graph
         self.graph = self.infragraph_service.get_networkx_graph()
         self.annotation = Annotation(self.graph)
@@ -100,41 +94,53 @@ class HTSimFatTree:
         # parse device
         # parse device instances
         # parse connections
-        for device in configuration.infragraph.infrastructure.devices:
-            self.annotation.add_device(device.name)
-            for link in device.links:
-                self.annotation.add_link(link)
 
-        # add links
-        for link in configuration.infragraph.infrastructure.links:
-            self.annotation.add_link(link)
+        # parse device
+        # parse device instances
+        # parse connections
 
-        for instance in configuration.infragraph.infrastructure.instances:
+        device_instance_map = NetworkxUtils.get_instance_data_from_graph(self.graph)
+
+        # get the devices
+        devices = set()
+        instance_map = {}
+        for instance_name, instance_obj in device_instance_map.items():
+            devices.add(instance_obj.device_name)
+
             self.annotation.add_device_instance(
-                device_instance=instance.name, device_name=instance.device
+                device_instance=instance_name, device_name=instance_obj.device_name
             )
-            for i in range(0, instance.count):
+            instance_map[instance_name] = []
+            for i in range(0, instance_obj.count):
                 self.annotation.add_device_instance(
-                    device_instance=instance.name + "." + str(i),
-                    device_name=instance.device,
+                    device_instance=instance_name + "." + str(i),
+                    device_name=instance_obj.device_name,
                 )
+                instance_map[instance_name].append(instance_name + "." + str(i))
 
-        self._get_host_instances(configuration.infragraph.infrastructure)
+        for device in devices:
+            self.annotation.add_device(instance_obj.device_name)
+
+        links = NetworkxUtils.get_links_from_graph(self.graph)
+        for _, _, attrs in self.graph.edges(data=True):
+            self.annotation.add_link(link_data=attrs)
+
+        # single device
+        if len(device_instance_map) == 1:
+            self._single_device = True
+
+        self._get_host_instances(device_instance_map)
         self.parse_graph(configuration)
 
-    def _get_host_instances(self, infrastructure: astra_sim.Infrastructure):
+    def _get_host_instances(self, device_instance_map: dict):
         # This fills the first level - hosts - all the instances
         # we will pass all the host instances and check for the upper tier
 
-        for device_instance in infrastructure.instances:
-            # get the type of device_instance
-            device_name = self.annotation.instance_to_device_name[device_instance.name]
-            if device_name in self.annotation.hosts:
-                # so we got a host
-                for i in range(0, device_instance.count):
-                    self.tier_device_instances["host"].add(
-                        device_instance.name + "." + str(i)
-                    )
+        for instance_name, instance_obj in device_instance_map.items():
+            if instance_obj.device_name in self.annotation.hosts:
+                for i in range(0, instance_obj.count):
+                    self.tier_device_instances["host"].add(instance_name + "." + str(i))
+
 
     def _edge_parser(self, source_key: str, destination_key: str):
         # source instances contain: host.0, host.1
@@ -146,49 +152,29 @@ class HTSimFatTree:
                 source_split = source.split(".")
                 destination_split = destination.split(".")
                 source_device_index = source_split[0] + "." + source_split[1]
-                destination_device_index = (
-                    destination_split[0] + "." + destination_split[1]
-                )
+                destination_device_index = destination_split[0] + "." + destination_split[1]
 
                 if source_device_index != destination_device_index:
                     # two device are connected
                     if source_device_index in self.tier_device_instances[source_key]:
                         # check if destination device index is present in an tier
                         if (
-                            destination_device_index
-                            not in self.tier_device_instances[destination_key]
+                            destination_device_index not in self.tier_device_instances[destination_key]
                             and destination_device_index not in parsed_devices
                         ):
-                            self.tier_device_instances[destination_key].add(
-                                destination_device_index
-                            )
-                        if (
-                            destination_device_index
-                            not in self.top_to_bottom_device_map
-                        ):
-                            self.top_to_bottom_device_map[
-                                destination_device_index
-                            ] = set()
-                            self.top_to_bottom_device_map[destination_device_index].add(
-                                source_device_index
-                            )
+                            self.tier_device_instances[destination_key].add(destination_device_index)
+                        if destination_device_index not in self.top_to_bottom_device_map:
+                            self.top_to_bottom_device_map[destination_device_index] = set()
+                            self.top_to_bottom_device_map[destination_device_index].add(source_device_index)
                         else:
-                            self.top_to_bottom_device_map[destination_device_index].add(
-                                source_device_index
-                            )
+                            self.top_to_bottom_device_map[destination_device_index].add(source_device_index)
 
-                    elif (
-                        destination_device_index
-                        in self.tier_device_instances[source_key]
-                    ):
+                    elif destination_device_index in self.tier_device_instances[source_key]:
                         if (
-                            source_device_index
-                            not in self.tier_device_instances[destination_key]
+                            source_device_index not in self.tier_device_instances[destination_key]
                             and source_device_index not in parsed_devices
                         ):
-                            self.tier_device_instances[destination_key].add(
-                                source_device_index
-                            )
+                            self.tier_device_instances[destination_key].add(source_device_index)
                         # if source_device_index not in self.top_to_bottom_device_map:
                         #     self.top_to_bottom_device_map[source_device_index] = set()
                         #     self.top_to_bottom_device_map[source_device_index].add(destination_device_index)
@@ -197,9 +183,7 @@ class HTSimFatTree:
 
     def _get_tier_information(self, up_tier: str, low_tier: str, mid_tier: str):
         # the expectation is that we get to see the devices placed in tiers and we will see if mid_tier single device is able to access either of them, we can count the data
-        if (
-            len(self.tier_device_instances[mid_tier]) <= 0
-        ):  # get the first device and check
+        if len(self.tier_device_instances[mid_tier]) <= 0:  # get the first device and check
             return None
         tier = Tier()
         tier.radix_up = 0
@@ -218,14 +202,10 @@ class HTSimFatTree:
             0
         ]  # get the first device instance and check
         # get the device too
-        current_tier_device = self.annotation.instance_to_device_name[
-            current_tier_device_instance
-        ]
+        current_tier_device = self.annotation.instance_to_device_name[current_tier_device_instance]
         # get the specification
 
-        current_tier_device_spec = self.annotation.get_device_specification(
-            current_tier_device
-        )
+        current_tier_device_spec = self.annotation.get_device_specification(current_tier_device)
         if len(current_tier_device_spec) == 0:
             raise InfragraphError(
                 f"Device specification for {current_tier_device} not set",
@@ -351,9 +331,7 @@ class HTSimFatTree:
             self.tier_device_instances["host"]
         )
         # create for tier0
-        tier0 = self._get_tier_information(
-            low_tier="host", mid_tier="tier0", up_tier="tier1"
-        )
+        tier0 = self._get_tier_information(low_tier="host", mid_tier="tier0", up_tier="tier1")
         self.racks_per_pod = self._get_rack_switches_per_pod()
         self.hosts_per_rack = self._get_nodes_per_rack()
         if tier0 is not None:
@@ -397,9 +375,7 @@ class HTSimFatTree:
             configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = (
                 1
             )
-        tier1 = self._get_tier_information(
-            low_tier="tier0", mid_tier="tier1", up_tier="tier2"
-        )
+        tier1 = self._get_tier_information(low_tier="tier0", mid_tier="tier1", up_tier="tier2")
         if tier1 is not None:
             agg_switch_count_per_pod = self._get_agg_switches_per_pod()
             if tier1.downlink_speed_gbps > 0:
@@ -440,9 +416,7 @@ class HTSimFatTree:
             configuration.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = (
                 2
             )
-        tier2 = self._get_tier_information(
-            low_tier="tier1", mid_tier="tier2", up_tier="tier3"
-        )
+        tier2 = self._get_tier_information(low_tier="tier1", mid_tier="tier2", up_tier="tier3")
         if tier2 is not None:
             spine_switch_count = self._get_spine_switch_count()
             if tier2.downlink_speed_gbps > 0:
