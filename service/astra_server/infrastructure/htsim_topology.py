@@ -119,7 +119,7 @@ class HTSimFatTree:
                 instance_map[instance_name].append(instance_name + "." + str(i))
 
         for device in devices:
-            self.annotation.add_device(instance_obj.device_name)
+            self.annotation.add_device(device)
 
         links = NetworkxUtils.get_links_from_graph(self.graph)
         for _, _, attrs in self.graph.edges(data=True):
