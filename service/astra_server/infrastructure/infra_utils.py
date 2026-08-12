@@ -27,7 +27,7 @@ import re
 
 import grpc
 import astra_sim_sdk.astra_sim_sdk as astra_sim
-from infragraph import QueryRequest, QueryNodeFilter, QueryNodeId
+from infragraph import QueryRequest
 
 if __package__ is None or __package__ == "":
     from errors import InfragraphError
@@ -520,23 +520,16 @@ class NetworkxUtils:
         This uses the infragraph request query mechanism and returns the component node for a given type and instance as well as instance index
         """
         request = QueryRequest()
-        query_filter = request.node_filters.add(name="component filter")
-        query_filter.choice = QueryNodeFilter.ATTRIBUTE_FILTER
-        query_filter.attribute_filter.name = "type"
-        query_filter.attribute_filter.operator = QueryNodeId.EQ
-        query_filter.attribute_filter.value = component_type
-        query_filter = request.node_filters.add(name="instance filter")
-        query_filter.choice = QueryNodeFilter.ATTRIBUTE_FILTER
-        query_filter.attribute_filter.name = "instance"
-        query_filter.attribute_filter.operator = QueryNodeId.EQ
-        query_filter.attribute_filter.value = instance_name
-        query_filter = request.node_filters.add(name="instance idx filter")
-        query_filter.choice = QueryNodeFilter.ATTRIBUTE_FILTER
-        query_filter.attribute_filter.name = "instance_idx"
-        query_filter.attribute_filter.operator = QueryNodeId.EQ
-        query_filter.attribute_filter.value = instance_index
+        request.attribute_query.node_filters.add(
+            name="component filter",
+            node_identifiers=[f"{instance_name}[{instance_index}]"],
+        )
         response = service.query_graph(request)
         nodes = []
-        for node in response.node_matches:
-            nodes.append(node.id)
+        for node_filter_result in response.attribute_query.nodes:
+            for node in node_filter_result.nodes:
+                for attribute in node.attributes:
+                    if attribute.attribute == "type" and attribute.value == component_type:
+                        nodes.append(node.name)
+                        break
         return nodes
