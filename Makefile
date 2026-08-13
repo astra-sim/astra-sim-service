@@ -55,7 +55,7 @@ build-astra-sim:
 build-all: version
 	make build-models
 	make test-client-scripts
-# make build-astra-sim
+	make build-astra-sim
 	make build-service
 
 .PHONY: build-bare-metal
