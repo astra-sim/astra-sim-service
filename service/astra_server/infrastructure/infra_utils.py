@@ -382,6 +382,10 @@ class Annotation:
         if link_data is not None and len(link_data) > 0:
 
             def extract_number(value):
+                # Pull the leading numeric part off a value like " 100 Gbps" or "-.5ms".
+                # Pattern: optional leading whitespace, then an optional +/- sign, then
+                # either digits with an optional fractional part ("100", "100.", "100.5")
+                # or a bare fraction (".5"). Any trailing unit text is ignored.
                 match = re.match(r"^\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))", value)
                 return float(match.group(1)) if match else None
 
