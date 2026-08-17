@@ -1,0 +1,12 @@
+protobuf~=6.33.6
+# 1.81.x bundles libprotoc 33.x, so chakra's generated *_pb2.py carry 6.33.x
+# gencode matching the protobuf runtime above. 1.82+ jumps to libprotoc 35.x /
+# protobuf 7.x. grpcio-tools 1.81.1 requires grpcio>=1.81.1.
+grpcio-tools~=1.81.1
+grpcio~=1.81.1
+
+# chakra's build backend, installed here so it can be built with
+# --no-build-isolation against the grpcio-tools pin above (see Makefile)
+setuptools>=77.0.1
+wheel
+setuptools-grpc
