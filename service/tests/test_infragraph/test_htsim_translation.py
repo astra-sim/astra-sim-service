@@ -87,7 +87,8 @@ def test_three_tier_eight_host_single_npu(
     host_index = 0
     for idx in range(rack_switch.count):
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[{host_index}]"
         edge.ep1.component = host_component.name
@@ -95,7 +96,8 @@ def test_three_tier_eight_host_single_npu(
         edge.ep2.component = f"{switch_component.name}[0]"
         host_index = host_index + 1
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[{host_index}]"
         edge.ep1.component = host_component.name
@@ -106,7 +108,8 @@ def test_three_tier_eight_host_single_npu(
     # tier0.0 and tier0.1 -> tier1.0 and tier1.1
     for i in [0, 1]:
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=pod_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=pod_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{rack_switch.name}[{i}]"
         edge.ep1.component = f"{switch_component.name}[{host_component.count + 1}]"
@@ -114,7 +117,8 @@ def test_three_tier_eight_host_single_npu(
         edge.ep2.component = f"{switch_component.name}[{i}]"
 
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=pod_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=pod_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{rack_switch.name}[{i}]"
         edge.ep1.component = f"{switch_component.name}[{host_component.count + 2}]"
@@ -124,7 +128,8 @@ def test_three_tier_eight_host_single_npu(
     # tier0.2 and tier0.3 -> tier1.2 and tier1.3
     for i in [2, 3]:
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=pod_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=pod_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{rack_switch.name}[{i}]"
         edge.ep1.component = f"{switch_component.name}[{host_component.count + 1}]"
@@ -132,7 +137,8 @@ def test_three_tier_eight_host_single_npu(
         edge.ep2.component = f"{switch_component.name}[{i - 2}]"
 
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=pod_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=pod_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{rack_switch.name}[{i}]"
         edge.ep1.component = f"{switch_component.name}[{host_component.count + 2}]"
@@ -144,7 +150,8 @@ def test_three_tier_eight_host_single_npu(
     for spine_idx in range(spine_switch.count):
         for pod_idx in range(pod_switch.count):
             edge = configuration.infragraph.infrastructure.edges.add(
-                scheme=InfrastructureEdge.ONE2ONE, link=spine_link.name  # type: ignore
+                scheme=InfrastructureEdge.ONE2ONE,
+                link=spine_link.name,  # type: ignore
             )
             edge.ep1.instance = f"{spine_switch.name}[{spine_idx}]"
             edge.ep1.component = f"{switch_component.name}[{pod_idx}]"
@@ -264,7 +271,8 @@ def test_three_tier_sixteen_host_single_npu(
     for rack_index in range(rack_switch.count):
         for host_index in range(0, 4):
             edge = configuration.infragraph.infrastructure.edges.add(
-                scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+                scheme=InfrastructureEdge.ONE2ONE,
+                link=rack_link.name,  # type: ignore
             )
             edge.ep1.instance = f"{hosts.name}[{host_index + host_multiplier}]"
             edge.ep1.component = f"{host_component.name}[0]"
@@ -276,7 +284,8 @@ def test_three_tier_sixteen_host_single_npu(
     for rack_switch_index in [0, 1]:
         for index in range(0, 4):
             edge = configuration.infragraph.infrastructure.edges.add(
-                scheme=InfrastructureEdge.ONE2ONE, link=pod_link.name  # type: ignore
+                scheme=InfrastructureEdge.ONE2ONE,
+                link=pod_link.name,  # type: ignore
             )
             edge.ep1.instance = f"{rack_switch.name}[{rack_switch_index}]"
             edge.ep1.component = f"{rack_switch_component.name}[{4 + index}]"
@@ -289,7 +298,8 @@ def test_three_tier_sixteen_host_single_npu(
     for rack_switch_index in [2, 3]:
         for index in range(0, 4):
             edge = configuration.infragraph.infrastructure.edges.add(
-                scheme=InfrastructureEdge.ONE2ONE, link=pod_link.name  # type: ignore
+                scheme=InfrastructureEdge.ONE2ONE,
+                link=pod_link.name,  # type: ignore
             )
             edge.ep1.instance = f"{rack_switch.name}[{rack_switch_index}]"
             edge.ep1.component = f"{rack_switch_component.name}[{4 + index}]"
@@ -301,7 +311,8 @@ def test_three_tier_sixteen_host_single_npu(
     # tier1.0 and tier1.1 -> tier2.0
     for index in range(0, 8):
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=spine_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=spine_link.name,  # type: ignore
         )
         if index < 4:
             edge.ep1.instance = f"{pod_switch.name}[{0}]"

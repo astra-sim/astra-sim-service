@@ -214,57 +214,25 @@ def htsim_schema_config():
         "switch", 8, 100, 0.005
     )
 
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes = (
-        8
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = (
-        3
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize = (
-        4
-    )
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.nodes = 8
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tiers = 3
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.podsize = 4
 
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_speed_gbps = (
-        200
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_up = (
-        2
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down = (
-        2
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_latency_ns = (
-        200
-    )
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_speed_gbps = 200
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_up = 2
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.radix_down = 2
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_0.downlink_latency_ns = 200
 
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_speed_gbps = (
-        200
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_up = (
-        2
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_down = (
-        2
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_latency_ns = (
-        1000
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.bundle = (
-        1
-    )
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_speed_gbps = 200
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_up = 2
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.radix_down = 2
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.downlink_latency_ns = 1000
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_1.bundle = 1
 
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.downlink_speed_gbps = (
-        100
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.radix_down = (
-        4
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.downlink_latency_ns = (
-        1000
-    )
-    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.bundle = (
-        2
-    )
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.downlink_speed_gbps = 100
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.radix_down = 4
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.downlink_latency_ns = 1000
+    config.network_backend.htsim.topology.network_topology_configuration.htsim_topology.fat_tree.tier_2.bundle = 2
 
     config.network_backend.htsim.htsim_protocol.tcp.nodes = "10"
 

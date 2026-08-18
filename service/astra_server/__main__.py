@@ -79,7 +79,10 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
             sr = astra_sim.ServerResponse()
             sr.message = "Upload configuration successfully executed"
             logger.info("Done executing UploadConfig")
-            return json_format.Parse(json.dumps({"server_response": sr.serialize("dict")}), pb2.SetConfigResponse())  # type: ignore
+            return json_format.Parse(
+                json.dumps({"server_response": sr.serialize("dict")}),
+                pb2.SetConfigResponse(),
+            )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
@@ -107,7 +110,10 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
             sr = astra_sim.ServerResponse()
             sr.message = "Upload configuration successfully executed"
             logger.info("Done executing streamUploadConfig")
-            return json_format.Parse(json.dumps({"server_response": sr.serialize("dict")}), pb2.SetConfigResponse())  # type: ignore
+            return json_format.Parse(
+                json.dumps({"server_response": sr.serialize("dict")}),
+                pb2.SetConfigResponse(),
+            )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
@@ -130,7 +136,10 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
             if warnings != "":
                 sr.message = sr.message + " " + warnings
                 logger.info("warnings: %s", warnings)
-            return json_format.Parse(json.dumps({"server_response": sr.serialize("dict")}), pb2.SetConfigResponse())  # type: ignore
+            return json_format.Parse(
+                json.dumps({"server_response": sr.serialize("dict")}),
+                pb2.SetConfigResponse(),
+            )  # type: ignore
 
         except ServerError as e:
             err = astra_sim.Error()
@@ -172,7 +181,9 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
                 file_data = file.read()
             file_bytes = base64.b64encode(file_data).decode("utf-8")
             logger.info("Done executing GetConfig")
-            return json_format.Parse(json.dumps({"response_bytes": file_bytes}), pb2.GetConfigResponse())  # type: ignore
+            return json_format.Parse(
+                json.dumps({"response_bytes": file_bytes}), pb2.GetConfigResponse()
+            )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
@@ -190,7 +201,10 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
             control_obj.status = status
             control_obj_json = control_obj.serialize("dict")
             logger.info("Done executing GetStatus")
-            return json_format.Parse(json.dumps({"control_status": control_obj_json}), pb2.GetStatusResponse())  # type: ignore
+            return json_format.Parse(
+                json.dumps({"control_status": control_obj_json}),
+                pb2.GetStatusResponse(),
+            )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
@@ -217,7 +231,10 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
                 sr.message = "Simulation terminated successfully"
                 logger.info("Done terminating simulation")
                 logger.info("Done executing SetControlAction")
-                return json_format.Parse(json.dumps({"server_response": sr.serialize("dict")}), pb2.SetControlActionResponse())  # type: ignore
+                return json_format.Parse(
+                    json.dumps({"server_response": sr.serialize("dict")}),
+                    pb2.SetControlActionResponse(),
+                )  # type: ignore
             elif choice_name == "start":
                 backend = request.control.start.backend
                 backend_name = pb2.ControlStart.Backend.Enum.Name(backend)  # type: ignore
@@ -231,7 +248,10 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
                 sr.message = "Simulation started successfully"
                 logger.info("Simulation started successfully")
                 logger.info("Done executing SetControlAction")
-                return json_format.Parse(json.dumps({"server_response": sr.serialize("dict")}), pb2.SetControlActionResponse())  # type: ignore
+                return json_format.Parse(
+                    json.dumps({"server_response": sr.serialize("dict")}),
+                    pb2.SetControlActionResponse(),
+                )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
@@ -299,7 +319,9 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
                 text_bytes = base64.b64encode(text_bytes).decode("utf-8")
                 logger.info("Done fetching result metadata")
                 logger.info("Done executing GetResult")
-                return json_format.Parse(json.dumps({"response_bytes": text_bytes}), pb2.GetResultResponse())  # type: ignore
+                return json_format.Parse(
+                    json.dumps({"response_bytes": text_bytes}), pb2.GetResultResponse()
+                )  # type: ignore
             elif result_configuration.choice == "filename":
                 filename = result_configuration.filename
                 logger.info("Fetching Result File %s", filename)
@@ -309,7 +331,9 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
                 file_bytes = base64.b64encode(file_data).decode("utf-8")
                 logger.info("Done fetching result file %s", filename)
                 logger.info("Done executing GetResult")
-                return json_format.Parse(json.dumps({"response_bytes": file_bytes}), pb2.GetResultResponse())  # type: ignore
+                return json_format.Parse(
+                    json.dumps({"response_bytes": file_bytes}), pb2.GetResultResponse()
+                )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
@@ -332,7 +356,9 @@ class OpenapiServicer(pb2_grpc.OpenapiServicer):
 
             version_obj_json = version_obj.serialize("dict")
             logger.info("Done executing GetVersion")
-            return json_format.Parse(json.dumps({"version": version_obj_json}), pb2.GetVersionResponse())  # type: ignore
+            return json_format.Parse(
+                json.dumps({"version": version_obj_json}), pb2.GetVersionResponse()
+            )  # type: ignore
         except ServerError as e:
             err = astra_sim.Error()
             err.code = e.grpc_code
