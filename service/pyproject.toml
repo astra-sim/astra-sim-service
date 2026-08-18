@@ -23,7 +23,6 @@ astra_server = "astra_server"
 "astra_server.infrastructure" = "astra_server/infrastructure"
 
 [tool.ruff]
-target-version = "py311"
 line-length = 88
 
 [tool.ruff.format]
