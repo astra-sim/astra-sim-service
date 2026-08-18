@@ -32,5 +32,5 @@ semantic-version
 jupyterlab-lsp
 semantic-version
 jupytext
-infragraph
+infragraph>=3.0.1
 

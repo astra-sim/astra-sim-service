@@ -9,6 +9,7 @@ help:
 
 .PHONY: install-prerequisites
 install-prerequisites:
+	python3 -m pip install --upgrade "pip>=23.1"
 	pip uninstall -y infragraph
 	pip uninstall -y astra-sim-sdk
 	cd client-scripts && make install-prerequisites
