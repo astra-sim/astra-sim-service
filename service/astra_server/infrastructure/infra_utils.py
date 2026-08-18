@@ -127,14 +127,24 @@ class DeviceRateMetrics:
         """
         Converts the bandwith to the specified transfer unit
         """
-        return self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value
+        return (
+            self._bandwidth_in_gbps
+            / TransferUnit.GIGABIT_PER_SECOND.value
+            * target_unit.value
+        )
 
     def to_str(self, target_unit=TransferUnit.GIGABIT_PER_SECOND):
         """
         Converts the bandwith to the specified transfer unit and returns as string with the unit name appended
         """
         return (
-            str(int(self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value))
+            str(
+                int(
+                    self._bandwidth_in_gbps
+                    / TransferUnit.GIGABIT_PER_SECOND.value
+                    * target_unit.value
+                )
+            )
             + InfraUtils.TRANSFER_UNIT_TO_SHORT_NOTATION[target_unit.name]
         )
 
@@ -143,7 +153,9 @@ class DeviceRateMetrics:
         Converts the bandwidth to the specified transfer unit and returns as an integer
         """
         return round(
-            self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value,
+            self._bandwidth_in_gbps
+            / TransferUnit.GIGABIT_PER_SECOND.value
+            * target_unit.value,
             decimal_places,
         )
 
@@ -151,14 +163,24 @@ class DeviceRateMetrics:
         """
         Converts the bandwidth to the specified transfer unit and returns as an integer
         """
-        return int(self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value)
+        return int(
+            self._bandwidth_in_gbps
+            / TransferUnit.GIGABIT_PER_SECOND.value
+            * target_unit.value
+        )
 
     def to_int_str(self, target_unit=TransferUnit.GIGABIT_PER_SECOND):
         """
         Converts the bandwidth to the specified transfer unit and returns a string with transfer unit value in integer
         """
         return (
-            str(int(self._bandwidth_in_gbps / TransferUnit.GIGABIT_PER_SECOND.value * target_unit.value))
+            str(
+                int(
+                    self._bandwidth_in_gbps
+                    / TransferUnit.GIGABIT_PER_SECOND.value
+                    * target_unit.value
+                )
+            )
             + InfraUtils.TRANSFER_UNIT_TO_SHORT_NOTATION[target_unit.name]
         )
 
@@ -259,7 +281,9 @@ class Annotation:
             self.device_specification[device_name] = {
                 "device_type": data.get("device_type"),
                 "device_latency_ms": self._to_float(data.get("device_latency_ms")),
-                "device_bandwidth_gbps": self._to_float(data.get("device_bandwidth_gbps")),
+                "device_bandwidth_gbps": self._to_float(
+                    data.get("device_bandwidth_gbps")
+                ),
                 "radix_up": self._to_int(data.get("radix_up")),
                 "radix_down": self._to_int(data.get("radix_down")),
                 "queue_up": self._to_int(data.get("queue_up")),
@@ -339,11 +363,15 @@ class Annotation:
         for device_name, device_data in self.device_specification.items():
             dev_type = device_data.get("device_type")
             if dev_type is None:
-                raise InfragraphError("Device Type is missing", grpc.StatusCode.INVALID_ARGUMENT, 400)
+                raise InfragraphError(
+                    "Device Type is missing", grpc.StatusCode.INVALID_ARGUMENT, 400
+                )
             if "host" == dev_type:
                 self.hosts.add(device_name)
         if len(self.hosts) == 0:
-            raise InfragraphError("host devices not specified", grpc.StatusCode.NOT_FOUND, 404)
+            raise InfragraphError(
+                "host devices not specified", grpc.StatusCode.NOT_FOUND, 404
+            )
 
     def add_device(self, device_name: str):
         """
@@ -397,29 +425,30 @@ class Annotation:
             # add the bandwidth and latency?
             if "bandwidth" in link_data:
                 if "Gbps" in link_data["bandwidth"]:
-                    self.link_specification[link_data["link"]]["bandwidth"] = extract_number(
-                        link_data["bandwidth"]
+                    self.link_specification[link_data["link"]]["bandwidth"] = (
+                        extract_number(link_data["bandwidth"])
                     )
-                elif "GBps" in link_data["bandwidth"] or "GT/s" in link_data["bandwidth"]:
-                    self.link_specification[link_data["link"]]["bandwidth"] = extract_number(
-                        link_data["bandwidth"] * 8
+                elif (
+                    "GBps" in link_data["bandwidth"] or "GT/s" in link_data["bandwidth"]
+                ):
+                    self.link_specification[link_data["link"]]["bandwidth"] = (
+                        extract_number(link_data["bandwidth"] * 8)
                     )
 
             if "latency" in link_data:
                 if "ms" in link_data["latency"]:
-                    self.link_specification[link_data["link"]]["latency"] = extract_number(
-                        link_data["latency"]
+                    self.link_specification[link_data["link"]]["latency"] = (
+                        extract_number(link_data["latency"])
                     )
                 if "ns" in link_data["latency"]:
-                    self.link_specification[link_data["link"]]["latency"] = extract_number(
-                        link_data["latency"] * 0.000001
+                    self.link_specification[link_data["link"]]["latency"] = (
+                        extract_number(link_data["latency"] * 0.000001)
                     )
                 if "us" in link_data["latency"]:
-                    self.link_specification[link_data["link"]]["latency"] = extract_number(
-                        link_data["latency"] * 0.001
+                    self.link_specification[link_data["link"]]["latency"] = (
+                        extract_number(link_data["latency"] * 0.001)
                     )
         else:
-
             if link.name not in self.link_specification:
                 # add default parameters
                 self._add_default_link(link.name)
@@ -427,9 +456,9 @@ class Annotation:
             if link.get("physical") is not None:
                 if link.physical.get("bandwidth") is not None:
                     if link.physical.bandwidth.choice == "gigabits_per_second":
-                        self.link_specification[link.name][
-                            "bandwidth"
-                        ] = link.physical.bandwidth.gigabits_per_second
+                        self.link_specification[link.name]["bandwidth"] = (
+                            link.physical.bandwidth.gigabits_per_second
+                        )
                     elif link.physical.bandwidth.choice == "gigabytes_per_second":
                         self.link_specification[link.name]["bandwidth"] = (
                             link.physical.bandwidth.gigabytes_per_second * 8
@@ -442,13 +471,19 @@ class Annotation:
 
                 if link.physical.get("latency") is not None:
                     if link.physical.latency.choice == "ms":
-                        self.link_specification[link.name]["latency"] = link.physical.latency.ms
+                        self.link_specification[link.name]["latency"] = (
+                            link.physical.latency.ms
+                        )
 
                     elif link.physical.latency.choice == "ns":
-                        self.link_specification[link.name]["latency"] = link.physical.latency.ns * 0.000001
+                        self.link_specification[link.name]["latency"] = (
+                            link.physical.latency.ns * 0.000001
+                        )
 
                     elif link.physical.latency.choice == "us":
-                        self.link_specification[link.name]["latency"] = link.physical.latency.us * 0.001
+                        self.link_specification[link.name]["latency"] = (
+                            link.physical.latency.us * 0.001
+                        )
 
     def add_device_instance(self, device_instance: str, device_name: str):
         """
@@ -473,13 +508,18 @@ class NetworkxUtils:
     def get_instance_data_from_graph(graph):
         instance_data = {}
         for _, attrs in graph.nodes(data=True):
-
             device_name = attrs.get("device")
             instance_name = attrs.get("instance")
             count = attrs.get("instance_idx")
-            if device_name is not None and instance_name is not None and count is not None:
+            if (
+                device_name is not None
+                and instance_name is not None
+                and count is not None
+            ):
                 if instance_name not in instance_data:
-                    instance_data[instance_name] = DeviceInstanceData(instance_name, device_name, count + 1)
+                    instance_data[instance_name] = DeviceInstanceData(
+                        instance_name, device_name, count + 1
+                    )
                 else:
                     if (count + 1) > instance_data[instance_name].count:
                         instance_data[instance_name].count = count + 1
@@ -506,13 +546,18 @@ class NetworkxUtils:
         return list(set(neighbors))
 
     @staticmethod
-    def get_nodes_from_device_component_type(graph, device_instance_name: str, component_type: str):
+    def get_nodes_from_device_component_type(
+        graph, device_instance_name: str, component_type: str
+    ):
         """
         This returns all the nodes from the graph for a given component type
         """
         nodes = []
         for node, attrs in graph.nodes(data=True):
-            if attrs.get("type") == component_type and attrs.get("instance") == device_instance_name:
+            if (
+                attrs.get("type") == component_type
+                and attrs.get("instance") == device_instance_name
+            ):
                 nodes.append(node)
         return nodes
 
@@ -533,7 +578,10 @@ class NetworkxUtils:
         for node_filter_result in response.attribute_query.nodes:
             for node in node_filter_result.nodes:
                 for attribute in node.attributes:
-                    if attribute.attribute == "type" and attribute.value == component_type:
+                    if (
+                        attribute.attribute == "type"
+                        and attribute.value == component_type
+                    ):
                         nodes.append(node.name)
                         break
         return nodes
