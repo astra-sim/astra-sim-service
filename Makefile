@@ -12,6 +12,7 @@ install-prerequisites:
 	python3 -m pip install --upgrade "pip>=23.1"
 	pip uninstall -y infragraph
 	pip uninstall -y astra-sim-sdk
+	pip uninstall -y astra-sim-service-client
 	cd client-scripts && make install-prerequisites
 	cd service && make install-prerequisites
 	pip install -r requirements.txt
@@ -35,6 +36,10 @@ build-models:
 generate-sdk-doc:
 	cd models && make redocly
 
+.PHONY: build-client-scripts
+build-client-scripts:
+	cd client-scripts && make build
+
 .PHONY: test-client-scripts
 test-client-scripts:
 	cd client-scripts && make test
@@ -54,6 +59,7 @@ build-astra-sim:
 .PHONY: build-all
 build-all: version
 	make build-models
+	make build-client-scripts
 	make test-client-scripts
 	make build-astra-sim
 	make build-service

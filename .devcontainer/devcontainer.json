@@ -9,7 +9,7 @@
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/astra_sim_service,type=bind",
     "workspaceFolder": "/workspaces/astra_sim_service",
     "containerEnv": {
-        "PYTHONPATH": "${containerWorkspaceFolder}/models,${containerWorkspaceFolder}/notebook,${containerWorkspaceFolder}/service,${containerWorkspaceFolder}/service/astra_server,${containerWorkspaceFolder}/client-scripts/utils",
+        "PYTHONPATH": "${containerWorkspaceFolder}/models,${containerWorkspaceFolder}/notebook,${containerWorkspaceFolder}/service,${containerWorkspaceFolder}/service/astra_server,${containerWorkspaceFolder}/client-scripts",
         "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "5"
     },
     "mounts": [

@@ -22,14 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
-
-from utils.config_to_schema import TranslateConfig
-from utils.common import Utilities
+from astra_sim_service_client.utils.config_to_schema import TranslateConfig
+from astra_sim_service_client.utils.common import Utilities
 
 
 def test_translate_remote_memory(config, resources_dir):

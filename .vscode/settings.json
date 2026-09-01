@@ -2,7 +2,7 @@
     "window.title": "ASTRA-sim Service: ${activeEditorShort}${separator}${rootName}${separator}${profileName}",
     "python.testing.pytestArgs": [
         "-s",
-        "client-scripts/tests/",
+        "client-scripts/astra_sim_service_client/tests/",
         "service/tests/",
     ],
     "python.testing.unittestEnabled": false,
@@ -12,7 +12,7 @@
         "**/build"
     ],
     "terminal.integrated.env.linux": {
-        "PYTHONPATH": "${containerWorkspaceFolder}/client-scripts,${containerWorkspaceFolder}/client-scripts/utils, ${containerWorkspaceFolder}/models, ${containerWorkspaceFolder}/service,${containerWorkspaceFolder}/service/astra_server",
+        "PYTHONPATH": "${containerWorkspaceFolder}/client-scripts, ${containerWorkspaceFolder}/models, ${containerWorkspaceFolder}/service,${containerWorkspaceFolder}/service/astra_server",
     },
     "files.eol": "\n",
     "files.trimTrailingWhitespace": true,
