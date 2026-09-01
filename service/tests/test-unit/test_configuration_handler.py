@@ -45,7 +45,9 @@ def test_generate_system_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
     generated_file = os.path.join(temp_dir, filename)
     actual_file = os.path.join(RESOURCES_DIR, "system.json")
-    ConfigurationHandler()._process_system_configuration(configuration, os.path.join(temp_dir, filename))
+    ConfigurationHandler()._process_system_configuration(
+        configuration, os.path.join(temp_dir, filename)
+    )
     assert Utilities.is_file_or_folder_present(generated_file) is True
 
     with open(actual_file) as f1, open(generated_file) as f2:
@@ -65,7 +67,9 @@ def test_generate_comm_group_configuration(config, filename, temp_dir, request):
     configuration = request.getfixturevalue(config)
     generated_file = os.path.join(temp_dir, filename)
     actual_file = os.path.join(RESOURCES_DIR, "communicator_group.json")
-    ConfigurationHandler()._process_communicator_group_configuration(configuration, generated_file)
+    ConfigurationHandler()._process_communicator_group_configuration(
+        configuration, generated_file
+    )
     assert Utilities.is_file_or_folder_present(generated_file) is True
 
     with open(actual_file) as f1, open(generated_file) as f2:
@@ -86,7 +90,9 @@ def test_generate_remote_memory_configuration(config, filename, temp_dir, reques
     generated_file = os.path.join(temp_dir, filename)
     actual_file = os.path.join(RESOURCES_DIR, "remote_memory.json")
 
-    ConfigurationHandler()._process_remote_memory_configuration(configuration, generated_file)
+    ConfigurationHandler()._process_remote_memory_configuration(
+        configuration, generated_file
+    )
     assert Utilities.is_file_or_folder_present(generated_file) is True
     with open(actual_file) as f1, open(generated_file) as f2:
         actual = json.load(f1)
@@ -96,7 +102,9 @@ def test_generate_remote_memory_configuration(config, filename, temp_dir, reques
 
 def test_generate_ns3_network_configuration(ns3_schema_config, temp_dir):
     generated_file = os.path.join(temp_dir, "ns3_network_config.txt")
-    ConfigurationHandler()._generate_ns3_network_configuration(ns3_schema_config, generated_file)
+    ConfigurationHandler()._generate_ns3_network_configuration(
+        ns3_schema_config, generated_file
+    )
     assert Utilities.is_file_or_folder_present(generated_file) is True
 
 
@@ -104,7 +112,9 @@ def test_generate_ns3_logical_topology(ns3_schema_config, temp_dir):
     generated_file = os.path.join(temp_dir, "ns3_logical_config.json")
     actual_file = os.path.join(RESOURCES_DIR, "ns3_logical_config.json")
 
-    ConfigurationHandler()._generate_ns3_logical_topology(ns3_schema_config, generated_file)
+    ConfigurationHandler()._generate_ns3_logical_topology(
+        ns3_schema_config, generated_file
+    )
     assert Utilities.is_file_or_folder_present(generated_file) is True
     with open(actual_file) as f1, open(generated_file) as f2:
         actual = json.load(f1)

@@ -46,12 +46,11 @@ def test_single_tier_single_host_eight_ranks(infra_multi_gpu_server_factory):
     )
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -102,21 +101,17 @@ def test_single_tier_single_host_four_rank(
         edge.ep2.component = f"{switch_component.name}[{idx}]"
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -146,20 +141,18 @@ def test_single_dgx_h100():
     # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
-    link_spec = astra_sim.AnnotationLinkSpecifications()
-    link_spec.link_error_rate = 0
-    link_spec.link_name = "pcie"
-    link_spec.packet_loss_rate = 0
-    link_spec.link_bandwidth_gbps = 1600
-    link_spec.link_latency_ms = 0.005
-    configuration.infragraph.annotations.link_specifications.append(link_spec)
+    link = configuration.infragraph.annotations.links.add(name="pcie")
+    link.attributes.add(attribute="link_error_rate", value="0")
+    link.attributes.add(attribute="link_name", value="pcie")
+    link.attributes.add(attribute="packet_loss_rate", value="0")
+    link.attributes.add(attribute="link_bandwidth_gbps", value="1600")
+    link.attributes.add(attribute="link_latency_ms", value="0.005")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -202,20 +195,18 @@ def test_single_dgx1():
     # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
-    link_spec = astra_sim.AnnotationLinkSpecifications()
-    link_spec.link_error_rate = 0
-    link_spec.link_name = "xpu_fabric"
-    link_spec.packet_loss_rate = 0
-    link_spec.link_bandwidth_gbps = 1600
-    link_spec.link_latency_ms = 0.005
-    configuration.infragraph.annotations.link_specifications.append(link_spec)
+    link = configuration.infragraph.annotations.links.add(name="xpu_fabric")
+    link.attributes.add(attribute="link_error_rate", value="0")
+    link.attributes.add(attribute="link_name", value="xpu_fabric")
+    link.attributes.add(attribute="packet_loss_rate", value="0")
+    link.attributes.add(attribute="link_bandwidth_gbps", value="1600")
+    link.attributes.add(attribute="link_latency_ms", value="0.005")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -270,20 +261,18 @@ def test_single_dgx_gb200():
     # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
-    link_spec = astra_sim.AnnotationLinkSpecifications()
-    link_spec.link_error_rate = 0
-    link_spec.link_name = "xpu_fabric"
-    link_spec.packet_loss_rate = 0
-    link_spec.link_bandwidth_gbps = 1600
-    link_spec.link_latency_ms = 0.005
-    configuration.infragraph.annotations.link_specifications.append(link_spec)
+    link = configuration.infragraph.annotations.links.add(name="xpu_fabric")
+    link.attributes.add(attribute="link_error_rate", value="0")
+    link.attributes.add(attribute="link_name", value="xpu_fabric")
+    link.attributes.add(attribute="packet_loss_rate", value="0")
+    link.attributes.add(attribute="link_bandwidth_gbps", value="1600")
+    link.attributes.add(attribute="link_latency_ms", value="0.005")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -326,20 +315,18 @@ def test_single_dgx_a100():
     # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
-    link_spec = astra_sim.AnnotationLinkSpecifications()
-    link_spec.link_error_rate = 0
-    link_spec.link_name = "xpu_fabric"
-    link_spec.packet_loss_rate = 0
-    link_spec.link_bandwidth_gbps = 1600
-    link_spec.link_latency_ms = 0.005
-    configuration.infragraph.annotations.link_specifications.append(link_spec)
+    link = configuration.infragraph.annotations.links.add(name="xpu_fabric")
+    link.attributes.add(attribute="link_error_rate", value="0")
+    link.attributes.add(attribute="link_name", value="xpu_fabric")
+    link.attributes.add(attribute="packet_loss_rate", value="0")
+    link.attributes.add(attribute="link_bandwidth_gbps", value="1600")
+    link.attributes.add(attribute="link_latency_ms", value="0.005")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -382,12 +369,11 @@ def test_single_ironwood_rack():
     # configuration.infragraph.infrastructure.instances.add(name=server.name, device=server.name, count=1)
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = server.name
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add(server.name)
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value=server.name)
+    node.attributes.add(attribute="device_type", value="host")
 
     AnalyticalTopology.generate_topology(configuration)
 
@@ -475,21 +461,17 @@ def test_single_tier_single_host_eight_ranks(
         edge.ep2.component = f"{switch_component.name}[{idx}]"
 
     # annotation
-    host_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    host_device_spec.device_bandwidth_gbps = 1000
-    host_device_spec.device_latency_ms = 0.005
-    host_device_spec.device_name = "server"
-    host_device_spec.device_type = "host"
-    configuration.infragraph.annotations.device_specifications.append(host_device_spec)
+    node = configuration.infragraph.annotations.nodes.add("host")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="server")
+    node.attributes.add(attribute="device_type", value="host")
 
-    switch_device_spec = astra_sim.AnnotationDeviceSpecifications()
-    switch_device_spec.device_bandwidth_gbps = 1000
-    switch_device_spec.device_latency_ms = 0.005
-    switch_device_spec.device_name = "switch"
-    switch_device_spec.device_type = "switch"
-    configuration.infragraph.annotations.device_specifications.append(
-        switch_device_spec
-    )
+    node = configuration.infragraph.annotations.nodes.add("rack_switch")
+    node.attributes.add(attribute="device_bandwidth_gbps", value="1000")
+    node.attributes.add(attribute="device_latency_ms", value="0.005")
+    node.attributes.add(attribute="device_name", value="switch")
+    node.attributes.add(attribute="device_type", value="switch")
 
     AnalyticalTopology.generate_topology(configuration)
 

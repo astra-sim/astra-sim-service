@@ -119,7 +119,7 @@ components:
           description: The infrastructure model representing the current version (v0.4.1) of InfraGraph schema
           x-field-uid: 1
         annotations:
-          $ref: "../infragraph/annotation.yaml#/components/schemas/Annotations"
+          $ref: "../infragraph/annotation.yaml#/components/schemas/Annotation"
           description: Additional annotations to enrich infrastructure data, used by Astra Sim backend network topologies and other components
           x-field-uid: 2
 

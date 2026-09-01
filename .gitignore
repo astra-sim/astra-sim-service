@@ -317,3 +317,7 @@ client-scripts/chakra
 # root dir
 log/*
 logs/*
+
+# devcontainer
+.devcontainer/devcontainer-lock.json
+nc-topology.txt
