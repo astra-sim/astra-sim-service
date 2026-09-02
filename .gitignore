@@ -303,7 +303,7 @@ service/astra_sim_service*
 service/idmap.txt
 service/tests/test-resources
 service/tests/resources
-
+service/tests/test-notebook
 # models
 models/openapiart/*
 models/artifacts/*
@@ -313,7 +313,7 @@ models/.GENERATED_VERSION
 # notebook
 client-scripts/trial/*
 client-scripts/chakra
-
+client-scripts/.GENERATED_VERSION
 # root dir
 log/*
 logs/*
