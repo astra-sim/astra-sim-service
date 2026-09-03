@@ -60,7 +60,7 @@ version: ## Generate build version
 pre-test:
 	rm -rf tests/test-notebook
 	python3 convert_nb_to_script.py
-	cp -r ../client-scripts/resources tests
+	cp -r ../client-scripts/astra_sim_service_client/resources tests
 
 .PHONY: post-test
 post-test:

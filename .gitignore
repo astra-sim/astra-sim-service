@@ -303,6 +303,8 @@ service/astra_sim_service*
 service/idmap.txt
 service/tests/test-resources
 service/tests/resources
+# generated from the client notebooks by `make pre-test`
+service/tests/test-notebook
 
 # models
 models/openapiart/*
@@ -310,8 +312,11 @@ models/artifacts/*
 models/astra_sim_sdk/*
 models/.GENERATED_VERSION
 
+# client scripts
+client-scripts/.GENERATED_VERSION
+
 # notebook
-client-scripts/trial/*
+client-scripts/astra_sim_service_client/trial/*
 client-scripts/chakra
 
 # root dir

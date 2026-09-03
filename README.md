@@ -110,7 +110,13 @@ This command launches the ASTRA-sim gRPC server, exposing it for client connecti
 
 ### 3. Using the Client Notebooks
 
-You can run any of the client Jupyter notebooks provided under [client-scripts/notebooks](client-scripts/notebooks). The easiest approach is to open the notebooks using the [VS Code Jupyter extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter). Configure the server endpoint of the running ASTRA-sim service (the server endpoint is displayed in the service/docker logs) at the top of the notebook, and run the rest of the notebook interactively. Refer to the README one level above ([client-scripts/README.md](client-scripts/)) for a description of each notebook.
+You can run any of the client Jupyter notebooks provided under [client-scripts/astra_sim_service_client/notebooks](client-scripts/astra_sim_service_client/notebooks). The easiest approach is to open the notebooks using the [VS Code Jupyter extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter). Configure the server endpoint of the running ASTRA-sim service (the server endpoint is displayed in the service/docker logs) at the top of the notebook, and run the rest of the notebook interactively. Refer to the README one level above ([client-scripts/astra_sim_service_client/README.md](client-scripts/astra_sim_service_client/README.md)) for a description of each notebook.
+
+The notebooks import their helpers from the `astra_sim_service_client` package, which `make build-all` builds and installs from [client-scripts](client-scripts). To run the notebooks without building the repo, install the published wheel from a [release](https://github.com/astra-sim/astra-sim-service/releases) instead:
+
+```
+pip install https://github.com/astra-sim/astra-sim-service/releases/download/v<version>/astra_sim_service_client-<version>-py3-none-any.whl
+```
 
 
 ## Repository Overview
@@ -121,7 +127,7 @@ The ASTRA-sim Service architecture consists of the following key components:
 Define the schema for ASTRA-sim configuration and infrastructure descriptions. These models are specified using [openapiart](https://github.com/open-traffic-generator/openapiart/tree/main), providing a neutral and extensible format for capturing system and simulation details.
 - service: [Read the service documentation](service/README.md)
 Implements the ASTRA-sim server that runs using gRPC. It serves as the execution backend for simulation requests from clients.
-- client-scripts: [Read the client-scripts documentation](client-scripts/README.md)
+- client-scripts: [Read the client-scripts documentation](client-scripts/astra_sim_service_client/README.md)
 Provide user-facing interfaces, including Jupyter notebooks, that allow users to configure simulations, trigger runs, and visualize results.
 
 The combination of these components supports model-driven simulation workflows where users can define ASTRA-sim setups programmatically, launch remote simulations, and analyze outcomes - all from interactive notebooks.

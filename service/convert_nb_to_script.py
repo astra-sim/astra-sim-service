@@ -29,11 +29,8 @@ def wrap_notebook_in_function(input_nb_path: Path, output_py_path: Path, functio
     cleaned_script = "\n".join(cleaned_code)
     cleaned_script = re.sub(r"\n\s*\n+", "\n\n", cleaned_script)
     cleaned_script = re.sub(r"# VISUALIZER_START[\s\S]*?# VISUALIZER_END", "", cleaned_script)
-    cleaned_script = re.sub(
-        r"sys\.path\.append\s*\(.*?\)",
-        'sys.path.append("../client-scripts/utils")\nsys.path.append("../../client-scripts/utils")\nsys.path.append("./client-scripts/utils")',
-        cleaned_script,
-    )
+    # The notebooks import from the pip-installed astra_sim_service_client package,
+    # so no sys.path rewriting is needed to make them importable from here.
     cleaned_script = re.sub(
         r'(server_endpoint\s*=\s*")[\d\.]+:\d+(")', r'f"0.0.0.0:{port_number}"', cleaned_script
     )
@@ -60,7 +57,9 @@ def convert_all_notebooks():
     wrapped in functions, saving them under a `tests/` subfolder.
     """
     current_folder = os.path.dirname(os.path.abspath(__file__))
-    notebook_dir = os.path.join(current_folder, "..", "client-scripts", "notebooks")
+    notebook_dir = os.path.join(
+        current_folder, "..", "client-scripts", "astra_sim_service_client", "notebooks"
+    )
     for notebook_path in Path(notebook_dir).rglob("*.ipynb"):
         if ".ipynb_checkpoints" in notebook_path.parts:
             continue

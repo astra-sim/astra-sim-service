@@ -120,6 +120,7 @@ jobs:
             models/artifacts/astra.proto
             models/artifacts/openapi.html
             models/dist/*.*
+            client-scripts/dist/*.*
             service/dist/*.*
       # service/astra_sim_service*.tar
 
@@ -136,6 +137,7 @@ jobs:
             models/artifacts/astra.proto
             models/artifacts/openapi.html
             models/dist/*.*
+            client-scripts/dist/*.*
             service/dist/*.*
       # service/astra_sim_service*.tar
           tag: ${{ steps.get_version.outputs.version }}
