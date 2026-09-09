@@ -93,7 +93,8 @@ def test_single_tier_single_host_four_rank(
     # link each host to one leaf switch
     for idx in range(hosts.count):
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[{idx}]"
         edge.ep1.component = host_component.name
@@ -453,7 +454,8 @@ def test_single_tier_single_host_eight_ranks(
     # link each host to one leaf switch
     for idx in range(0, 8):
         edge = configuration.infragraph.infrastructure.edges.add(
-            scheme=InfrastructureEdge.ONE2ONE, link=rack_link.name  # type: ignore
+            scheme=InfrastructureEdge.ONE2ONE,
+            link=rack_link.name,  # type: ignore
         )
         edge.ep1.instance = f"{hosts.name}[0]"
         edge.ep1.component = f"{host_component.name}[{idx}]"

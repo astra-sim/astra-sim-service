@@ -21,3 +21,9 @@ packages = [ "astra_server", "astra_server.infrastructure",]
 [tool.setuptools.package-dir]
 astra_server = "astra_server"
 "astra_server.infrastructure" = "astra_server/infrastructure"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+indent-style = "space"

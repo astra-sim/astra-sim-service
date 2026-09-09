@@ -5,6 +5,7 @@ pylint
 requests
 psutil
 black
+ruff
 toml
 build
 grafanalib

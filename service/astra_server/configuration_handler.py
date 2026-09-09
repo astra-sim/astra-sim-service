@@ -201,14 +201,17 @@ class ConfigurationHandler:
                     ]:
                         # Prepend the config dir to the file paths
                         new_list = Utilities.add_directory_prefix_to_file_path_list(
-                            Constants.CONFIGURATION_DIR, serialize_system_json[sys_prop]  # type: ignore
+                            Constants.CONFIGURATION_DIR,
+                            serialize_system_json[sys_prop],  # type: ignore
                         )
-                        system_json[
-                            schema.properties[sys_prop].astra_sim_name
-                        ] = new_list
+                        system_json[schema.properties[sys_prop].astra_sim_name] = (
+                            new_list
+                        )
                         clean_non_chakra = True
                     else:
-                        system_json[schema.properties[sys_prop].astra_sim_name] = serialize_system_json[sys_prop]  # type: ignore
+                        system_json[schema.properties[sys_prop].astra_sim_name] = (
+                            serialize_system_json[sys_prop]
+                        )  # type: ignore
             if clean_non_chakra:
                 system_json.pop("all-reduce-implementation", None)
                 system_json.pop("reduce-scatter-implementation", None)
@@ -399,9 +402,7 @@ class ConfigurationHandler:
                     == configuration.network_backend.analytical_congestion_aware.topology.NETWORK
                 ):
                     module_logger.info("Network topology set")
-                    self.topology = (
-                        configuration.network_backend.analytical_congestion_aware.topology.NETWORK
-                    )
+                    self.topology = configuration.network_backend.analytical_congestion_aware.topology.NETWORK
                 else:
                     raise ConfigurationError(
                         "topology configuration not found",
@@ -434,9 +435,7 @@ class ConfigurationHandler:
                     == configuration.network_backend.analytical_congestion_unaware.topology.NETWORK
                 ):
                     module_logger.info("Network topology set")
-                    self.topology = (
-                        configuration.network_backend.analytical_congestion_unaware.topology.NETWORK
-                    )
+                    self.topology = configuration.network_backend.analytical_congestion_unaware.topology.NETWORK
                 else:
                     raise ConfigurationError(
                         "topology configuration not found",
@@ -463,9 +462,7 @@ class ConfigurationHandler:
                     == configuration.network_backend.htsim.topology.NETWORK_TOPOLOGY_CONFIGURATION
                 ):
                     module_logger.info("Network topology set")
-                    self.topology = (
-                        configuration.network_backend.htsim.topology.NETWORK_TOPOLOGY_CONFIGURATION
-                    )
+                    self.topology = configuration.network_backend.htsim.topology.NETWORK_TOPOLOGY_CONFIGURATION
                 else:
                     raise ConfigurationError(
                         "topology configuration not found",
@@ -642,25 +639,28 @@ class ConfigurationHandler:
                 # get the astra_sim_name
                 if "file" in net_prop:
                     if "topology_file" == net_prop:
-                        network[
-                            schema.properties[net_prop].astra_sim_name
-                        ] = os.path.join(
-                            Constants.CONFIGURATION_DIR, nc_topology_filename
+                        network[schema.properties[net_prop].astra_sim_name] = (
+                            os.path.join(
+                                Constants.CONFIGURATION_DIR, nc_topology_filename
+                            )
                         )
                     elif "trace_file" == net_prop:
-                        network[
-                            schema.properties[net_prop].astra_sim_name
-                        ] = trace_filename
+                        network[schema.properties[net_prop].astra_sim_name] = (
+                            trace_filename
+                        )
                         if not trace_present:
                             Utilities.create_file(trace_filename)
                     else:
-                        network[
-                            schema.properties[net_prop].astra_sim_name
-                        ] = os.path.join(
-                            Constants.RESULTS_DIR, network_config["network"][net_prop]  # type: ignore
+                        network[schema.properties[net_prop].astra_sim_name] = (
+                            os.path.join(
+                                Constants.RESULTS_DIR,
+                                network_config["network"][net_prop],  # type: ignore
+                            )
                         )
                 else:
-                    network[schema.properties[net_prop].astra_sim_name] = network_config["network"][net_prop]  # type: ignore
+                    network[schema.properties[net_prop].astra_sim_name] = (
+                        network_config["network"][net_prop]
+                    )  # type: ignore
         # dump as file
         if filename is None or filename == "":
             filename = Constants.NS3_NETWORK_TXT
@@ -781,20 +781,14 @@ class ConfigurationHandler:
         }
         analytical_config = None
         if configuration.network_backend.get("analytical_congestion_aware") is not None:
-            analytical_config = (
-                configuration.network_backend.analytical_congestion_aware.topology.network
-            )
+            analytical_config = configuration.network_backend.analytical_congestion_aware.topology.network
         elif (
             configuration.network_backend.get("analytical_congestion_unaware")
             is not None
         ):
-            analytical_config = (
-                configuration.network_backend.analytical_congestion_unaware.topology.network
-            )
+            analytical_config = configuration.network_backend.analytical_congestion_unaware.topology.network
         elif configuration.network_backend.get("htsim") is not None:
-            analytical_config = (
-                configuration.network_backend.htsim.topology.network_topology_configuration.network
-            )
+            analytical_config = configuration.network_backend.htsim.topology.network_topology_configuration.network
         if analytical_config is None or len(analytical_config) == 0:
             raise ConfigurationError(
                 "analytical configuration not found", grpc.StatusCode.NOT_FOUND, 404
